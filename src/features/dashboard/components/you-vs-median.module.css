@@ -1,0 +1,121 @@
+.card {
+  background: var(--e2-surface);
+  border: var(--border-width) solid var(--e2-border);
+  box-shadow: var(--e2-shadow);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+.title {
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.note {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.label {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-secondary);
+}
+
+.figures {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.mine {
+  font: var(--type-data);
+  color: var(--text-primary);
+}
+
+.median {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+/* E0: the track is a well, and the reading sits in it. */
+.track {
+  position: relative;
+  height: 8px;
+  background: var(--e0-surface);
+  border: var(--border-width) solid var(--e0-border);
+}
+
+.bar {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  display: block;
+}
+
+.tick {
+  position: absolute;
+  inset-block: -3px;
+  width: 1px;
+  background: var(--text-secondary);
+  display: block;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.legendBar {
+  width: 14px;
+  height: 8px;
+  background: var(--text-primary);
+  display: block;
+}
+
+.legendTick {
+  width: 1px;
+  height: 12px;
+  background: var(--text-secondary);
+  display: block;
+}

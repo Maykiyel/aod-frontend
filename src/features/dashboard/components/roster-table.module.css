@@ -1,0 +1,102 @@
+.card {
+  background: var(--e2-surface);
+  border: var(--border-width) solid var(--e2-border);
+  box-shadow: var(--e2-shadow);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+.title {
+  margin: 0;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.count {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 566px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  padding: var(--space-4) var(--space-3);
+  border-bottom: var(--border-width) solid var(--border-soft);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table thead th {
+  padding-block: var(--space-3);
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.player {
+  width: auto;
+  text-align: left;
+  padding-left: var(--space-6);
+}
+
+.table tbody .player {
+  font-weight: 400;
+}
+
+.playerCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.username {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.figure {
+  width: 96px;
+  text-align: right;
+  font: var(--type-data);
+  color: var(--text-primary);
+}
+
+.state {
+  width: 112px;
+  text-align: right;
+  padding-right: var(--space-6);
+}
+
+.table tbody .state {
+  white-space: nowrap;
+}
