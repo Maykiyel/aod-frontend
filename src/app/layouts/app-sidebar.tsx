@@ -1,10 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { Button } from '@/components/ui/button/button';
-import { HexSlot } from '@/components/ui/hex-slot/hex-slot';
 import { Icon } from '@/components/ui/icon/icon';
 import { NavItem } from '@/components/ui/nav-item/nav-item';
 import { Surface } from '@/components/ui/surface/surface';
 import { DESTINATIONS } from '@/app/navigation';
+import { UserMenu } from '@/app/layouts/user-menu';
 import { capabilitiesOf, useMembership } from '@/features/team/hooks/use-membership';
 import type { MembershipState } from '@/features/team/hooks/use-membership';
 import { useAuth } from '@/lib/auth-context';
@@ -16,10 +15,6 @@ const ROLE_LABELS: Record<MemberRole, string> = {
   assistant_coach: 'ASSISTANT COACH',
   player: 'PLAYER',
 };
-
-function initialsOf(username: string): string {
-  return username.slice(0, 2).toUpperCase();
-}
 
 /** Silence is neutral: a membership still loading, or one that failed to load,
  *  is not a fact about the user, so nothing is said in its place. */
@@ -114,27 +109,15 @@ export function AppSidebar() {
             </span>
           </div>
 
+          {/* The design draws the profile block but no account actions. Logging
+              out lives behind it rather than beside it, as a menu at E3. */}
           {user ? (
-            <div className={styles.user}>
-              <HexSlot
-                initials={initialsOf(user.username)}
-                state="active"
-                width={34}
-                height={38}
-                aria-hidden="true"
-              />
-              <span className={styles.userText}>
-                <span className={styles.userName}>{user.username}</span>
-                {reading ? <span className={styles.userRole}>{reading}</span> : null}
-              </span>
-            </div>
+            <UserMenu
+              username={user.username}
+              reading={reading}
+              onLogout={() => void logout()}
+            />
           ) : null}
-
-          {/* The design draws no log-out control anywhere in the shell; the
-              sidebar's user block is where one belongs. */}
-          <Button variant="ghost" className={styles.signOut} onClick={() => void logout()}>
-            Log out
-          </Button>
         </div>
       </div>
     </Surface>

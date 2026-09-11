@@ -193,35 +193,3 @@
   background: var(--aligned);
 }
 
-.user {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.userText {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.userName {
-  font: var(--type-body-s);
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.userRole {
-  font: var(--type-micro);
-  letter-spacing: var(--track-micro);
-  color: var(--text-muted);
-}
-
-.signOut {
-  align-self: flex-start;
-  padding-left: 0;
-  padding-right: 0;
-}

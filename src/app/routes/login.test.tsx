@@ -5,9 +5,16 @@ import { envelope } from '@/testing/mocks/handlers';
 import { authToken, mainCoach } from '@/testing/mocks/fixtures';
 import { server } from '@/testing/mocks/server';
 import { renderApp } from '@/testing/test-utils';
+import type { UserEvent } from '@testing-library/user-event';
 import { env } from '@/config/env';
 
 const TOKEN_KEY = 'aod.auth.token.v1';
+
+/** Logging out lives behind the sidebar's profile block, not beside it. */
+async function logOut(user: UserEvent) {
+  await user.click(await screen.findByRole('button', { name: /maincoach/ }));
+  await user.click(await screen.findByRole('menuitem', { name: 'Log out' }));
+}
 
 /** The single seam from #14: render a route with the network mocked at the HTTP
  *  boundary and drive it as a person would. Controls found by accessible name;
@@ -67,7 +74,7 @@ describe('authentication', () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     const { user } = renderApp('/');
 
-    await user.click(await screen.findByRole('button', { name: 'Log out' }));
+    await logOut(user);
 
     expect(await screen.findByLabelText('Email')).toBeInTheDocument();
     expect(window.localStorage.getItem(TOKEN_KEY)).toBeNull();
@@ -78,7 +85,7 @@ describe('authentication', () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     const { user } = renderApp('/');
 
-    await user.click(await screen.findByRole('button', { name: 'Log out' }));
+    await logOut(user);
 
     // Failing to log out is not a state the user can act on.
     expect(await screen.findByLabelText('Email')).toBeInTheDocument();
