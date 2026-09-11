@@ -5,14 +5,13 @@ import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
 import { BrandPanel } from '@/features/auth/components/brand-panel';
 import { ApiError } from '@/lib/api-client';
-import { useAuth } from '@/lib/auth-context';
+import { login } from '@/lib/auth-store';
 import styles from './login.module.css';
 
 /** Screen 01, built against `docs/design/01 Log in.dc.html`. The browser validates
  *  email and password (`type="email"`, `required`) — the spec asks that a malformed
  *  address be caught before a request, not after a round trip. */
 export function LoginRoute() {
-  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);

@@ -6,7 +6,7 @@ import { DESTINATIONS } from '@/app/navigation';
 import { UserMenu } from '@/app/layouts/user-menu';
 import { capabilitiesOf, useMembership } from '@/features/team/hooks/use-membership';
 import type { MembershipState } from '@/features/team/hooks/use-membership';
-import { useAuth } from '@/lib/auth-context';
+import { logout, useAuth } from '@/lib/auth-store';
 import type { MemberRole } from '@/types/api';
 import styles from './app-sidebar.module.css';
 
@@ -43,7 +43,7 @@ const PLATE = (
  *  capabilities derived from the active membership, which is also what makes a
  *  teamless user's sidebar honest: only the dashboard is reachable. */
 export function AppSidebar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const membership = useMembership();
 
   const capabilities = capabilitiesOf(membership);

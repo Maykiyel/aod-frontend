@@ -3,7 +3,7 @@ import { activeTeamQuery } from '@/features/team/api/get-team';
 import { capabilitiesFor, NO_CAPABILITIES } from '@/features/team/capabilities';
 import type { Capabilities } from '@/features/team/capabilities';
 import { ApiError } from '@/lib/api-client';
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from '@/lib/auth-store';
 import { toMembership } from '@/types/api';
 import type { Membership, Team } from '@/types/api';
 
