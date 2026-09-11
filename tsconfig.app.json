@@ -5,6 +5,10 @@
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
     "types": ["vite/client"],
+
+    /* Absolute imports — bulletproof-react convention. `paths` resolves
+       relative to this file; TS 6 deprecated `baseUrl`. */
+    "paths": { "@/*": ["./src/*"] },
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 

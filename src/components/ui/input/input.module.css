@@ -1,0 +1,65 @@
+/* Ported from docs/design/_ds/source/components/core/Input.jsx.
+   Upstream set `outline: none` with no replacement, because a replacement needs
+   :focus-visible and an inline style object has no selectors. The design did
+   specify the treatment — "focus lights the border red; no glow, no ring"
+   (Input.prompt.md) — so the rule below is the documented behaviour, restored,
+   not a new invention. */
+
+.label {
+  display: block;
+  font: var(--type-label);
+  font-size: 12px;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 7px;
+}
+
+.field {
+  width: 100%;
+  background: var(--e0-surface);
+  border: var(--border-width) solid var(--e0-border);
+  border-radius: var(--radius-none);
+  box-shadow: var(--e0-shadow);
+  color: var(--text-primary);
+  font: var(--type-body);
+  padding: 11px 13px;
+  transition: border-color 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field {
+    transition: none;
+  }
+}
+
+/* Two classes deep so the face wins regardless of stylesheet order — `font` is
+   a shorthand and would otherwise depend on source position. */
+.field.mono {
+  font: var(--type-data-l);
+}
+
+.field::placeholder {
+  color: var(--text-muted);
+}
+
+.field:focus-visible {
+  outline: none;
+  border-color: var(--red);
+}
+
+.field:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.unit {
+  font: var(--type-data);
+  color: var(--text-muted);
+}
