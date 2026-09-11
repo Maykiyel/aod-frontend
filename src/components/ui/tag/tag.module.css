@@ -1,0 +1,66 @@
+/* The source's 11px face and 5px/10px padding have no tokens; the nearest ones
+   stand. Tone alphas are mixed from the colour tokens rather than transcribed. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-2) - 1px);
+  padding: var(--space-1) var(--space-3);
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-tag);
+  border: var(--border-width) solid var(--tag-line);
+  background: var(--tag-fill);
+  color: var(--tag-ink);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--tag-ink);
+  animation: aod-pulse 1.8s ease-in-out infinite;
+  display: block;
+  flex: none;
+}
+
+.neutral {
+  --tag-ink: var(--text-secondary);
+  --tag-line: var(--border-raised);
+  --tag-fill: var(--void);
+}
+
+.live {
+  --tag-ink: var(--cyan);
+  --tag-line: color-mix(in srgb, var(--cyan) 35%, transparent);
+  --tag-fill: color-mix(in srgb, var(--cyan) 10%, transparent);
+}
+
+.alert {
+  --tag-ink: var(--red);
+  --tag-line: color-mix(in srgb, var(--red) 40%, transparent);
+  --tag-fill: color-mix(in srgb, var(--red) 12%, transparent);
+}
+
+.aligned {
+  --tag-ink: var(--aligned);
+  --tag-line: color-mix(in srgb, var(--aligned) 35%, transparent);
+  --tag-fill: color-mix(in srgb, var(--aligned) 10%, transparent);
+}
+
+.informative {
+  --tag-ink: var(--informative);
+  --tag-line: color-mix(in srgb, var(--informative) 35%, transparent);
+  --tag-fill: color-mix(in srgb, var(--informative) 10%, transparent);
+}
+
+.declarative {
+  --tag-ink: var(--declarative);
+  --tag-line: color-mix(in srgb, var(--declarative) 35%, transparent);
+  --tag-fill: color-mix(in srgb, var(--declarative) 10%, transparent);
+}
+
+.compound {
+  --tag-ink: var(--compound);
+  --tag-line: color-mix(in srgb, var(--compound) 35%, transparent);
+  --tag-fill: color-mix(in srgb, var(--compound) 10%, transparent);
+}
