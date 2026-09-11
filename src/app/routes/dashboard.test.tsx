@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
-import { delay, http } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
 import { envelope } from '@/testing/mocks/handlers';
 import {
@@ -143,6 +143,28 @@ describe('the dashboard', () => {
     await screen.findByRole('alert');
     // A failure says nothing about membership, so the sidebar says nothing.
     expect(screen.queryByText('NO TEAM')).not.toBeInTheDocument();
+  });
+
+  it('renders the error treatment when the request never lands at all', async () => {
+    // A dropped request, not a failed one: HttpResponse.error() is a transport
+    // failure, which the client turns into an ApiError with no status.
+    server.use(http.get(`${env.apiUrl}/teams`, () => HttpResponse.error()));
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/could not reach the server/i);
+  });
+
+  it('returns the user to login when the team request comes back 401', async () => {
+    server.use(http.get(`${env.apiUrl}/teams`, () => envelope('Unauthenticated.', [], 401)));
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // A 401 from ANY request, not just the auth module's own, ends the session.
+    expect(await screen.findByLabelText('Email')).toBeInTheDocument();
+    await waitFor(() => expect(window.localStorage.getItem(TOKEN_KEY)).toBeNull());
   });
 
   it('renders the loading treatment while the membership is in flight', async () => {
