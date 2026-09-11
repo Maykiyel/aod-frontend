@@ -64,14 +64,20 @@ record. Read `docs/design/_ds/source/README.md` first — it carries the two tra
 with-Riot variant. The no-Riot pair is current scope; the with-Riot pair is the
 reserved future shape.
 
-### Building the design-system primitives
+### React and TypeScript practice
 
-This repo authors the 16 AOD Comms primitives itself (see
-`docs/adr/0001-author-design-system-primitives-in-typescript.md`). When building
-or refactoring them, consult the `vercel-composition-patterns` and
-`vercel-react-best-practices` skills.
+Consult the `vercel-composition-patterns` and `vercel-react-best-practices`
+skills for **all** React and TypeScript work in this repo — routes, feature
+modules, API layers, hooks and state as much as components. Reaching for them
+only when a primitive is being written is the failure mode: waterfalls, bundle
+shape, re-render cost and boolean-prop creep bite hardest in feature and route
+code, which is most of what gets written here.
 
 Treat both as **strong defaults, not law.** Where a pattern they recommend fights
 the design system's constraints — the fixed elevation ladder, groove count equal
 to elevation level, comm-type colours fixed by the data model — the design system
-wins, and the departure is worth a sentence in the component saying why.
+wins, and the departure is worth a sentence in the code saying why.
+
+This repo authors the 16 AOD Comms primitives itself (see
+`docs/adr/0001-author-design-system-primitives-in-typescript.md`), so both skills
+apply there too, alongside the vendored source in `docs/design/_ds/source/`.
