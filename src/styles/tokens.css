@@ -1,0 +1,10 @@
+/* AOD Comms design tokens — the styling contract for this app.
+   Vendored from the design handoff; treat as read-only. Every colour,
+   type shorthand, space and geometry value in the UI comes from here. */
+@import "./tokens/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/elevation.css";
+@import "./tokens/geometry.css";
+@import "./tokens/spacing.css";
+@import "./tokens/base.css";

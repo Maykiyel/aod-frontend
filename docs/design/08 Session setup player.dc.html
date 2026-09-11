@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { color: var(--red); }
+  </style>
+</helmet>
+<div data-screen-label="08 Session setup player" style="display:flex;align-items:stretch;width:100%;min-height:100vh;background:var(--void);color:var(--text-primary);font:var(--type-body)">
+
+  <dc-import name="Sidebar shell" active="sessions" team="Team Nova" team-code="NOVA-7X2K" user-name="Gojira" user-role="PLAYER" user-initials="GO" dashboard-href="07 Player dashboard.dc.html" sessions-href="08 Session setup player.dc.html" team-href="07 Player dashboard.dc.html" settings-href="07 Player dashboard.dc.html" style="position:sticky;top:0;height:100vh;align-self:flex-start" hint-size="212px,100vh"></dc-import>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="display:block;position:sticky;top:0;z-index:5" hint-size="100%,84px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-6);padding:var(--space-5) var(--space-page-x)">
+        <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">TEAM NOVA / SESSIONS / NEW SESSION</span>
+          <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Session setup</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-4)">
+          <span style="font:var(--type-data);font-size:12px;color:var(--text-muted)">SESSION_048</span>
+          <x-import component-from-global-scope="AODComms.Tag" tone="live" dot="{{ true }}" hint-size="176px,24px">WAITING FOR PLAYERS</x-import>
+        </div>
+      </div>
+    </x-import>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-7);padding:var(--space-7) var(--space-page-x) var(--space-section);max-width:var(--page-max);box-sizing:border-box;width:100%">
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+        <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="Session setup — player" index="SESSION_048" title="Scrim vs Team Nova" hint-size="560px,120px"></x-import>
+        <div style="display:flex;flex-direction:column;gap:6px;text-align:right">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">NOT READY</span>
+          <span style="font:var(--type-stat);color:var(--red);line-height:1">3 <span style="color:var(--text-muted)">/ 5</span></span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-start">
+
+        <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:var(--space-4)">
+          <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Participants</span>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:var(--space-4)">
+            <sc-for list="{{ participants }}" as="p" hint-placeholder-count="6">
+              <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-5)" style="display:block;box-sizing:border-box" hint-size="100%,116px">
+                <div style="display:flex;flex-direction:column;gap:var(--space-4);border-left:2px solid {{ p.accent }};padding-left:var(--space-4);margin-left:calc(-1 * var(--space-4))">
+                  <div style="display:flex;align-items:center;gap:var(--space-4);min-width:0">
+                    <x-import component-from-global-scope="AODComms.HexSlot" initials="{{ p.initials }}" state="{{ p.slot }}" width="{{ 40 }}" height="{{ 45 }}" hint-size="40px,45px"></x-import>
+                    <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                      <span style="font:var(--type-body-s);color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span>
+                      <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">{{ p.role }}</span>
+                    </span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border-soft)">
+                    <span style="{{ p.markStyle }}"><span style="{{ p.markInnerStyle }}"></span></span>
+                    <span style="font:var(--type-data);font-size:11px;letter-spacing:.04em;color:{{ p.textColor }}">{{ p.requirement }}</span>
+                  </div>
+                </div>
+              </x-import>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);border:1px dashed var(--border-raised)">
+            <span style="display:flex;align-items:center;gap:var(--space-3)">
+              <span style="width:10px;height:10px;background:var(--text-muted);transform:rotate(45deg);display:block;flex:0 0 auto"></span>
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Waiting for coach to start recording</span>
+            </span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary)">Your track opens the moment the coach starts. Nothing is captured before then.</span>
+          </div>
+        </div>
+
+        <div style="flex:0 1 var(--size-rail);min-width:0;display:flex;flex-direction:column;gap:var(--space-5)">
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-5)" style="display:block;box-sizing:border-box" hint-size="100%,300px">
+            <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+              <div style="display:flex;align-items:center;gap:var(--space-3)">
+                <span style="width:9px;height:10px;background:var(--red);clip-path:var(--clip-hex);display:block"></span>
+                <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Consent</span>
+              </div>
+
+              <span style="font:var(--type-body-s);color:var(--text-secondary)">Your mic and screen are recorded for this session. Your coach and teammates can review it afterwards.</span>
+
+              <div style="display:flex;align-items:flex-start;gap:var(--space-3);cursor:pointer;padding-top:var(--space-4);border-top:1px solid var(--border-soft)" onClick="{{ toggleConsent }}">
+                <span style="{{ boxStyle }}">
+                  <sc-if value="{{ consented }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:9px;height:5px;border-left:2px solid var(--text-on-accent);border-bottom:2px solid var(--text-on-accent);transform:rotate(-45deg) translate(1px,-1px);display:block"></span>
+                  </sc-if>
+                </span>
+                <span style="font:var(--type-body-s);color:var(--text-primary)">I consent to my mic and screen being recorded for this session</span>
+              </div>
+
+              <div style="display:flex">
+                <x-import component-from-global-scope="AODComms.Button" variant="primary" disabled="{{ notConsented }}" hint-size="176px,44px">Accept &amp; continue</x-import>
+              </div>
+
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">{{ consentReading }}</span>
+            </div>
+          </x-import>
+
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);padding-top:var(--space-4);border-top:1px solid var(--border-soft)">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">DEVICE</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+              <span style="font:var(--type-body-s);color:var(--text-secondary)">Mic — Shure MV7</span>
+              <x-import component-from-global-scope="AODComms.Tag" tone="aligned" hint-size="74px,24px">FOUND</x-import>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+              <span style="font:var(--type-body-s);color:var(--text-secondary)">Screen share</span>
+              <x-import component-from-global-scope="AODComms.Tag" tone="aligned" hint-size="74px,24px">READY</x-import>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap;padding-top:var(--space-5);border-top:1px solid var(--border-soft)">
+        <span style="display:flex;align-items:center;gap:var(--space-3);padding-left:var(--space-3);border-left:2px solid var(--red)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">NOTE</span>
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">MIRROR STATE 09 — COACH VIEW: SAME ROSTER GRID, CONSENT PANEL REPLACED BY START RECORDING</span>
+        </span>
+        <a href="10 Recording player.dc.html" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">NEXT — RECORDING</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { consented: false };
+
+  // Outer hex carries the edge colour; an inset inner hex punches it hollow.
+  // border + clip-path shears the stroke at this size, so never use it.
+  // Outer hex is the edge colour; the inner hex punches it hollow. Absence gets
+  // the 45° hatch over the card surface — never a solid fill.
+  mark(kind) {
+    const base = 'position:relative;flex:0 0 auto;width:16px;height:18px;display:block;clip-path:var(--clip-hex);';
+    if (kind === 'ready') return base + 'background:var(--aligned);';
+    if (kind === 'absent') return base + 'background:var(--absence);';
+    return base + 'background:var(--red);';
+  }
+
+  markInner(kind) {
+    if (kind !== 'absent') return 'display:none;';
+    return 'position:absolute;inset:2px;display:block;clip-path:var(--clip-hex);'
+      + 'background-color:var(--e2-surface);background-image:var(--absence-hatch);';
+  }
+
+  renderVals() {
+    const rows = [
+      { initials: 'CR', name: 'Coach Reyes', role: 'COACH', kind: 'ready', requirement: 'READY' },
+      { initials: 'PA', name: 'Player A', role: 'PLAYER — YOU', kind: 'needs', requirement: 'NEEDS: CONSENT' },
+      { initials: 'PB', name: 'Player B', role: 'PLAYER', kind: 'ready', requirement: 'READY' },
+      { initials: 'PC', name: 'Player C', role: 'PLAYER', kind: 'needs', requirement: 'NEEDS: MIC, CONSENT' },
+      { initials: 'PD', name: 'Player D', role: 'PLAYER', kind: 'needs', requirement: 'NEEDS: SCREEN SHARE' },
+      { initials: 'PE', name: 'Player E', role: 'PLAYER', kind: 'absent', requirement: 'NOT JOINED YET' }
+    ];
+    const consented = this.state.consented;
+    return {
+      participants: rows.map(r => ({
+        ...r,
+        slot: r.kind === 'ready' ? 'active' : r.kind === 'absent' ? 'offline' : 'idle',
+        accent: r.kind === 'ready' ? 'var(--aligned)' : r.kind === 'absent' ? 'var(--border-raised)' : 'var(--red)',
+        markStyle: this.mark(r.kind),
+        markInnerStyle: this.markInner(r.kind),
+        textColor: r.kind === 'ready' ? 'var(--aligned)' : r.kind === 'absent' ? 'var(--text-muted)' : 'var(--red)'
+      })),
+      consented,
+      notConsented: !consented,
+      toggleConsent: () => this.setState(s => ({ consented: !s.consented })),
+      boxStyle: 'flex:0 0 auto;width:18px;height:18px;margin-top:1px;display:flex;align-items:center;justify-content:center;border:1px solid '
+        + (consented ? 'var(--red)' : 'var(--border-raised)') + ';background:' + (consented ? 'var(--red)' : 'transparent') + ';',
+      consentReading: consented ? 'CONSENT GRANTED — WITHDRAW ANY TIME BEFORE START' : 'CONSENT REQUIRED BEFORE YOUR TRACK OPENS'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+:root {
+  /* edge grooves — count equals elevation level */
+  --groove-width: 18px;
+  --groove-depth: 6px;
+  --groove-gap: 8px;
+  --groove-inset: 24px;
+  --groove-divider-width: 26px;
+  --groove-divider-depth: 7px;
+
+  /* inward notch — fixed-size corner tile + plain fills.
+     The tile is sized in px, never stretched, so the 7px radii and the inner
+     fillet hold their shape at every card size. */
+  --notch-tile: 60px;
+  --notch-radius: 7px;
+  --notch-corner: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2060%2060%22%3E%3Cpath%20d%3D%22M60%2C0%20H53%20A7%2C7%200%200%200%2046%2C7%20V39%20A7%2C7%200%200%201%2039%2C46%20H7%20A7%2C7%200%200%200%200%2C53%20V60%20H60%20Z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E');
+  --notch-mask:
+    var(--notch-corner) no-repeat 0 0/var(--notch-tile) var(--notch-tile),
+    linear-gradient(#fff,#fff) no-repeat var(--notch-tile) 0/calc(100% - var(--notch-tile)) 100%,
+    linear-gradient(#fff,#fff) no-repeat 0 var(--notch-tile)/var(--notch-tile) calc(100% - var(--notch-tile));
+  --notch-badge-size: 28px;
+  --notch-badge-offset: 9px;
+  --notch-clearance: 56px;
+
+  /* radii — 0 everywhere; 2px is the ceiling for a rectangular surface */
+  --radius-none: 0;
+  --radius-hair: 2px;
+  --radius-pill: 9999px;
+
+  /* clipped corners */
+  --clip-button: 10px;
+  --clip-thumbnail: 22px;
+  --clip-statbar-skew: 14px;
+  --clip-statbar-skew-compact: 12px;
+  --clip-hex: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+
+  --border-width: 1px;
+}

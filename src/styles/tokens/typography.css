@@ -1,0 +1,29 @@
+:root {
+  --font-display: "Big Shoulders Display", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* display — always uppercase */
+  --type-display-xl: 900 104px/.86 var(--font-display);
+  --type-display-l: 800 52px/1 var(--font-display);
+  --type-display-m: 800 30px/1 var(--font-display);
+  --type-display-s: 800 24px/1 var(--font-display);
+  --type-stat: 900 44px/1 var(--font-display);
+
+  /* body */
+  --type-body-l: 400 16.5px/1.5 var(--font-body);
+  --type-body: 400 14.5px/1.5 var(--font-body);
+  --type-body-s: 400 13px/1.45 var(--font-body);
+  --type-label: 600 13px/1.2 var(--font-body);
+
+  /* mono — anything measured */
+  --type-data-l: 500 15px/1.6 var(--font-mono);
+  --type-data: 400 12px/1.6 var(--font-mono);
+  --type-eyebrow: 400 11.5px/1.4 var(--font-mono);
+  --type-micro: 400 10.5px/1.4 var(--font-mono);
+
+  --track-eyebrow: .16em;
+  --track-micro: .14em;
+  --track-label: .04em;
+  --track-tag: .08em;
+}

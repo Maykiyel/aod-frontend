@@ -1,0 +1,5 @@
+/* Brand faces, self-hosted. Big Shoulders Display - display. Inter - prose.
+   JetBrains Mono - anything measured. No render-time dependency on a font host.
+   The @font-face rules live in public/fonts/fonts.css so the woff2 files are
+   served as-is rather than passing through the bundler. */
+@import url("/fonts/fonts.css");

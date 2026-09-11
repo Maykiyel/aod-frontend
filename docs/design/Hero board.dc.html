@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    @keyframes om-mark-in {
+      0%   { opacity: 0; transform: rotate(45deg) scale(.2) }
+      70%  { opacity: 1; transform: rotate(45deg) scale(1.25) }
+      100% { opacity: 1; transform: rotate(45deg) scale(1) }
+    }
+    @keyframes om-sweep { 0% { left: 0 } 100% { left: 100% } }
+    @keyframes om-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+    @keyframes om-hatch-in { 0% { opacity: 0 } 100% { opacity: 1 } }
+  </style>
+</helmet>
+<div style="position:relative;width:100%;box-sizing:border-box;background:var(--e1-surface);border:1px solid var(--border);box-shadow:{{ shadow }}">
+
+  <div style="position:absolute;top:6px;left:6px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;top:6px;right:6px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;bottom:6px;left:6px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;bottom:6px;right:6px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--border-soft)">
+    <div style="display:flex;align-items:center;gap:var(--space-3);min-width:0">
+      <span style="width:6px;height:6px;border-radius:var(--radius-pill);background:var(--cyan);display:block;animation:om-pulse 1.8s linear infinite"></span>
+      <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary);white-space:nowrap">REVIEW BOARD</span>
+    </div>
+    <span style="font:var(--type-data);font-size:11px;color:var(--text-muted);white-space:nowrap">TIMELINE_ID:0048-A</span>
+  </div>
+
+  <div style="padding:var(--space-4) var(--space-5) 0">
+    <div style="position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--e0-surface);border:1px solid var(--border-recessed)">
+      <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 44px),repeating-linear-gradient(to bottom, var(--plate-grid) 0 1px, transparent 1px 44px)"></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:var(--space-4)">
+        <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">GAMEPLAY FOOTAGE SLOT</span>
+        <span style="font:var(--type-data);font-size:10px;color:var(--text-muted)">assets/hero-gameplay.mp4</span>
+      </div>
+      <video src="assets/hero-gameplay.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></video>
+      <div style="position:absolute;left:var(--space-3);top:var(--space-3);display:flex;align-items:center;gap:7px;padding:4px 9px;background:rgba(8,9,12,.72);border:1px solid var(--border)">
+        <span style="width:5px;height:5px;border-radius:var(--radius-pill);background:var(--red);display:block;animation:om-pulse 1.8s linear infinite"></span>
+        <span style="font:var(--type-data);font-size:10px;color:var(--text-primary)">04:11</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:var(--space-5)">
+    <div style="position:relative">
+      <div style="position:absolute;top:0;bottom:0;width:1px;background:var(--text-primary);z-index:3;pointer-events:none;left:calc(var(--size-track-label) + var(--space-4));animation:om-sweep 9s linear infinite;opacity:.7">
+        <span style="position:absolute;left:-4px;top:0;width:9px;height:9px;background:var(--text-primary);transform:rotate(45deg);display:block"></span>
+      </div>
+
+      <sc-for list="{{ lanes }}" as="lane" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:var(--space-4);height:34px;border-bottom:1px solid var(--border-recessed)">
+          <span style="width:var(--size-track-label);font:var(--type-data);font-size:10px;color:{{ lane.labelColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ lane.label }}</span>
+          <div style="flex:1;min-width:0;position:relative;height:100%">
+            <span style="{{ lane.absenceStyle }}"></span>
+            <sc-for list="{{ lane.markers }}" as="mk" hint-placeholder-count="4">
+              <span style="{{ mk.style }}"></span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-4);padding-top:var(--space-4)">
+      <span style="display:flex;align-items:center;gap:7px;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)"><span style="width:7px;height:7px;background:var(--informative);transform:rotate(45deg);display:block"></span>INFORMATIVE</span>
+      <span style="display:flex;align-items:center;gap:7px;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)"><span style="width:7px;height:7px;background:var(--declarative);transform:rotate(45deg);display:block"></span>DECLARATIVE</span>
+      <span style="display:flex;align-items:center;gap:7px;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)"><span style="width:7px;height:7px;background:var(--compound);transform:rotate(45deg);display:block"></span>COMPOUND</span>
+      <span style="display:flex;align-items:center;gap:7px;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)"><span style="width:13px;height:7px;background-color:var(--absence-fill);background-image:var(--absence-hatch);border:1px solid var(--absence);box-sizing:border-box;display:block"></span>ABSENCE</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:620},&quot;glow&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const glow = p.glow ?? 'none';
+    const total = 1440;
+    const pct = v => (v / total) * 100;
+    const hue = { informative: 'var(--informative)', declarative: 'var(--declarative)', compound: 'var(--compound)', event: 'var(--text-muted)' };
+
+    const lanes = [
+      { label: 'EVENTS', meta: true, marks: [[180, 'event'], [430, 'event'], [760, 'event'], [1090, 'event'], [1330, 'event']] },
+      { label: 'ABSENCE', meta: true, absence: [780, 1164], marks: [] },
+      { label: 'PLAYER_A', marks: [[92, 'informative'], [251, 'compound'], [690, 'declarative'], [1180, 'informative']] },
+      { label: 'PLAYER_B', marks: [[210, 'informative'], [520, 'declarative'], [980, 'compound']] },
+      { label: 'PLAYER_C', marks: [[402, 'informative'], [866, 'declarative'], [1240, 'declarative']] }
+    ];
+
+    let n = 0;
+    return {
+      shadow: glow === 'none' ? '0 2px 6px rgba(0,0,0,.5)' : glow,
+      lanes: lanes.map(lane => ({
+        label: lane.label,
+        labelColor: lane.meta ? 'var(--text-secondary)' : 'var(--text-primary)',
+        absenceStyle: lane.absence
+          ? 'position:absolute;top:calc(50% - 8px);height:16px;display:block;'
+            + 'left:' + pct(lane.absence[0]) + '%;width:' + pct(lane.absence[1] - lane.absence[0]) + '%;'
+            + 'background-color:var(--absence-fill);background-image:var(--absence-hatch);'
+            + 'border:1px solid var(--absence);box-sizing:border-box;'
+            + 'animation:om-hatch-in .4s linear both;animation-delay:1.6s;'
+          : 'display:none;',
+        markers: lane.marks.map(([at, type]) => {
+          const delay = (n++ * 0.075).toFixed(3);
+          return {
+            style: 'position:absolute;display:block;width:9px;height:9px;'
+              + 'left:calc(' + pct(at) + '% - 4.5px);top:calc(50% - 4.5px);'
+              + 'background:' + hue[type] + ';transform:rotate(45deg);opacity:0;'
+              + 'animation:om-mark-in .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:' + delay + 's;'
+          };
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

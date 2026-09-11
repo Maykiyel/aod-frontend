@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { color: var(--red); }
+    @keyframes om-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+  </style>
+</helmet>
+<div data-screen-label="10 Recording player" style="display:flex;align-items:stretch;width:100%;min-height:100vh;background:var(--void);color:var(--text-primary);font:var(--type-body)">
+
+  <dc-import name="Sidebar shell" active="sessions" team="Team Nova" team-code="NOVA-7X2K" user-name="Gojira" user-role="PLAYER" user-initials="GO" dashboard-href="07 Player dashboard.dc.html" sessions-href="08 Session setup player.dc.html" team-href="07 Player dashboard.dc.html" settings-href="07 Player dashboard.dc.html" style="position:sticky;top:0;height:100vh;align-self:flex-start" hint-size="212px,100vh"></dc-import>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="display:block;position:sticky;top:0;z-index:5" hint-size="100%,84px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-6);padding:var(--space-5) var(--space-page-x)">
+        <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">TEAM NOVA / SESSIONS / SESSION_048</span>
+          <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Recording</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-4)">
+          <span style="font:var(--type-data-l);color:var(--text-primary)">00:14:22.480</span>
+          <span style="display:flex;align-items:center;gap:8px;padding:5px 11px;border:1px solid var(--red)">
+            <span style="width:7px;height:7px;border-radius:var(--radius-pill);background:var(--red);display:block;animation:om-pulse 1.8s linear infinite"></span>
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">REC</span>
+          </span>
+        </div>
+      </div>
+    </x-import>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-7);padding:var(--space-7) var(--space-page-x) var(--space-section);max-width:var(--page-max);box-sizing:border-box;width:100%">
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+        <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="Recording — player" index="SESSION_048" title="Session in progress" hint-size="560px,120px"></x-import>
+        <div style="display:flex;flex-direction:column;gap:6px;text-align:right">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">PLAYERS CAPTURING</span>
+          <span style="font:var(--type-stat);color:var(--text-primary);line-height:1">3 <span style="color:var(--text-muted)">/ 5</span></span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-start">
+
+        <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:var(--space-5)">
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-6)" style="display:block;box-sizing:border-box" hint-size="100%,220px">
+            <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+                <div style="display:flex;flex-direction:column;gap:var(--space-3);min-width:0">
+                  <span style="display:flex;align-items:center;gap:var(--space-3)">
+                    <span style="width:9px;height:9px;border-radius:var(--radius-pill);background:var(--red);display:block;animation:om-pulse 1.8s linear infinite"></span>
+                    <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--red)">Recording</span>
+                  </span>
+                  <span style="font:var(--type-data-l);font-size:44px;color:var(--text-primary);line-height:1">00:14:22</span>
+                  <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">ELAPSED ON SESSION CLOCK</span>
+                </div>
+                <div style="display:flex">
+                  <x-import component-from-global-scope="AODComms.Button" variant="secondary" hint-size="120px,44px">Mute mic</x-import>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-wrap:wrap;gap:var(--space-5);padding-top:var(--space-4);border-top:1px solid var(--border-soft)">
+
+                <div style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:var(--space-4)">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">MIC</span>
+                    <span style="font:var(--type-data);font-size:11px;color:var(--text-primary)">SHURE MV7 — 48 kHz</span>
+                  </div>
+
+                  <x-import component-from-global-scope="AODComms.Surface" level="0" behind="var(--e2-surface)" padding="var(--space-3) var(--space-4)" style="display:block;box-sizing:border-box" hint-size="100%,72px">
+                    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-2);height:44px;overflow:hidden">
+                      <sc-for list="{{ levels }}" as="bar" hint-placeholder-count="14">
+                        <span style="{{ bar.style }}"></span>
+                      </sc-for>
+                    </div>
+                  </x-import>
+
+                  <div style="display:flex;align-items:center;gap:var(--space-3)">
+                    <span style="width:7px;height:7px;border-radius:var(--radius-pill);background:var(--aligned);display:block"></span>
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">SIGNAL PRESENT — DEVICE LEVEL ONLY</span>
+                  </div>
+                </div>
+
+                <div style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:var(--space-4)">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">GAME WINDOW</span>
+                    <span style="font:var(--type-data);font-size:11px;color:var(--text-primary)">VALORANT — 1080p60</span>
+                  </div>
+
+                  <x-import component-from-global-scope="AODComms.Surface" level="0" behind="var(--e2-surface)" padding="0" style="display:block;box-sizing:border-box" hint-size="100%,72px">
+                    <div style="position:relative;height:72px;overflow:hidden;background-image:repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 44px),repeating-linear-gradient(to bottom, var(--plate-grid) 0 1px, transparent 1px 44px)">
+                      <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">VOD PREVIEW</span>
+                    </div>
+                  </x-import>
+
+                  <div style="display:flex;align-items:center;gap:var(--space-3)">
+                    <span style="width:7px;height:7px;border-radius:var(--radius-pill);background:var(--aligned);display:block"></span>
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">CAPTURING — SYNC OFFSET 0 ms</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </x-import>
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="0" style="display:block;box-sizing:border-box" hint-size="100%,300px">
+            <div style="padding:var(--space-5) var(--space-6) var(--space-3)">
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Capture status</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:minmax(150px,1fr) 104px 116px;gap:var(--space-4);padding:0 var(--space-6) var(--space-3)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">PLAYER</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">MIC</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">WINDOW</span>
+            </div>
+
+            <sc-for list="{{ roster }}" as="r" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:minmax(150px,1fr) 104px 116px;gap:var(--space-4);align-items:center;padding:var(--space-4) var(--space-6);border-top:1px solid var(--border-soft)">
+                <div style="display:flex;align-items:center;gap:var(--space-4);min-width:0">
+                  <span style="flex:0 0 auto;width:34px;height:38px;display:flex;align-items:center;justify-content:center;clip-path:var(--clip-hex);background:var(--red)">
+                    <span style="font:var(--type-data);font-size:11px;color:var(--text-on-accent)">{{ r.initials }}</span>
+                  </span>
+                  <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                    <span style="font:var(--type-display-s);text-transform:uppercase;color:{{ r.nameColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span>
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);white-space:nowrap">{{ r.role }}</span>
+                  </span>
+                </div>
+                <span style="font:var(--type-data);font-size:11px;color:{{ r.micColor }};text-align:right;white-space:nowrap">{{ r.mic }}</span>
+                <span style="font:var(--type-data);font-size:11px;color:{{ r.windowColor }};text-align:right;white-space:nowrap">{{ r.window }}</span>
+              </div>
+            </sc-for>
+          </x-import>
+
+        </div>
+
+        <div style="flex:0 1 var(--size-rail);min-width:0;display:flex;flex-direction:column;gap:var(--space-5)">
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-5)" style="display:block;box-sizing:border-box" hint-size="100%,220px">
+            <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Session</span>
+              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                  <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">SESSION</span>
+                  <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">SESSION_048</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                  <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">STARTED</span>
+                  <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">14:02:11</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                  <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">DEAD AIR THRESHOLD</span>
+                  <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">4000 ms</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+                  <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">KEYWORD SETS</span>
+                  <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">4 CATEGORIES</span>
+                </div>
+              </div>
+            </div>
+          </x-import>
+
+          <div style="display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);border:1px dashed var(--border-raised)">
+            <span style="display:flex;align-items:center;gap:var(--space-3)">
+              <span style="width:10px;height:10px;background:var(--text-muted);transform:rotate(45deg);display:block;flex:0 0 auto"></span>
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Coach controls the clock</span>
+            </span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary)">The session ends when the coach stops recording. Your report opens after processing.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap;padding-top:var(--space-5);border-top:1px solid var(--border-soft)">
+        <span style="display:flex;align-items:center;gap:var(--space-3);padding-left:var(--space-3);border-left:2px solid var(--red)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">NOTE</span>
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">MIRROR STATE 11 — COACH VIEW: SAME ROSTER PLUS STOP RECORDING</span>
+        </span>
+        <a href="12 Post-match report.dc.html" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">NEXT — POST-MATCH REPORT</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  mark(kind) {
+    const base = 'position:relative;flex:0 0 auto;width:16px;height:18px;display:block;clip-path:var(--clip-hex);';
+    if (kind === 'rec') return base + 'background:var(--aligned);';
+    if (kind === 'absent') return base + 'background:var(--absence);';
+    return base + 'background:var(--border-raised);';
+  }
+
+  markInner(kind) {
+    if (kind !== 'absent') return 'display:none;';
+    return 'position:absolute;inset:2px;display:block;clip-path:var(--clip-hex);'
+      + 'background-color:var(--e2-surface);background-image:var(--absence-hatch);';
+  }
+
+  renderVals() {
+    // Device input level — mic feedback from the browser, not session analysis.
+    const seed = [6,14,26,18,9,22,38,44,31,17,8,12,27,34];
+    const rows = [
+      { name: 'Gojira', role: 'PLAYER — YOU', kind: 'rec', mic: 'ON', window: 'CAPTURING' },
+      { name: 'Walker', role: 'PLAYER', kind: 'rec', mic: 'MUTED', window: 'CAPTURING' },
+      { name: 'Zupo', role: 'PLAYER', kind: 'rec', mic: 'ON', window: 'CAPTURING' },
+      { name: 'Catero', role: 'PLAYER', kind: 'absent', mic: 'NOT JOINED', window: 'NOT JOINED' },
+      { name: 'Moore', role: 'PLAYER', kind: 'absent', mic: 'NO CONSENT', window: 'NO CONSENT' }
+    ];
+    return {
+      levels: seed.map(v => ({
+        style: 'flex:0 0 10px;width:10px;display:block;height:' + Math.max(20, v * 1.35) + '%;'
+          + 'background:' + (v > 36 ? 'var(--text-primary)' : v > 16 ? 'var(--text-secondary)' : 'var(--border-raised)') + ';'
+      })),
+      roster: rows.map(r => ({
+        ...r,
+        initials: r.name.slice(0, 2).toUpperCase(),
+        nameColor: r.kind === 'rec' ? 'var(--text-primary)' : 'var(--text-secondary)',
+        micColor: r.mic === 'ON' ? 'var(--aligned)' : r.mic === 'MUTED' ? 'var(--red)' : 'var(--text-muted)',
+        windowColor: r.window === 'CAPTURING' ? 'var(--aligned)' : 'var(--text-muted)'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

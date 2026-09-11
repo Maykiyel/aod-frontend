@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { color: var(--red); }
+  </style>
+</helmet>
+<div data-screen-label="06 Coach dashboard" style="display:flex;align-items:stretch;width:100%;min-height:100vh;background:var(--void);color:var(--text-primary);font:var(--type-body)">
+
+  <dc-import name="Sidebar shell" active="dashboard" team="Team Nova" team-code="NOVA-7X2K" user-name="Coach Reyes" user-role="COACH" user-initials="CR" style="position:sticky;top:0;height:100vh;align-self:flex-start" hint-size="212px,100vh"></dc-import>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="display:block;position:sticky;top:0;z-index:5" hint-size="100%,84px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-6);padding:var(--space-5) var(--space-page-x)">
+        <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">TEAM NOVA / DASHBOARD</span>
+          <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Team dashboard</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-4)">
+          <x-import component-from-global-scope="AODComms.Tag" tone="live" dot="{{ true }}" hint-size="128px,24px">LOBBY OPEN</x-import>
+          <a href="09 Session setup coach.dc.html" style="display:inline-flex">
+            <x-import component-from-global-scope="AODComms.Button" variant="primary" icon="{{ addIcon }}" hint-size="164px,44px">Create session</x-import>
+          </a>
+        </div>
+      </div>
+    </x-import>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:var(--space-7);padding:var(--space-7) var(--space-page-x) var(--space-section);max-width:var(--page-max);box-sizing:border-box;width:100%">
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+        <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="Team dashboard — coach" index="AUG 14 — AUG 16" title="Team Nova" hint-size="560px,120px"></x-import>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-start">
+
+        <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:var(--space-6)">
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">SESSIONS LOGGED</span>
+            <span style="font:var(--type-stat);color:var(--text-primary);line-height:1">12</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4) var(--space-6)">
+            <x-import component-from-global-scope="AODComms.StatBar" label="COMM FREQUENCY" value="18.4" unit="/min" fill="white" hint-size="100%,44px"></x-import>
+            <x-import component-from-global-scope="AODComms.StatBar" label="ALIGNMENT" value="87" unit="%" fill="aligned" hint-size="100%,44px"></x-import>
+            <x-import component-from-global-scope="AODComms.StatBar" label="ABSENCE TOTAL" value="4:12" unit="min" fill="red" hint-size="100%,44px"></x-import>
+            <x-import component-from-global-scope="AODComms.StatBar" label="CALLS CLASSIFIED" value="1,842" unit="calls" fill="white" hint-size="100%,44px"></x-import>
+          </div>
+
+          <x-import component-from-global-scope="AODComms.NotchedCard" level="2" padding="var(--notch-clearance) var(--space-6) var(--space-6)" badge="{{ flagBadge }}" hint-size="100%,168px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:var(--space-3);min-width:0">
+                <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">SESSION_048</span>
+                <span style="font:var(--type-display-l);text-transform:uppercase;color:var(--text-primary)">Scrim vs Ronin Squad</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-4);align-items:flex-end">
+                <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end">
+                  <x-import component-from-global-scope="AODComms.Tag" tone="live" dot="{{ true }}" hint-size="76px,24px">LOBBY</x-import>
+                </div>
+                <a href="09 Session setup coach.dc.html" style="display:inline-flex">
+                  <x-import component-from-global-scope="AODComms.Button" variant="secondary" hint-size="150px,44px">Open session</x-import>
+                </a>
+              </div>
+            </div>
+          </x-import>
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="0" style="display:block;min-width:0" hint-size="100%,480px">
+            <div style="overflow-x:auto;overflow-y:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-5) var(--space-6);border-bottom:1px solid var(--border-soft);min-width:566px">
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Team members</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">6 ON ROSTER · 4 ONLINE</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:minmax(150px,1fr) 76px 56px 68px 104px;gap:var(--space-4);padding:var(--space-3) var(--space-6);border-bottom:1px solid var(--border-soft);min-width:566px">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">PLAYER</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">COMMS/MIN</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">ALIGN</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">ABSENCE</span>
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);text-align:right">STATE</span>
+            </div>
+
+            <sc-for list="{{ members }}" as="m" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:minmax(150px,1fr) 76px 56px 68px 104px;gap:var(--space-4);align-items:center;padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--border-soft);min-width:566px">
+                <div style="display:flex;align-items:center;gap:var(--space-4);min-width:0">
+                  <x-import component-from-global-scope="AODComms.HexSlot" initials="{{ m.initials }}" state="{{ m.state }}" width="{{ 44 }}" height="{{ 50 }}" hint-size="44px,50px"></x-import>
+                  <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                    <span style="font:var(--type-body-s);color:var(--text-primary);white-space:nowrap">{{ m.name }}</span>
+                    <span style="font:var(--type-data);font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.email }}</span>
+                  </span>
+                </div>
+                <span style="font:var(--type-data);color:var(--text-primary);text-align:right">{{ m.freq }}</span>
+                <span style="font:var(--type-data);color:var(--text-primary);text-align:right">{{ m.align }}</span>
+                <span style="font:var(--type-data);color:var(--text-secondary);text-align:right">{{ m.absence }}</span>
+                <div style="display:flex;justify-content:flex-end">
+                  <x-import component-from-global-scope="AODComms.Tag" tone="{{ m.tone }}" hint-size="auto,24px">{{ m.status }}</x-import>
+                </div>
+              </div>
+            </sc-for>
+            </div>
+          </x-import>
+
+        </div>
+
+        <div style="flex:0 1 var(--size-rail);min-width:0;display:flex;flex-direction:column;gap:var(--space-6)">
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-5)" style="display:block" hint-size="100%,280px">
+            <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+              <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+                <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Comm mix</span>
+                <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">1,842 CALLS CLASSIFIED</span>
+              </div>
+
+              <div style="display:flex;height:10px;width:100%;overflow:hidden">
+                <span style="width:42%;background:var(--informative);display:block"></span>
+                <span style="width:31%;background:var(--declarative);display:block"></span>
+                <span style="width:18%;background:var(--compound);display:block"></span>
+                <span style="width:9%;background:var(--absence);display:block"></span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                <div style="display:flex;align-items:center;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+                  <span style="width:8px;height:8px;background:var(--informative);transform:rotate(45deg);display:block"></span>
+                  <span style="flex:1;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary)">INFORMATIVE</span>
+                  <span style="font:var(--type-data);color:var(--text-primary)">42%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+                  <span style="width:8px;height:8px;background:var(--declarative);transform:rotate(45deg);display:block"></span>
+                  <span style="flex:1;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary)">DECLARATIVE</span>
+                  <span style="font:var(--type-data);color:var(--text-primary)">31%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+                  <span style="width:8px;height:8px;background:var(--compound);transform:rotate(45deg);display:block"></span>
+                  <span style="flex:1;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary)">COMPOUND</span>
+                  <span style="font:var(--type-data);color:var(--text-primary)">18%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-3)">
+                  <span style="width:12px;height:8px;background:var(--absence-fill);border:1px solid var(--absence);display:block"></span>
+                  <span style="flex:1;font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary)">ABSENCE</span>
+                  <span style="font:var(--type-data);color:var(--text-primary)">9%</span>
+                </div>
+              </div>
+            </div>
+          </x-import>
+
+          <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="0" style="display:block" hint-size="100%,340px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-5);border-bottom:1px solid var(--border-soft)">
+              <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Sessions</span>
+              <a href="09 Session setup coach.dc.html" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">ALL</a>
+            </div>
+
+            <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="3">
+              <a href="{{ s.href }}" style="display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);border-bottom:1px solid var(--border-soft)">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3)">
+                  <span style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                    <span style="font:var(--type-body-s);color:var(--text-primary)">{{ s.name }}</span>
+                    <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">{{ s.meta }}</span>
+                  </span>
+                  <x-import component-from-global-scope="AODComms.Tag" tone="{{ s.tone }}" hint-size="auto,24px">{{ s.status }}</x-import>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-4)">
+                  <span style="font:var(--type-data);font-size:11px;color:var(--text-secondary)">{{ s.freq }}</span>
+                  <span style="font:var(--type-data);font-size:11px;color:var(--text-secondary)">{{ s.align }}</span>
+                  <span style="font:var(--type-data);font-size:11px;color:var(--text-secondary)">{{ s.absence }}</span>
+                </div>
+              </a>
+            </sc-for>
+          </x-import>
+
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap;padding-top:var(--space-5);border-top:1px solid var(--border-soft)">
+        <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);max-width:620px;line-height:1.7">THIS PRODUCT ISN'T ENDORSED BY RIOT GAMES AND DOESN'T REFLECT THE VIEWS OR OPINIONS OF RIOT GAMES OR ANYONE OFFICIALLY INVOLVED IN PRODUCING OR MANAGING RIOT GAMES PROPERTIES. RIOT GAMES, AND ALL ASSOCIATED PROPERTIES ARE TRADEMARKS OR REGISTERED TRADEMARKS OF RIOT GAMES, INC.</span>
+        <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">LAST SYNC 14:02:11</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  renderVals() {
+    const { Icon } = window.AODComms || {};
+    return {
+      flagBadge: Icon ? React.createElement(Icon, { name: 'flagAdd', size: 14, color: 'var(--red)' }) : null,
+      addIcon: Icon ? React.createElement(Icon, { name: 'add', size: 13, color: 'var(--text-on-accent)' }) : null,
+      members: [
+        { initials: 'CR', role: 'COACH', state: 'active', name: 'Coach Reyes', email: 'coach@teamnova.gg', freq: '—', align: '—', absence: '—', tone: 'neutral', status: 'HOST' },
+        { initials: 'PA', role: 'PLAYER', state: 'active', name: 'Player A', email: 'playera@teamnova.gg', freq: '21.6', align: '91%', absence: '0:38', tone: 'aligned', status: 'ONLINE' },
+        { initials: 'PB', role: 'PLAYER', state: 'active', name: 'Player B', email: 'playerb@teamnova.gg', freq: '16.2', align: '84%', absence: '1:04', tone: 'aligned', status: 'ONLINE' },
+        { initials: 'PC', role: 'PLAYER', state: 'offline', name: 'Player C', email: 'playerc@teamnova.gg', freq: '12.8', align: '79%', absence: '1:52', tone: 'neutral', status: 'OFFLINE' },
+        { initials: 'PD', role: 'PLAYER', state: 'active', name: 'Player D', email: 'playerd@teamnova.gg', freq: '18.9', align: '88%', absence: '0:47', tone: 'aligned', status: 'ONLINE' },
+        { initials: 'PE', role: 'PLAYER', state: 'idle', name: 'Player E', email: 'playere@teamnova.gg', freq: '9.4', align: '71%', absence: '2:31', tone: 'alert', status: 'NEEDS CONSENT' }
+      ],
+      sessions: [
+        { name: 'Scrim vs Ronin Squad', meta: 'AUG 16, 2026 · 4 OF 5 PLAYERS', tone: 'live', status: 'LOBBY', freq: 'LIVE', align: '—', absence: '—', href: '09 Session setup coach.dc.html' },
+        { name: 'Scrim vs Vertex GG', meta: 'AUG 15, 2026 · SESSION_047', tone: 'neutral', status: 'IN REVIEW', freq: '18.4/MIN', align: '87%', absence: '1:26 ABS', href: '12 Post-match report.dc.html' },
+        { name: 'Scrim vs Team Nova II', meta: 'AUG 14, 2026 · SESSION_046', tone: 'neutral', status: 'COMPLETED', freq: '17.1/MIN', align: '82%', absence: '2:03 ABS', href: '12 Post-match report.dc.html' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

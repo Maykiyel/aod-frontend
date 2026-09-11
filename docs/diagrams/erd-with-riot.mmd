@@ -1,0 +1,359 @@
+---
+title: AOD Backend - entity relationship diagram, Riot API implemented (2026-09-10)
+config:
+  layout: elk
+---
+%% Riot-aware variant. Attributes and entities added for a real Riot API
+%% integration are marked "Riot:" in their comment. Everything else is the
+%% shipped prototype schema unchanged.
+erDiagram
+    direction TB
+
+    USERS {
+        bigint id PK
+        string username
+        string email UK
+        string user_code UK "public-facing ID; PL- for players, CH- for coaches"
+        boolean is_online "true from login until logout; not a live-connection check"
+        string riot_id UK "the player's Riot Games account name, optional"
+        string riot_puuid UK "Riot: stable account id resolved from riot_id through the Riot Account API"
+        string password "stored hashed"
+        string remember_token "Laravel 'remember me' cookie value"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TEAMS {
+        bigint id PK
+        string team_code UK "shareable code new members use to join, format TM-XXXXXXXX"
+        string team_name
+        text description "optional"
+        datetime disbanded_at "set when the team is disbanded; otherwise empty"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TEAM_MEMBERS {
+        bigint id PK
+        bigint team_id FK "the team"
+        bigint user_id FK "the member"
+        string member_role "player, assistant_coach, or main_coach"
+        string status "pending (awaiting approval), active, or removed"
+        bigint decided_by FK "the main coach who approved or rejected this join request"
+        datetime decided_at "when that approval or rejection happened"
+        datetime joined_at "when the member became active"
+        datetime left_at "when the member left or was removed"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TEAM_SETTINGS {
+        bigint id PK
+        bigint team_id FK "the team this setting belongs to"
+        string setting_name "which setting: dead_air_threshold, comm_event_padding, game_alignment_window, informative_keywords, or declarative_keywords"
+        int setting_parameter "the value in milliseconds for the three timing settings; empty for the two keyword-list settings"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TEAM_KEYWORDS {
+        bigint id PK
+        bigint team_settings_id FK "the informative_keywords or declarative_keywords setting row this sits under"
+        string keyword "one word to detect in speech; single words only in the prototype"
+        string category "informative or declarative"
+        datetime created_at
+        datetime updated_at
+    }
+
+    APP_SESSIONS {
+        bigint id PK "one recorded practice game; table is app_sessions to avoid Laravel's own sessions table"
+        bigint team_id FK "the team playing"
+        bigint created_by FK "the coach who created the game"
+        string session_name "free-text title chosen by the coach"
+        string session_code UK "auto-generated label like SESSION_048"
+        string status "queuing, in_progress, processing, timeline_ready, analysis_ready, or cancelled"
+        datetime analysis_ready_at "when it most recently became ready for the whole team; sorts the coach dashboard"
+        datetime game_alignment_assessed_at "when the comms-versus-game comparison finished; empty until then"
+        datetime dead_air_detected_at "when the silence detection finished; empty until then"
+        string riot_ingest_status "Riot: not_requested, queued, fetched, or failed"
+        datetime riot_ingested_at "Riot: when Riot match data finished importing"
+        datetime created_at
+        datetime updated_at
+    }
+
+    RIOT_MATCHES {
+        bigint id PK "Riot: one imported Riot match, tied to a practice game"
+        bigint session_id FK "Riot: the practice game this match maps to; one match per game"
+        string match_id UK "Riot: Riot's match id, region-prefixed"
+        string region "Riot: the routing value the match was fetched from"
+        string game_mode "Riot: Riot game mode, e.g. competitive"
+        string map_id "Riot: the map the match was played on"
+        datetime game_start_utc "Riot: match start reported by Riot"
+        bigint game_length_ms "Riot: match length reported by Riot"
+        bigint start_offset_ms "Riot: offset from the recordings' shared start to match start; everything aligns to this"
+        string status "Riot: queued, fetched, or failed"
+        string error "Riot: failure reason, if it failed"
+        json raw_match "Riot: the match-details response, kept for reference"
+        json raw_timeline "Riot: the match-timeline response, kept for reference"
+        int poll_count "Riot: how many times Riot has been checked for a result; caps the wait"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TIMELINES {
+        bigint id PK
+        bigint session_id FK "the practice game; one timeline per game, created once analysis starts"
+        bigint riot_start_offset_ms "Riot: copied from RIOT_MATCHES once the import succeeds; empty when no Riot data"
+        datetime created_at
+        datetime updated_at
+    }
+
+    SESSION_PARTICIPANTS {
+        bigint id PK
+        bigint session_id FK "the practice game"
+        bigint user_id FK "the participant"
+        string participant_role "the member's team role captured at the moment they joined this game"
+        string participant_status "needs_consent, ready, recording, or completed; only moves forward"
+        string riot_puuid "Riot: the participant's Riot id captured for this game, so match events attribute to the right person"
+        datetime joined_at
+        datetime left_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    AOD_RECORDS {
+        bigint id PK "one player's stored microphone recording for a game (AOD = audio on demand)"
+        bigint session_participant_id FK "the player; one audio recording per player per game"
+        string disk "which storage location holds the file"
+        string path "file location within that storage"
+        string original_filename "name of the uploaded file"
+        string mime_type "file format, e.g. audio/webm"
+        bigint size_bytes "file size in bytes"
+        bigint sync_offset_ms "Riot: this recording's offset to timeline zero; replaces the shared-start assumption"
+        datetime created_at
+        datetime updated_at
+    }
+
+    VOD_RECORDS {
+        bigint id PK "one player's stored screen recording for a game (VOD = video on demand)"
+        bigint session_participant_id FK "the player; one video recording per player per game"
+        string disk "which storage location holds the file"
+        string path "file location within that storage"
+        string original_filename "name of the uploaded file"
+        string mime_type "file format, e.g. video/mp4"
+        bigint size_bytes "file size in bytes"
+        bigint sync_offset_ms "Riot: this recording's offset to timeline zero; replaces the shared-start assumption"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TRANSCRIPTS {
+        bigint id PK "the speech-to-text result for one player's audio"
+        bigint aod_record_id FK "the audio recording this transcribes; one transcript per recording"
+        string provider "transcription service used; assemblyai"
+        string provider_transcript_id "the job ID on the provider's side"
+        string status "queued, processing, completed, or failed"
+        text text "the full transcribed text"
+        string language_code "detected language; only English and Filipino are accepted"
+        float confidence "the provider's overall confidence, 0 to 1"
+        bigint audio_duration_ms "length of the audio; taken as the game's overall length only when there is no Riot data"
+        boolean comm_events_detected "true once callouts have been extracted from this transcript"
+        string error "failure reason, if it failed"
+        json raw_response "the provider's full response, kept for reference"
+        int poll_count "how many times the provider has been checked for a result; caps the wait"
+        datetime created_at
+        datetime updated_at
+    }
+
+    TRANSCRIPT_SENTENCES {
+        bigint id PK "one sentence of a transcript, as split by the provider; used for on-screen captions"
+        bigint transcript_id FK "the transcript this sentence is part of"
+        int position "order of this sentence in the transcript, starting at 0"
+        text text "the sentence text"
+        bigint start_ms "sentence start, measured from the start of the audio"
+        bigint end_ms "sentence end, measured from the start of the audio"
+        float confidence "confidence for this sentence"
+    }
+
+    TRANSCRIPT_WORDS {
+        bigint id PK "one spoken word of a transcript, with its exact timing"
+        bigint transcript_id FK "the transcript this word is part of"
+        bigint transcript_sentence_id FK "the sentence this word belongs to"
+        int position "order of this word in the whole transcript"
+        int sentence_position "order of this word within its sentence"
+        string word "the word itself"
+        bigint start_ms "word start, measured from the start of the audio"
+        bigint end_ms "word end, measured from the start of the audio"
+        float confidence "confidence for this word"
+    }
+
+    COMM_EVENTS {
+        bigint id PK "a detected callout: a burst of one player's speech that hit one or more tracked keywords"
+        datetime reviewed_at "when a coach signed off on this entry; cleared if the entry is later edited"
+        bigint reviewed_by FK "the coach who signed off"
+        bigint created_by FK "the coach who added this by hand; empty if the system detected it"
+        bigint transcript_id FK "the player transcript this callout came from"
+        string communication_type "informative, declarative, or compound (both)"
+        boolean is_redundant "true if the callout repeated something already said with nothing new"
+        bigint start_ms "callout start within the game"
+        bigint end_ms "callout end within the game"
+        text content "the words that make up the callout"
+        int padding_ms "the max gap used to group keyword hits into one callout, as set at detection time"
+        datetime created_at
+        datetime updated_at
+    }
+
+    CALLOUT_DETECTIONS {
+        bigint id PK "one keyword hit inside a callout"
+        bigint comm_event_id FK "the callout this hit belongs to"
+        bigint transcript_word_id FK "the exact transcribed word that matched"
+        string keyword "the tracked keyword text, as it was at detection time"
+        string normalized_keyword "the keyword reduced to a standard form for matching"
+        string category "informative or declarative, as it was at detection time"
+        bigint start_ms "hit start within the game"
+        bigint end_ms "hit end within the game"
+        float confidence "confidence of the underlying word"
+    }
+
+    GAME_EVENTS {
+        bigint id PK "one thing that happened in the match, placed on the timeline"
+        datetime reviewed_at "when a coach signed off on this entry"
+        bigint reviewed_by FK "the coach who signed off"
+        bigint created_by FK "the coach who added this by hand; empty for a fed-in event"
+        bigint session_id FK "the game this event belongs to"
+        bigint riot_match_id FK "Riot: the imported match this event came from; empty for a manual entry"
+        string source "manual (hand-entered) or riot (from the Riot Match API)"
+        string type "kill, death, assist, spike_plant, spike_defuse, round_start, round_win, or round_lost"
+        string side "ally or enemy; empty for round start/win/loss"
+        bigint match_time_ms "when in the match it happened"
+        int round_number "which round, if applicable"
+        string round_result "Riot: how the round was decided (elimination, spike, defuse, time); empty for manual"
+        string actor_puuid "Riot: the Riot id of the player the event is about, when Riot supplies it"
+        string external_ref "Riot: the event's id or index in the Riot match timeline; empty for a manual entry"
+        string note "optional free-text note entered with the event"
+        json raw "the original entry data, kept for reference"
+        datetime created_at
+        datetime updated_at
+    }
+
+    DEAD_AIR_PERIODS {
+        bigint id PK "a stretch where the whole team was silent longer than the team's threshold"
+        datetime reviewed_at "when a coach signed off on this entry"
+        bigint reviewed_by FK "the coach who signed off"
+        bigint created_by FK "the coach who added this by hand; empty if the system detected it"
+        bigint session_id FK "the game this belongs to"
+        int start_ms "silent stretch start within the game"
+        int end_ms "silent stretch end within the game"
+        int dead_air_threshold_ms "the silence threshold in force when this was detected"
+        datetime created_at
+        datetime updated_at
+    }
+
+    ANNOTATIONS {
+        bigint id PK "a note attached to a callout, game event, or silent stretch"
+        bigint parent_id FK "the note this is a reply to; empty for a top-level note (replies go one level deep)"
+        string annotatable_type "what this note is attached to: comm_event, game_event, or dead_air_period"
+        bigint annotatable_id "which specific callout, game event, or silent stretch"
+        bigint user_id FK "the coach or player who wrote it; empty if the system generated it"
+        string topic "game_state_alignment or dead_air (system-written), or note or reply (human-written)"
+        string assessment "for a game_state_alignment note: possibly_positive, possibly_negative, or neutral"
+        text body "the note text"
+        json game_event_ids "the match events this note is based on"
+        int alignment_window_ms "the timing window used to relate comms and game events when this was written"
+        datetime created_at
+        datetime updated_at
+    }
+
+    PERSONAL_ACCESS_TOKENS {
+        bigint id PK "an API login token (Laravel Sanctum)"
+        string tokenable_type "the kind of owner; always a user here"
+        bigint tokenable_id "the owning user"
+        text name "label for the token"
+        string token UK "the hashed token value"
+        text abilities "what the token is allowed to do"
+        datetime last_used_at
+        datetime expires_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    ROLES {
+        bigint id PK "a named role, from the Spatie permission package (per-team roles enabled)"
+        bigint team_id "the team this role is scoped to, if any"
+        string name
+        string guard_name "which auth guard the role applies to"
+        datetime created_at
+        datetime updated_at
+    }
+
+    PERMISSIONS {
+        bigint id PK "a named permission, from the Spatie permission package"
+        string name
+        string guard_name "which auth guard the permission applies to"
+        datetime created_at
+        datetime updated_at
+    }
+
+    MODEL_HAS_ROLES {
+        bigint role_id FK "the role"
+        string model_type "the kind of holder; a user"
+        bigint model_id FK "the holder"
+        bigint team_id "the team the assignment applies to"
+    }
+
+    MODEL_HAS_PERMISSIONS {
+        bigint permission_id FK "the permission"
+        string model_type "the kind of holder; a user"
+        bigint model_id FK "the holder"
+        bigint team_id "the team the assignment applies to"
+    }
+
+    ROLE_HAS_PERMISSIONS {
+        bigint permission_id FK "the permission"
+        bigint role_id FK "the role it is bundled into"
+    }
+
+    TEAMS ||--o{ TEAM_MEMBERS : "lists as members"
+    USERS ||--o{ TEAM_MEMBERS : "belong to teams through"
+    USERS |o--o{ TEAM_MEMBERS : "approve join requests as"
+    TEAMS ||--o{ TEAM_SETTINGS : "configured by"
+    TEAM_SETTINGS ||--o{ TEAM_KEYWORDS : "holds keywords"
+
+    TEAMS ||--o{ APP_SESSIONS : "runs practice games"
+    USERS ||--o{ APP_SESSIONS : "creates"
+    APP_SESSIONS ||--o| TIMELINES : "has one"
+    APP_SESSIONS ||--o| RIOT_MATCHES : "imported from Riot as"
+    APP_SESSIONS ||--o{ SESSION_PARTICIPANTS : "includes"
+    USERS ||--o{ SESSION_PARTICIPANTS : "join games as"
+
+    SESSION_PARTICIPANTS ||--o| AOD_RECORDS : "provides audio"
+    SESSION_PARTICIPANTS ||--o| VOD_RECORDS : "provides video"
+    AOD_RECORDS ||--o| TRANSCRIPTS : "transcribed into"
+    TRANSCRIPTS ||--o{ TRANSCRIPT_SENTENCES : "split into sentences"
+    TRANSCRIPTS ||--o{ TRANSCRIPT_WORDS : "split into words"
+    TRANSCRIPT_SENTENCES ||--o{ TRANSCRIPT_WORDS : "contains"
+
+    TRANSCRIPTS ||--o{ COMM_EVENTS : "scanned for callouts"
+    COMM_EVENTS ||--o{ CALLOUT_DETECTIONS : "made up of keyword hits"
+    TRANSCRIPT_WORDS ||--o{ CALLOUT_DETECTIONS : "matched by"
+    APP_SESSIONS ||--o{ GAME_EVENTS : "records match events"
+    RIOT_MATCHES ||--o{ GAME_EVENTS : "expands into match events"
+    APP_SESSIONS ||--o{ DEAD_AIR_PERIODS : "flags silent stretches"
+
+    COMM_EVENTS ||--o{ ANNOTATIONS : "annotated by"
+    GAME_EVENTS ||--o{ ANNOTATIONS : "annotated by"
+    DEAD_AIR_PERIODS ||--o{ ANNOTATIONS : "annotated by"
+    ANNOTATIONS |o--o{ ANNOTATIONS : "replied to by"
+    USERS |o--o{ ANNOTATIONS : "writes"
+
+    USERS |o--o{ COMM_EVENTS : "reviews or adds"
+    USERS |o--o{ GAME_EVENTS : "reviews or adds"
+    USERS |o--o{ DEAD_AIR_PERIODS : "reviews or adds"
+
+    USERS |o--o{ PERSONAL_ACCESS_TOKENS : "authenticates with"
+    ROLES ||--o{ MODEL_HAS_ROLES : "assigned through"
+    PERMISSIONS ||--o{ MODEL_HAS_PERMISSIONS : "assigned through"
+    ROLES ||--o{ ROLE_HAS_PERMISSIONS : "bundles"
+    PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS : "bundled through"
+    USERS |o--o{ MODEL_HAS_ROLES : "holds roles through"
+    USERS |o--o{ MODEL_HAS_PERMISSIONS : "holds permissions through"

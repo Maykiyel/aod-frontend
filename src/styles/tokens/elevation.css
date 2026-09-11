@@ -1,0 +1,34 @@
+:root {
+  /* E0 recessed — inputs, tracks, wells. Sits below the plate. 0 grooves. */
+  --e0-surface: var(--well);
+  --e0-border: var(--border-recessed);
+  --e0-shadow: inset 0 2px 3px rgba(0,0,0,.85);
+  --e0-grooves: 0;
+
+  /* E1 structure — sidebar, rails, bezel. Fixed chrome. 1 groove. */
+  --e1-surface: var(--ash);
+  --e1-border: var(--border-soft);
+  --e1-shadow: inset 0 1px 0 var(--hairline-e1);
+  --e1-grooves: 1;
+
+  /* E2 module — cards, tiles, annotations. The working level. 2 grooves. */
+  --e2-surface: var(--steel);
+  --e2-border: var(--border);
+  --e2-shadow: inset 0 1px 0 var(--hairline-e2), 0 2px 6px rgba(0,0,0,.5);
+  --e2-grooves: 2;
+
+  /* E3 raised — selection, popover, dropdown. 3 grooves. */
+  --e3-surface: var(--steel-2);
+  --e3-border: var(--border-raised);
+  --e3-shadow: inset 0 1px 0 var(--hairline-e3), 0 6px 18px rgba(0,0,0,.55);
+  --e3-grooves: 3;
+
+  /* E4 overlay — modal, palette. One at a time, over --scrim. 4 grooves. */
+  --e4-surface: var(--steel-3);
+  --e4-border: var(--border-overlay);
+  --e4-shadow: inset 0 1px 0 var(--hairline-e4), 0 18px 40px rgba(0,0,0,.72);
+  --e4-grooves: 4;
+
+  /* the Review Board monitor object only */
+  --bezel-shadow: inset 0 1px 0 var(--hairline-e1), 0 30px 70px rgba(0,0,0,.6);
+}

@@ -1,0 +1,61 @@
+:root {
+  /* substrate — the elevation ladder's surface tints */
+  --void: #08090C;
+  --well: #0B0D11;
+  --ash: #101317;
+  --steel: #161A20;
+  --steel-2: #1C222A;
+  --steel-3: #232A34;
+
+  /* borders — one hairline per level */
+  --border-recessed: #14171C;
+  --border-soft: #1A1E24;
+  --border: #22272F;
+  --border-raised: #2A303A;
+  --border-overlay: #333B47;
+
+  /* text */
+  --text-primary: #F3F4F6;
+  --text-secondary: #8A8F99;
+  --text-muted: #52565F;
+  --text-on-accent: #FFFFFF;
+  --text-on-light: #08090C;
+
+  /* signal — instrument accents, never washes */
+  --red: #FF2E3E;
+  --red-hover: #FF4A57;
+  --cyan: #3FE1D6;
+  --aligned: #2ED573;
+
+  /* comm types — fixed by the data model */
+  --informative: #8B7FFF;
+  --declarative: #FFB020;
+  --compound: #FF6FA8;
+  --absence: #FF2E3E;
+
+  /* machined-edge highlights, one per level */
+  --hairline-e1: rgba(255,255,255,.045);
+  --hairline-e2: rgba(255,255,255,.06);
+  --hairline-e3: rgba(255,255,255,.09);
+  --hairline-e4: rgba(255,255,255,.13);
+
+  /* plate texture */
+  --plate-silhouette: rgba(255,255,255,.055);
+  --plate-ring: rgba(255,255,255,.05);
+  --plate-grid: rgba(255,255,255,.028);
+  --plate-bolt: #2A303A;
+
+  /* semantic aliases */
+  --app-bg: var(--void);
+  --surface-recessed: var(--well);
+  --surface-structure: var(--ash);
+  --surface-card: var(--steel);
+  --surface-raised: var(--steel-2);
+  --surface-overlay: var(--steel-3);
+  --accent: var(--red);
+  --scrim: rgba(8,9,12,.6);
+
+  /* absence hatch — the only region fill in the system */
+  --absence-fill: rgba(255,46,62,.14);
+  --absence-hatch: repeating-linear-gradient(45deg, rgba(255,46,62,.85) 0 2px, transparent 2px 9px);
+}

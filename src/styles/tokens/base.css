@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--text-primary);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--red); color: var(--text-on-accent); }
+a { color: var(--cyan); text-decoration: none; }
+a:hover { color: var(--red); }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--void); }
+*::-webkit-scrollbar-thumb { background: var(--border-raised); }
+
+@keyframes aod-spin { to { transform: rotate(360deg); } }
+@keyframes aod-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* Sizing. Components take explicit widths alongside token padding, so the
+   border-box model is what makes `width: 118px` mean 118px on screen. */
+*, *::before, *::after { box-sizing: border-box; }

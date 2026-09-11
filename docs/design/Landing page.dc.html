@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { color: var(--red); }
+    @keyframes om-wave { 0%, 100% { transform: scaleY(.42) } 50% { transform: scaleY(1) } }
+    @keyframes om-drift { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+    @keyframes om-pulse-dot { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+    [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity .75s cubic-bezier(.2,.7,.3,1), transform .75s cubic-bezier(.2,.7,.3,1) }
+    [data-reveal][data-shown] { opacity: 1; transform: none }
+    [data-tilt] { transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s linear; will-change: transform }
+    @media (min-width: 1100px) {
+      [data-board-overlap] {
+        margin-left: -19%;
+        -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,.06) 12%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.78) 34%, #000 44%);
+        mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,.06) 12%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.78) 34%, #000 44%);
+      }
+    }
+  </style>
+</helmet>
+<div data-screen-label="Landing page" style="width:100%;background:var(--void);color:var(--text-primary);font:var(--type-body)">
+
+  <x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="display:block;position:sticky;top:0;z-index:20" hint-size="100%,64px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-5);max-width:var(--board-max);margin:0 auto;padding:var(--space-4) var(--space-page-x);box-sizing:border-box">
+      <div style="display:flex;align-items:center;gap:var(--space-3);min-width:0">
+        <span style="width:13px;height:14px;background:var(--red);clip-path:var(--clip-hex);display:block;flex:0 0 auto"></span>
+        <span style="font:var(--type-display-s);text-transform:uppercase;letter-spacing:.01em;color:var(--text-primary);white-space:nowrap">Beyond Mechanics</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--space-5)">
+        <a href="#how" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary);white-space:nowrap">HOW IT WORKS</a>
+        <a href="01 Log in.dc.html" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary);white-space:nowrap">LOG IN</a>
+        <a href="{{ ctaHref }}" style="display:inline-flex">
+          <x-import component-from-global-scope="AODComms.Button" variant="primary" hint-size="126px,40px">{{ ctaLabel }}</x-import>
+        </a>
+      </div>
+    </div>
+  </x-import>
+
+  <div style="position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 140px);pointer-events:none"></div>
+    <div data-parallax="0.12" style="position:absolute;left:-180px;bottom:-240px;width:820px;height:560px;background:var(--plate-silhouette);clip-path:polygon(0 30%, 26% 30%, 34% 10%, 72% 10%, 84% 32%, 100% 32%, 100% 100%, 48% 100%, 40% 72%, 0 72%);pointer-events:none;animation:om-drift 14s ease-in-out infinite"></div>
+    <div data-parallax="0.12" style="position:absolute;left:640px;right:0;bottom:-240px;height:381px;background:var(--plate-silhouette);pointer-events:none;animation:om-drift 14s ease-in-out infinite"></div>
+    <div data-parallax="0.2" style="position:absolute;left:60px;bottom:-110px;width:420px;height:420px;border:1px solid var(--plate-ring);border-radius:var(--radius-pill);pointer-events:none;animation:om-drift 18s ease-in-out infinite"></div>
+    <div data-parallax="-0.08" style="position:absolute;top:-220px;right:-160px;width:1000px;height:1000px;border-radius:var(--radius-pill);background:radial-gradient(circle, rgba(255,46,62,.15) 0%, rgba(255,46,62,0) 60%);pointer-events:none"></div>
+    <div data-parallax="0.06" style="position:absolute;left:-200px;top:120px;width:760px;height:760px;border-radius:var(--radius-pill);background:radial-gradient(circle, rgba(63,225,214,.06) 0%, rgba(63,225,214,0) 64%);pointer-events:none"></div>
+
+    <div style="position:relative;max-width:var(--board-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-wrap:wrap;gap:var(--space-7);align-items:center">
+
+      <div style="flex:1 1 420px;min-width:0;position:relative;z-index:2;display:flex;flex-direction:column;gap:var(--space-6)">
+        <div data-reveal="" style="display:flex;align-items:center;gap:var(--space-3)">
+          <span style="width:8px;height:8px;background:var(--red);display:block;box-shadow:0 0 14px rgba(255,46,62,.7)"></span>
+          <span style="font:var(--type-eyebrow);letter-spacing:var(--track-eyebrow);color:var(--text-secondary)">AUDIO-BASED COMMUNICATION ANALYSIS</span>
+        </div>
+
+        <div data-reveal="" data-reveal-delay="80" style="font:var(--type-display-xl);font-size:clamp(44px,5.4vw,92px);line-height:.86;letter-spacing:-.012em;text-transform:uppercase;color:var(--text-primary)">
+          <div>Communication</div>
+          <div style="display:flex;align-items:baseline;gap:18px">
+            <span>measured</span>
+            <span style="flex:1;height:2px;background:var(--red);transform:translateY(-12px);box-shadow:0 0 16px rgba(255,46,62,.65)"></span>
+          </div>
+        </div>
+
+        <span data-reveal="" data-reveal-delay="160" style="font:var(--type-body-l);color:var(--text-secondary);max-width:520px;text-wrap:pretty">The AOD Communication Analysis Framework records each player's mic and game window, classifies every callout by type, and measures the silence between them. One session, one review board.</span>
+
+        <div data-reveal="" data-reveal-delay="240" style="display:flex;align-items:center;gap:var(--space-5);flex-wrap:wrap">
+          <a href="{{ ctaHref }}" style="display:inline-flex">
+            <x-import component-from-global-scope="AODComms.Button" variant="primary" hint-size="150px,44px">{{ ctaLabel }}</x-import>
+          </a>
+          <a href="12 Post-match report.dc.html" style="display:inline-flex">
+            <x-import component-from-global-scope="AODComms.Button" variant="secondary" hint-size="176px,44px">See the review board</x-import>
+          </a>
+        </div>
+
+        <div data-reveal="" data-reveal-delay="320" style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-5);border-top:1px solid var(--border-soft)">
+          <div style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;padding:var(--space-4);background:linear-gradient(to bottom, rgba(255,255,255,.045), rgba(255,255,255,0));border-top:1px solid var(--border-raised)">
+            <span data-countup="1842" data-fmt="comma" style="font:var(--type-stat);font-size:38px;color:var(--text-primary);line-height:1">0</span>
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">CALLS CLASSIFIED</span>
+          </div>
+          <div style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;padding:var(--space-4);background:linear-gradient(to bottom, rgba(255,255,255,.045), rgba(255,255,255,0));border-top:1px solid var(--border-raised)">
+            <span data-countup="252" data-fmt="clock" style="font:var(--type-stat);font-size:38px;color:var(--text-primary);line-height:1">0:00</span>
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">DEAD AIR</span>
+          </div>
+          <div style="flex:1 1 140px;display:flex;flex-direction:column;gap:6px;padding:var(--space-4);background:linear-gradient(to bottom, rgba(255,255,255,.045), rgba(255,255,255,0));border-top:1px solid var(--border-raised)">
+            <span data-countup="1440" data-fmt="clock" style="font:var(--type-stat);font-size:38px;color:var(--text-primary);line-height:1">0:00</span>
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">SESSION LENGTH</span>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal="" data-reveal-delay="200" data-board-overlap="" style="flex:1 1 560px;min-width:0;position:relative;z-index:0">
+        <dc-import name="Hero board" glow="0 28px 70px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.05), 0 0 90px rgba(255,46,62,.1)" hint-size="100%,600px"></dc-import>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="position:relative;max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-6)">
+    <div data-reveal="">
+      <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="The problem" index="01/04" title="Nobody reviews the audio" lede="Teams rewatch the VOD and talk about aim, positioning and economy. The comms are right there on the recording and never get opened, because there is no way to find the moment that mattered." hint-size="620px,140px"></x-import>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-5)">
+      <div data-reveal="" data-tilt="" style="display:block">
+        <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-6)" style="display:block;box-sizing:border-box;height:100%" hint-size="100%,190px">
+          <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">SCALE</span>
+            <span style="font:var(--type-display-s);text-transform:uppercase;color:var(--text-primary)">Hours of audio, no index</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">A three-hour scrim block is three hours per player. Finding the one late rotate call means scrubbing all of it.</span>
+          </div>
+        </x-import>
+      </div>
+      <div data-reveal="" data-reveal-delay="90" data-tilt="" style="display:block">
+        <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-6)" style="display:block;box-sizing:border-box;height:100%" hint-size="100%,190px">
+          <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">MEMORY</span>
+            <span style="font:var(--type-display-s);text-transform:uppercase;color:var(--text-primary)">Feedback from recall</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">"You went quiet in the retake" is a memory, not a measurement. It gets argued with, and nothing changes.</span>
+          </div>
+        </x-import>
+      </div>
+      <div data-reveal="" data-reveal-delay="180" data-tilt="" style="display:block">
+        <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-6)" style="display:block;box-sizing:border-box;height:100%" hint-size="100%,190px">
+          <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--red)">SILENCE</span>
+            <span style="font:var(--type-display-s);text-transform:uppercase;color:var(--text-primary)">Dead air is invisible</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">Nothing in a VOD shows the six seconds where nobody called the defuse. Absence leaves no trace to review.</span>
+          </div>
+        </x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:relative;background:linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,0) 40%);border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)">
+    <div id="how" style="position:relative;max-width:var(--board-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-7)">
+      <div data-reveal="">
+        <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="How it works" index="02/04" title="Record, classify, review" lede="Three steps. The team does the first one and nothing else changes about how they practise." hint-size="620px,140px"></x-import>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-7);align-items:flex-start">
+
+        <div style="flex:1 1 480px;min-width:0;position:sticky;top:120px">
+          <div data-reveal="" style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <div style="border:1px solid var(--border);background:var(--well);box-shadow:0 28px 70px rgba(0,0,0,.72), 0 0 90px rgba(255,46,62,.08)">
+              <img src="assets/review-board.png" alt="The Beyond Mechanics review board: a VOD frame above timeline lanes sharing one clock, with comm-type diamonds, a hatched absence region and a call detail panel." style="display:block;width:100%;height:auto">
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-4)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">THE REVIEW BOARD, AS BUILT</span>
+              <a href="12 Post-match report.dc.html" style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary);white-space:nowrap">OPEN IT →</a>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:var(--space-section)">
+
+          <div data-reveal="" style="display:flex;flex-direction:column;gap:var(--space-4);padding-left:var(--space-5);border-left:2px solid var(--red)">
+            <span style="font:var(--type-display-l);font-size:56px;color:var(--red);line-height:1">01</span>
+            <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Record the session</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">The coach opens a lobby. Each player grants mic and screen access on their own machine, and both streams open on one session clock when the coach starts.</span>
+            <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">MIC · GAME WINDOW · SYNC OFFSET</span>
+          </div>
+
+          <div data-reveal="" style="display:flex;flex-direction:column;gap:var(--space-4);padding-left:var(--space-5);border-left:2px solid var(--red)">
+            <span style="font:var(--type-display-l);font-size:56px;color:var(--red);line-height:1">02</span>
+            <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Classify every call</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">After the session ends, each track is transcribed and every callout is sorted into one of four categories against the team's own keyword sets. Gaps longer than the team's threshold are logged as absence.</span>
+            <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">KEYWORD SETS · DEAD AIR THRESHOLD</span>
+          </div>
+
+          <div data-reveal="" style="display:flex;flex-direction:column;gap:var(--space-4);padding-left:var(--space-5);border-left:2px solid var(--red)">
+            <span style="font:var(--type-display-l);font-size:56px;color:var(--red);line-height:1">03</span>
+            <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Review on one board</span>
+            <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">Game events, absence and every player sit as lanes on the same clock. Select a marker to read the call, its matched keywords and the frame it lands on, then leave a note on it.</span>
+            <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">EVENTS · ABSENCE · ONE LANE PER PLAYER</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:relative;max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-7)">
+    <div data-reveal="">
+      <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="What gets measured" index="03/04" title="Four categories, fixed" lede="The vocabulary does not grow. Every callout in the product is one of these, and silence is the fourth." hint-size="620px,140px"></x-import>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-5)">
+
+      <div data-reveal="" style="display:flex;flex-direction:column;gap:var(--space-4);padding-top:var(--space-4);border-top:2px solid var(--informative)">
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <span style="width:10px;height:10px;background:var(--informative);transform:rotate(45deg);display:block"></span>
+          <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Informative</span>
+        </div>
+        <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">States what is happening. Enemy positions, counts, utility spent.</span>
+        <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">"ONE DOWN A MAIN"</span>
+      </div>
+
+      <div data-reveal="" data-reveal-delay="80" style="display:flex;flex-direction:column;gap:var(--space-4);padding-top:var(--space-4);border-top:2px solid var(--declarative)">
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <span style="width:10px;height:10px;background:var(--declarative);transform:rotate(45deg);display:block"></span>
+          <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Declarative</span>
+        </div>
+        <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">Commits to an action. The speaker is telling the team what they are doing.</span>
+        <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">"TAKING B, FOLLOW ME"</span>
+      </div>
+
+      <div data-reveal="" data-reveal-delay="160" style="display:flex;flex-direction:column;gap:var(--space-4);padding-top:var(--space-4);border-top:2px solid var(--compound)">
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <span style="width:10px;height:10px;background:var(--compound);transform:rotate(45deg);display:block"></span>
+          <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Compound</span>
+        </div>
+        <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">Information and intent in one breath. The densest call a player can make.</span>
+        <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">"THREE PUSHING, I HAVE ULT"</span>
+      </div>
+
+      <div data-reveal="" data-reveal-delay="240" style="display:flex;flex-direction:column;gap:var(--space-4);padding-top:var(--space-4);border-top:2px solid var(--absence)">
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <span style="width:16px;height:10px;background-color:var(--absence-fill);background-image:var(--absence-hatch);border:1px solid var(--absence);box-sizing:border-box;display:block"></span>
+          <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">Absence</span>
+        </div>
+        <span style="font:var(--type-body-s);color:var(--text-secondary);text-wrap:pretty">An interval longer than the team's threshold with nothing said. Counted, not scored.</span>
+        <span style="font:var(--type-data);font-size:11px;color:var(--text-muted)">DEAD AIR 6.4s</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="position:relative;overflow:hidden;border-top:1px solid var(--border-soft)">
+    <div data-parallax="0.1" style="position:absolute;right:-160px;top:-120px;width:640px;height:640px;border-radius:var(--radius-pill);background:radial-gradient(circle, rgba(63,225,214,.05) 0%, rgba(63,225,214,0) 64%);pointer-events:none"></div>
+
+    <div style="position:relative;max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-wrap:wrap;gap:var(--space-7);align-items:flex-start">
+      <div style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:var(--space-5)">
+        <div data-reveal="">
+          <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="Privacy" index="04/04" title="Recording is opt-in, every session" lede="Players are being recorded while they practise. The product treats that as the sensitive thing it is." hint-size="560px,140px"></x-import>
+        </div>
+        <span data-reveal="" data-reveal-delay="90" style="font:var(--type-body-s);color:var(--text-secondary);max-width:520px;text-wrap:pretty">Access is granted per session on the player's own machine, before anything is captured. A player who declines stays out of the recording and their interval is counted as absence — the session still runs, and nothing is captured from them.</span>
+      </div>
+
+      <div data-reveal="" data-reveal-delay="140" data-tilt="" style="flex:0 1 var(--size-rail);min-width:0">
+        <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--void)" padding="var(--space-6)" style="display:block;box-sizing:border-box" hint-size="100%,240px">
+          <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">GRANTED</span>
+              <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">PER SESSION</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">SCOPE</span>
+              <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">MIC + GAME WINDOW</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding-bottom:var(--space-3);border-bottom:1px solid var(--border-soft)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">VISIBLE TO</span>
+              <span style="font:var(--type-data);font-size:12px;color:var(--text-primary)">COACH + TEAMMATES</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)">
+              <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">IF DECLINED</span>
+              <span style="font:var(--type-data);font-size:12px;color:var(--text-muted)">COUNTED AS ABSENCE</span>
+            </div>
+          </div>
+        </x-import>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showPrototype }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;background:linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,0) 40%);border-top:1px solid var(--border-soft)">
+      <div id="prototype" style="max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-6)">
+        <div data-reveal="" style="display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-6);flex-wrap:wrap">
+          <x-import component-from-global-scope="AODComms.SectionHeader" eyebrow="Prototype" index="05/05" title="Walk the whole flow" lede="Every screen below is live and clicks through to the next. Sign-up to review board, coach side and player side." hint-size="560px,140px"></x-import>
+          <span style="display:flex;align-items:center;gap:8px;padding:5px 11px;border:1px solid var(--border-raised)">
+            <span style="width:6px;height:6px;border-radius:var(--radius-pill);background:var(--cyan);display:block;animation:om-pulse-dot 1.8s linear infinite"></span>
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-secondary)">CLICKABLE</span>
+          </span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4)">
+          <sc-for list="{{ screens }}" as="s" hint-placeholder-count="8">
+            <a href="{{ s.href }}" data-reveal="" data-tilt="" style="display:block">
+              <x-import component-from-global-scope="AODComms.Surface" level="2" behind="var(--e1-surface)" padding="var(--space-5)" style="display:block;box-sizing:border-box;height:100%" hint-size="100%,96px">
+                <div style="display:flex;align-items:flex-start;gap:var(--space-4)">
+                  <span style="font:var(--type-data);font-size:12px;color:var(--red);flex:0 0 auto">{{ s.num }}</span>
+                  <span style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                    <span style="font:var(--type-label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-primary)">{{ s.name }}</span>
+                    <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">{{ s.role }}</span>
+                  </span>
+                </div>
+              </x-import>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 140px);pointer-events:none"></div>
+    <div data-parallax="-0.1" style="position:absolute;top:-260px;left:50%;width:900px;height:900px;margin-left:-450px;border-radius:var(--radius-pill);background:radial-gradient(circle, rgba(255,46,62,.13) 0%, rgba(255,46,62,0) 60%);pointer-events:none"></div>
+
+    <div style="position:relative;max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-6);align-items:flex-start">
+      <div data-reveal="" style="font:var(--type-display-l);font-size:clamp(34px,4vw,64px);line-height:.9;letter-spacing:-.008em;text-transform:uppercase;color:var(--text-primary);max-width:760px">Start with one scrim</div>
+      <span data-reveal="" data-reveal-delay="90" style="font:var(--type-body-l);color:var(--text-secondary);max-width:560px;text-wrap:pretty">Record a single session, open the board, and see what the team actually said. Free to set up a team and invite a roster.</span>
+      <div data-reveal="" data-reveal-delay="160" style="display:flex;align-items:center;gap:var(--space-6);flex-wrap:wrap">
+        <a href="{{ ctaHref }}" style="display:inline-flex">
+          <x-import component-from-global-scope="AODComms.Button" variant="primary" hint-size="150px,44px">{{ ctaLabel }}</x-import>
+        </a>
+        <a href="01 Log in.dc.html" style="font:var(--type-body-s);color:var(--text-secondary);border-bottom:1px solid var(--border-raised);padding-bottom:2px">Log in</a>
+      </div>
+    </div>
+  </div>
+
+  <x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="display:block;position:relative;overflow:hidden" hint-size="100%,620px">
+    <div style="position:absolute;right:0;top:0;width:70%;height:360px;pointer-events:none;display:flex;align-items:flex-start;justify-content:flex-end;gap:22px;mask-image:linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 96%),linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 82%);mask-composite:intersect;-webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 96%),linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 82%);-webkit-mask-composite:source-in">
+      <span style="flex:0 0 34px;height:96px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.6s ease-in-out 0.00s infinite"></span>
+      <span style="flex:0 0 34px;height:168px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.1s ease-in-out 0.13s infinite"></span>
+      <span style="flex:0 0 34px;height:242px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.2s ease-in-out 0.26s infinite"></span>
+      <span style="flex:0 0 34px;height:140px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.4s ease-in-out 0.39s infinite"></span>
+      <span style="flex:0 0 34px;height:298px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.8s ease-in-out 0.52s infinite"></span>
+      <span style="flex:0 0 34px;height:196px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.6s ease-in-out 0.65s infinite"></span>
+      <span style="flex:0 0 34px;height:112px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.4s ease-in-out 0.78s infinite"></span>
+      <span style="flex:0 0 34px;height:264px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3s ease-in-out 0.91s infinite"></span>
+      <span style="flex:0 0 34px;height:336px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.7s ease-in-out 1.04s infinite"></span>
+      <span style="flex:0 0 34px;height:214px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.3s ease-in-out 1.17s infinite"></span>
+      <span style="flex:0 0 34px;height:128px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.1s ease-in-out 1.30s infinite"></span>
+      <span style="flex:0 0 34px;height:186px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.9s ease-in-out 1.43s infinite"></span>
+      <span style="flex:0 0 34px;height:280px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.5s ease-in-out 1.56s infinite"></span>
+      <span style="flex:0 0 34px;height:158px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.5s ease-in-out 1.69s infinite"></span>
+      <span style="flex:0 0 34px;height:104px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.2s ease-in-out 1.82s infinite"></span>
+      <span style="flex:0 0 34px;height:230px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.3s ease-in-out 1.95s infinite"></span>
+      <span style="flex:0 0 34px;height:312px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.8s ease-in-out 2.08s infinite"></span>
+      <span style="flex:0 0 34px;height:176px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3.7s ease-in-out 2.21s infinite"></span>
+      <span style="flex:0 0 34px;height:120px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 2.6s ease-in-out 2.34s infinite"></span>
+      <span style="flex:0 0 34px;height:252px;background:var(--plate-silhouette);display:block;transform-origin:top center;animation:om-wave 3s ease-in-out 2.47s infinite"></span>
+    </div>
+    <div style="position:absolute;top:8px;left:8px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+    <div style="position:absolute;top:8px;right:8px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+
+    <div style="position:relative;max-width:var(--page-max);margin:0 auto;padding:var(--space-section) var(--space-page-x) var(--space-6);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-section)">
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-7);align-items:flex-start;justify-content:space-between">
+
+        <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:var(--space-5)">
+          <div style="display:flex;align-items:center;gap:var(--space-3)">
+            <span style="width:13px;height:14px;background:var(--red);clip-path:var(--clip-hex);display:block"></span>
+            <span style="font:var(--type-display-s);text-transform:uppercase;color:var(--text-primary)">Beyond Mechanics</span>
+          </div>
+          <span style="font:var(--type-body-s);color:var(--text-secondary);max-width:320px;text-wrap:pretty">The AOD Communication Analysis Framework. Built for teams who review what they said, not just what they did.</span>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">STATUS</span>
+            <div style="display:flex;align-items:center;gap:var(--space-3)">
+              <span style="width:6px;height:6px;border-radius:var(--radius-pill);background:var(--aligned);display:block"></span>
+              <span style="font:var(--type-data);font-size:11px;color:var(--text-secondary)">ALL SYSTEMS NOMINAL</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:0 1 170px;min-width:140px;display:flex;flex-direction:column;gap:var(--space-4)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">PRODUCT</span>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <a href="#how" style="font:var(--type-body-s);color:var(--text-secondary)">How it works</a>
+            <a href="12 Post-match report.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Review board</a>
+            <a href="09 Session setup coach.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Session setup</a>
+            <a href="11 Recording coach.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Recording</a>
+          </div>
+        </div>
+
+        <div style="flex:0 1 170px;min-width:140px;display:flex;flex-direction:column;gap:var(--space-4)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">FOR TEAMS</span>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <a href="06 Coach dashboard.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Coaches</a>
+            <a href="07 Player dashboard.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Players</a>
+            <a href="05 Team setup.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Team setup</a>
+            <a href="02 Sign up role.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Sign up</a>
+          </div>
+        </div>
+
+        <div style="flex:0 1 170px;min-width:140px;display:flex;flex-direction:column;gap:var(--space-4)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">ACCOUNT</span>
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <a href="01 Log in.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Log in</a>
+            <a href="14 Privacy policy.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Privacy</a>
+            <a href="15 Terms of service.dc.html" style="font:var(--type-body-s);color:var(--text-secondary)">Terms</a>
+            <a href="#contact" style="font:var(--type-body-s);color:var(--text-secondary)">Contact</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-6);align-items:flex-end;justify-content:space-between;padding-top:var(--space-6);border-top:1px solid var(--border-soft)">
+        <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:var(--space-4)">
+          <span style="font:var(--type-display-m);text-transform:uppercase;color:var(--text-primary)">Start with one scrim</span>
+          <div style="display:flex;align-items:center;gap:var(--space-5);flex-wrap:wrap">
+            <a href="{{ ctaHref }}" style="display:inline-flex">
+              <x-import component-from-global-scope="AODComms.Button" variant="primary" hint-size="150px,44px">{{ ctaLabel }}</x-import>
+            </a>
+            <a href="12 Post-match report.dc.html" style="font:var(--type-body-s);color:var(--text-secondary);border-bottom:1px solid var(--border-raised);padding-bottom:2px">See the review board</a>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3);text-align:right">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">BUILD</span>
+          <span style="font:var(--type-data);font-size:12px;color:var(--text-secondary)">4.0.2</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-5)">
+        <div style="font:var(--type-display-xl);font-size:clamp(40px,11.5vw,152px);line-height:.82;letter-spacing:-.018em;text-transform:uppercase;color:var(--text-primary);opacity:.13;white-space:nowrap;line-height:1">Beyond Mechanics</div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:flex-start;justify-content:space-between;padding-top:var(--space-5);border-top:1px solid var(--border-soft)">
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);max-width:760px;line-height:1.7">THIS PRODUCT ISN'T ENDORSED BY RIOT GAMES AND DOESN'T REFLECT THE VIEWS OR OPINIONS OF RIOT GAMES OR ANYONE OFFICIALLY INVOLVED IN PRODUCING OR MANAGING RIOT GAMES PROPERTIES. RIOT GAMES, AND ALL ASSOCIATED PROPERTIES ARE TRADEMARKS OR REGISTERED TRADEMARKS OF RIOT GAMES, INC.</span>
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);white-space:nowrap">© 2026 AOD COMMS</span>
+        </div>
+      </div>
+
+    </div>
+  </x-import>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;ctaLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sign up free&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Call to action&quot;},&quot;ctaHref&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;02 Sign up role.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Call to action&quot;},&quot;showPrototype&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this._teardown = [];
+    this._scan = this._scan.bind(this);
+    this._onScroll = this._onScroll.bind(this);
+    // the template streams in, so re-scan a few times for nodes that arrive late
+    this._ticks = [0, 250, 700, 1500, 3000].map(t => setTimeout(this._scan, t));
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._onScroll();
+  }
+
+  componentWillUnmount() {
+    (this._ticks || []).forEach(clearTimeout);
+    window.removeEventListener('scroll', this._onScroll);
+    if (this._io) this._io.disconnect();
+    (this._teardown || []).forEach(fn => fn());
+  }
+
+  _scan() {
+    this._initReveal();
+    this._initTilt();
+    this._parallax = Array.from(document.querySelectorAll('[data-parallax]'));
+  }
+
+  _initReveal() {
+    if (!this._io) {
+      this._io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target;
+          const d = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
+          setTimeout(() => {
+            el.setAttribute('data-shown', '');
+            el.querySelectorAll('[data-countup]:not([data-counted])').forEach(n => this._count(n));
+            if (el.hasAttribute('data-countup')) this._count(el);
+          }, d);
+          this._io.unobserve(el);
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+    }
+    document.querySelectorAll('[data-reveal]:not([data-reveal-init])').forEach(el => {
+      el.setAttribute('data-reveal-init', '');
+      this._io.observe(el);
+    });
+  }
+
+  _count(el) {
+    el.setAttribute('data-counted', '');
+    const target = parseFloat(el.getAttribute('data-countup') || '0');
+    const fmt = el.getAttribute('data-fmt') || 'comma';
+    const dur = 1200;
+    const t0 = performance.now();
+    const render = v => {
+      if (fmt === 'clock') {
+        const s = Math.round(v);
+        el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+      } else {
+        el.textContent = Math.round(v).toLocaleString('en-US');
+      }
+    };
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      render(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  _initTilt() {
+    document.querySelectorAll('[data-tilt]:not([data-tilt-init])').forEach(el => {
+      el.setAttribute('data-tilt-init', '');
+      const move = ev => {
+        const r = el.getBoundingClientRect();
+        const cx = (ev.clientX - r.left) / r.width - 0.5;
+        const cy = (ev.clientY - r.top) / r.height - 0.5;
+        el.style.transform = 'perspective(900px) rotateY(' + (cx * 6).toFixed(2) + 'deg) rotateX(' + (-cy * 6).toFixed(2) + 'deg) translateY(-3px)';
+      };
+      const leave = () => { el.style.transform = ''; };
+      el.addEventListener('mousemove', move);
+      el.addEventListener('mouseleave', leave);
+      this._teardown.push(() => {
+        el.removeEventListener('mousemove', move);
+        el.removeEventListener('mouseleave', leave);
+      });
+    });
+  }
+
+  _onScroll() {
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null;
+      const y = window.scrollY || 0;
+      (this._parallax || []).forEach(el => {
+        const f = parseFloat(el.getAttribute('data-parallax') || '0');
+        el.style.transform = 'translate3d(0,' + (y * f).toFixed(1) + 'px,0)';
+      });
+    });
+  }
+
+  renderVals() {
+    const p = this.props;
+    return {
+      ctaLabel: p.ctaLabel ?? 'Sign up free',
+      ctaHref: p.ctaHref ?? '02 Sign up role.dc.html',
+      showPrototype: p.showPrototype ?? false,
+      screens: [
+        { num: '01', name: 'Log in', role: 'ENTRY', href: '01 Log in.dc.html' },
+        { num: '02', name: 'Account type', role: 'SIGN UP', href: '02 Sign up role.dc.html' },
+        { num: '05', name: 'Team setup', role: 'SIGN UP', href: '05 Team setup.dc.html' },
+        { num: '06', name: 'Coach dashboard', role: 'COACH', href: '06 Coach dashboard.dc.html' },
+        { num: '07', name: 'Player dashboard', role: 'PLAYER', href: '07 Player dashboard.dc.html' },
+        { num: '09', name: 'Session setup', role: 'COACH', href: '09 Session setup coach.dc.html' },
+        { num: '11', name: 'Recording', role: 'COACH', href: '11 Recording coach.dc.html' },
+        { num: '12', name: 'Review board', role: 'COACH', href: '12 Post-match report.dc.html' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/fonts/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/geometry.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/tokens/base.css">
+  <link rel="stylesheet" href="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/styles.css">
+  <script src="_ds/aod-comms-1a2f24a9-022c-44db-8f9f-7a6bc8ba2f93/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; background: var(--void); }
+    a { color: var(--text-primary); text-decoration: none; }
+    a:hover { color: var(--red); }
+  </style>
+</helmet>
+<x-import component-from-global-scope="AODComms.Surface" level="1" behind="var(--void)" padding="0" style="width:var(--size-sidebar);min-width:var(--size-sidebar);height:100vh;box-sizing:border-box;position:relative;overflow:hidden" hint-size="212px,100vh">
+  <div style="position:absolute;left:0;bottom:0;width:100%;height:298px;pointer-events:none;background:var(--plate-silhouette);clip-path:polygon(0 9%, 12% 0, 44% 0, 44% 48%, 72% 48%, 100% 74%, 100% 100%, 0 100%)"></div>
+  <div style="position:absolute;left:12px;bottom:262px;width:5px;height:5px;border-radius:var(--radius-pill);background:var(--void);pointer-events:none"></div>
+  <div style="position:absolute;left:12px;bottom:22px;width:5px;height:5px;border-radius:var(--radius-pill);background:var(--void);pointer-events:none"></div>
+  <div style="position:absolute;right:14px;bottom:22px;width:5px;height:5px;border-radius:var(--radius-pill);background:var(--void);pointer-events:none"></div>
+  <div style="position:absolute;left:18px;bottom:26px;width:132px;height:132px;border:1px solid var(--plate-ring);border-radius:var(--radius-pill);pointer-events:none"></div>
+  <div style="position:absolute;top:7px;left:7px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;top:7px;right:7px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;bottom:7px;left:7px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:absolute;bottom:7px;right:7px;width:3px;height:3px;border-radius:var(--radius-pill);background:var(--plate-bolt)"></div>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;box-sizing:border-box;padding:var(--space-5) var(--space-4);overflow-y:auto">
+
+    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:var(--space-3);padding:0 var(--space-2) var(--space-5)">
+      <span style="width:14px;height:15px;background:var(--red);clip-path:var(--clip-hex);display:block"></span>
+      <span style="font:var(--type-display-s);text-transform:uppercase;letter-spacing:.01em;color:var(--text-primary)">Beyond Mechanics</span>
+    </div>
+
+    <div style="position:relative;z-index:1;padding:0 var(--space-2) var(--space-5)">
+      <x-import component-from-global-scope="AODComms.Surface" level="0" behind="var(--e1-surface)" padding="var(--space-3)" style="display:block;box-sizing:border-box;width:100%" hint-size="100%,52px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-2)">
+          <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted);white-space:nowrap">TEAM</span>
+            <span style="font:var(--type-body-s);color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ team }}</span>
+            <span style="font:var(--type-data);font-size:11px;color:var(--text-muted);white-space:nowrap">{{ teamCode }}</span>
+          </span>
+          <x-import component-from-global-scope="AODComms.Icon" name="split" size="{{ 13 }}" color="var(--text-muted)" hint-size="13px,13px"></x-import>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:2px">
+      <a href="{{ dashboardHref }}" style="display:block">
+        <x-import component-from-global-scope="AODComms.NavItem" label="Dashboard" active="{{ onDashboard }}" icon="{{ iconDashboard }}" hint-size="100%,38px"></x-import>
+      </a>
+      <a href="{{ sessionsHref }}" style="display:block">
+        <x-import component-from-global-scope="AODComms.NavItem" label="Sessions" active="{{ onSessions }}" icon="{{ iconSessions }}" hint-size="100%,38px"></x-import>
+      </a>
+      <a href="{{ teamHref }}" style="display:block">
+        <x-import component-from-global-scope="AODComms.NavItem" label="Team" active="{{ onTeam }}" icon="{{ iconTeam }}" hint-size="100%,38px"></x-import>
+      </a>
+      <a href="{{ settingsHref }}" style="display:block">
+        <x-import component-from-global-scope="AODComms.NavItem" label="Settings" active="{{ onSettings }}" icon="{{ iconSettings }}" hint-size="100%,38px"></x-import>
+      </a>
+    </div>
+
+    <div style="flex:1;min-height:var(--space-6)"></div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-4) var(--space-2) 0;border-top:1px solid var(--border-soft)">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">{{ buildLabel }}</span>
+        <span style="display:flex;align-items:center;gap:7px">
+          <span style="width:6px;height:6px;border-radius:var(--radius-pill);background:var(--aligned);display:block"></span>
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">API:OK</span>
+        </span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <x-import component-from-global-scope="AODComms.HexSlot" initials="{{ userInitials }}" width="{{ 34 }}" height="{{ 38 }}" state="active" hint-size="34px,38px"></x-import>
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span style="font:var(--type-body-s);color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ userName }}</span>
+          <span style="font:var(--type-micro);letter-spacing:var(--track-micro);color:var(--text-muted)">{{ userRole }}</span>
+        </span>
+      </div>
+    </div>
+
+  </div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:212,&quot;height&quot;:900},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;sessions&quot;,&quot;team&quot;,&quot;settings&quot;],&quot;default&quot;:&quot;dashboard&quot;,&quot;tsType&quot;:&quot;'dashboard' | 'sessions' | 'team' | 'settings'&quot;},&quot;team&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Team Nova&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;teamCode&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;NOVA-7X2K&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Coach Reyes&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userRole&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;COACH&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;userInitials&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;CR&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;buildLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;BUILD:4.0.2&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;dashboardHref&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;06 Coach dashboard.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;sessionsHref&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;09 Session setup coach.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;teamHref&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;06 Coach dashboard.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;settingsHref&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;06 Coach dashboard.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const active = p.active || 'dashboard';
+    const { Icon } = window.AODComms || {};
+    const ico = (name, on) => Icon
+      ? React.createElement(Icon, { name, size: 15, color: on ? 'var(--red)' : 'var(--text-muted)' })
+      : null;
+    return {
+      team: p.team ?? 'Team Nova',
+      teamCode: p.teamCode ?? 'NOVA-7X2K',
+      userName: p.userName ?? 'Coach Reyes',
+      userRole: p.userRole ?? 'COACH',
+      userInitials: p.userInitials ?? 'CR',
+      buildLabel: p.buildLabel ?? 'BUILD:4.0.2',
+      dashboardHref: p.dashboardHref ?? '06 Coach dashboard.dc.html',
+      sessionsHref: p.sessionsHref ?? '09 Session setup coach.dc.html',
+      teamHref: p.teamHref ?? '06 Coach dashboard.dc.html',
+      settingsHref: p.settingsHref ?? '06 Coach dashboard.dc.html',
+      onDashboard: active === 'dashboard',
+      onSessions: active === 'sessions',
+      onTeam: active === 'team',
+      onSettings: active === 'settings',
+      iconDashboard: ico('frame', active === 'dashboard'),
+      iconSessions: ico('tracks', active === 'sessions'),
+      iconTeam: ico('role', active === 'team'),
+      iconSettings: ico('filter', active === 'settings')
+    };
+  }
+}
+</script>
+</body>
+</html>

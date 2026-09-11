@@ -1,0 +1,154 @@
+---
+title: AOD - end-to-end flow with the frontend (2026-09-10)
+config:
+  layout: elk
+---
+flowchart TD
+    subgraph Legend ["Legend"]
+        direction LR
+        Lg1["React + Vite client"]:::frontendNode
+        Lg2["Laravel API / queue worker"]:::processNode
+        Lg3["Database table"]:::dataNode
+        Lg4["Decision point"]:::decisionNode
+    end
+
+    Start([Start]) --> FEOpen["React client (Vite build) loads;<br/>React Router shows the log-in or sign-up route"]
+    FEOpen --> CheckAccount{"Already have<br/>an account?"}
+
+    CheckAccount -->|Yes| FELoginForm["Log-in form: React Hook Form + Zod<br/>validate email and password in the browser"]
+    FELoginForm --> FELoginCall["Axios POST /api/login"]
+    FELoginCall --> ValidateCredentials["API checks the credentials"]
+    ValidateCredentials --> IssueToken["API issues an access token,<br/>marks the user online"]
+    IssueToken --> FEStoreToken["Client stores the token, sets the Axios<br/>auth header, seeds TanStack Query with the user"]
+    FEStoreToken --> RedirectDash["React Router opens the view for the user's role"]
+
+    CheckAccount -->|No| FESignUpForm["Sign-up form (React Hook Form + Zod):<br/>choose Coach or Player, enter account details<br/>(players may add a Riot ID)"]
+    FESignUpForm --> FESignUpCall["Axios POST /api/register"]
+    FESignUpCall --> TeamChoice{"Set up a team<br/>now, or later?"}
+
+    TeamChoice -->|Create a team| FETeamForm["Team form (React Hook Form + Zod):<br/>name and description"]
+    FETeamForm --> FETeamCall["Axios POST /api/teams"]
+    FETeamCall --> GenTeamCode["API makes a unique team code, TM-XXXXXXXX,<br/>and default team settings:<br/>keyword lists, silence threshold, timing windows"]
+    GenTeamCode --> CoachMainActive["Creator becomes the main coach,<br/>an active member"]
+    CoachMainActive --> IssueToken
+
+    TeamChoice -->|Join with a code| FEJoinForm["Join form: enter a team code"]
+    FEJoinForm --> FEJoinCall["Axios POST /api/teams/join"]
+    FEJoinCall --> ValidateCode["API checks the code"]
+    ValidateCode --> PendingRequest["Added as a pending request:<br/>player, or assistant coach"]
+    PendingRequest --> MainCoachDecides{"Main coach<br/>approves?"}
+    MainCoachDecides -->|"Approve, within the 5-player cap"| BecomeActive["Becomes an active member"]
+    MainCoachDecides -->|Reject| RejectedMember["Request rejected;<br/>user stays teamless"]
+    BecomeActive --> IssueToken
+    RejectedMember --> IssueToken
+
+    TeamChoice -->|Skip for now| Teamless["No team yet;<br/>can join one later"]
+    Teamless --> IssueToken
+
+    RedirectDash --> FEDash["Team view (React): TanStack Query loads<br/>GET /api/teams and GET /api/dashboard/header"]
+    FEDash --> RoleGate{"User's team<br/>role?"}
+
+    RoleGate -->|Main coach| ManageTeam["Coach UI: approve or remove members,<br/>edit team settings, and run sessions"]
+    RoleGate -->|Assistant coach| AssistantCoach["Coach UI: run sessions;<br/>no membership control"]
+    RoleGate -->|Player| PlayerView["Player UI: see and join the team's sessions"]
+
+    ManageTeam --> FECreateSession["Coach names a session;<br/>Axios POST /api/teams/{team}/sessions"]
+    AssistantCoach --> FECreateSession
+    FECreateSession --> SystemCreateSession["API creates the session, one game per session,<br/>gives it a code like SESSION_048,<br/>and adds the coach as the first participant"]
+    SystemCreateSession --> LobbyState["Session is waiting to start (queuing).<br/>No timeline yet."]
+
+    LobbyState --> FELobby["SESSION LOBBY (React): the client subscribes to the<br/>session channel via Laravel Echo + Pusher-js"]
+    FELobby --> PlayersJoin["Team members join the session<br/>(Axios POST /api/sessions/{id}/join)"]
+    PlayerView --> FEJoinFromList["Player opens the team's session from the list"]
+    FEJoinFromList --> PlayersJoin
+    PlayersJoin --> RecordParticipants[("SESSION_PARTICIPANTS:<br/>one row per person, with a team-role snapshot")]
+    RecordParticipants --> FELiveLobby["Lobby updates arrive as real-time events over Echo:<br/>participant joined or left, status changed"]
+    FELiveLobby --> Consent["Each player is asked to consent to being recorded<br/>(Axios POST /api/sessions/{id}/consent)"]
+    Consent --> ConsentGate{"Every present player has<br/>consented, and there is<br/>at least one player?"}
+    ConsentGate -->|Not yet| FELobby
+    ConsentGate -->|Yes| CanStart["Coach can start the session"]
+
+    CanStart --> StartSession["Coach starts the session<br/>(Axios POST /api/sessions/{id}/start)"]
+    StartSession --> MoveInProgress["Session moves to recording (in_progress);<br/>consented players move to a recording state"]
+    MoveInProgress --> NotifyPlayers["Players' clients receive the status event over Echo:<br/>recording has begun"]
+    NotifyPlayers --> Capture["Each player's browser records their own microphone<br/>audio and screen video with MediaRecorder"]
+    Capture --> PlayGame["The team plays the game"]
+    PlayGame --> FEStopRecording["On stop, fix-webm-duration patches the<br/>WebM duration header on each recording"]
+    FEStopRecording --> CoachCompletes["When the game ends, the coach submits one form<br/>(React Hook Form, multipart Axios POST<br/>/api/sessions/{id}/complete):<br/>every recording player's audio and video,<br/>plus the match events typed in by hand<br/>(kills, deaths, spike plant and defuse, round win and loss)"]
+
+    CoachCompletes --> StoreFiles["API saves the uploaded files"]
+    StoreFiles --> AODRecords[("AOD_RECORDS")]
+    StoreFiles --> VODRecords[("VOD_RECORDS")]
+    CoachCompletes --> GameEventRows[("GAME_EVENTS:<br/>entered by hand for now;<br/>a Riot data feed is reserved for later")]
+    CoachCompletes --> CreateTimeline["Session moves to processing;<br/>the session's timeline is created now"]
+    CreateTimeline --> TimelinesRow[("TIMELINES")]
+    CreateTimeline -.-> note1["The prototype lines audio, video and match up<br/>from a shared start, with no drift correction yet"]
+    CreateTimeline -.-> FEProcessing["Client shows a processing view; transcription<br/>progress and status changes stream in over Echo + Pusher-js"]
+
+    AODRecords --> SubmitAssembly["Send each player's audio to AssemblyAI<br/>for speech-to-text"]
+    SubmitAssembly --> PollAssembly["Wait for each result;<br/>store the text, language, and confidence"]
+    PollAssembly --> LangCheck{"English or Filipino,<br/>and the provider succeeded?"}
+    LangCheck -->|"No"| TranscriptFailed["Mark that one transcript failed;<br/>it still counts as done"]
+    LangCheck -->|Yes| TranscriptRows[("TRANSCRIPTS")]
+    TranscriptRows --> FetchSentences["Fetch the sentence and word breakdown"]
+    FetchSentences --> SentenceRows[("TRANSCRIPT_SENTENCES and TRANSCRIPT_WORDS")]
+
+    SentenceRows --> LoadSettings["Load the team's keyword lists and timing settings"]
+    LoadSettings --> DetectCallouts["Scan each transcript for the team's keywords,<br/>group nearby hits into one callout"]
+    DetectCallouts --> CalloutRows[("COMM_EVENTS and CALLOUT_DETECTIONS")]
+    DetectCallouts -.-> note2["Detection and tagging only:<br/>informative, declarative, or both.<br/>No good or bad judgment."]
+
+    CalloutRows --> DeadAir["For every session, find stretches where the whole<br/>team was silent longer than the threshold"]
+    TranscriptFailed --> DeadAir
+    DeadAir --> DeadAirRows[("DEAD_AIR_PERIODS")]
+    DeadAirRows --> DeadAirNote{"A match event went<br/>uncalled inside a<br/>silent stretch?"}
+    DeadAirNote -->|Yes| DeadAirAnnotation["Add a system note on that stretch,<br/>naming the events that went uncalled"]
+    DeadAirNote -->|No| AlignStep{"Does the session have<br/>match events?"}
+    DeadAirAnnotation --> AlignStep
+
+    AlignStep -->|Yes| Alignment["For callouts near a match event, add a soft note:<br/>possibly positive, possibly negative, or neutral"]
+    Alignment --> AlignmentRows[("ANNOTATIONS, topic game_state_alignment")]
+    AlignStep -->|No| ReadyGate{"Transcripts done, callouts found,<br/>silence checked, and alignment<br/>checked when there are match events?"}
+    AlignmentRows -.-> note3["A hedged read of the moment,<br/>not a verdict on the call.<br/>The coach still judges."]
+    AlignmentRows --> ReadyGate
+
+    ReadyGate -->|Not yet| WaitMore["Wait for the remaining steps"]
+    WaitMore --> ReadyGate
+    ReadyGate -->|Yes| ReadyForReview["Session moves to<br/>ready for coach review (timeline_ready)"]
+
+    ReadyForReview --> FEReviewBoard["Coach review UI (React), coach-only: TanStack Query<br/>loads GET /api/sessions/{id}/timeline and /timeline-summary;<br/>GSAP drives timeline scrubbing and playback"]
+    FEReviewBoard --> ReviewBoard["Shows callouts per player, match events, silent<br/>stretches, notes, captions, and each recording's details"]
+    ReviewBoard --> CoachActions["Coach adds manual callouts or silent stretches,<br/>edits or deletes entries, writes notes, replies,<br/>and signs off each entry as reviewed<br/>(Axios POST, PUT, DELETE; the list refetches)"]
+    ReviewBoard -.->|"re-analyze with updated settings"| LoadSettings
+    CoachActions --> ReviewComplete{"Every entry<br/>signed off?"}
+    ReviewComplete -->|No| ReviewBoard
+    ReviewComplete -->|Yes| ShareWithTeam["Coach marks it shared with the team (analysis_ready)"]
+    ShareWithTeam --> PlayerReview["Players' clients receive the analysis_ready event;<br/>the timeline routes open to them"]
+    PlayerReview --> PlayerActions["Players view the callouts, match events, and notes,<br/>and add their own notes and replies (Axios)"]
+    PlayerActions --> Reopen{"Coach reopens<br/>review?"}
+    Reopen -->|Yes| ReviewBoard
+    Reopen -->|No| Completed(["Completed post-game analysis"])
+
+    Completed --> Dashboard["Recent shared sessions roll up into the team dashboard<br/>(TanStack Query): communication rate, alignment rate,<br/>silence, and per-player lines"]
+    Dashboard --> FutureTraining["Kept for tracking communication habits over time"]
+    FutureTraining --> End([End])
+
+    classDef processNode stroke:#818cf8,fill:#eef2ff
+    classDef decisionNode stroke:#fb923c,fill:#fff7ed
+    classDef dataNode stroke:#2dd4bf,fill:#f0fdfa
+    classDef authNode stroke:#a78bfa,fill:#f5f3ff
+    classDef sessionNode stroke:#f87171,fill:#fef2f2
+    classDef reviewNode stroke:#38bdf8,fill:#f0f9ff
+    classDef terminalNode stroke:#4ade80,fill:#f0fdf4
+    classDef noteNode stroke:#facc15,fill:#fefce8
+    classDef frontendNode stroke:#64748b,fill:#f1f5f9
+
+    class Start,Completed,FutureTraining,End terminalNode
+    class FEOpen,RedirectDash,FELoginForm,FELoginCall,FEStoreToken,FESignUpForm,FESignUpCall,FETeamForm,FETeamCall,FEJoinForm,FEJoinCall,FEDash,FECreateSession,FELobby,FEJoinFromList,FELiveLobby,NotifyPlayers,Capture,FEStopRecording,CoachCompletes,FEProcessing,FEReviewBoard frontendNode
+    class ManageTeam,AssistantCoach,PlayerView,ValidateCredentials,ValidateCode,PlayGame,SubmitAssembly,PollAssembly,FetchSentences,LoadSettings,DetectCallouts,DeadAir,DeadAirAnnotation,Alignment,CoachActions,PlayerActions,WaitMore,TranscriptFailed processNode
+    class CheckAccount,TeamChoice,MainCoachDecides,RoleGate,ConsentGate,LangCheck,DeadAirNote,AlignStep,ReadyGate,ReviewComplete,Reopen decisionNode
+    class IssueToken,GenTeamCode,CoachMainActive,BecomeActive,RecordParticipants,AODRecords,VODRecords,GameEventRows,TimelinesRow,TranscriptRows,SentenceRows,CalloutRows,DeadAirRows,AlignmentRows dataNode
+    class PendingRequest,RejectedMember,Teamless authNode
+    class SystemCreateSession,LobbyState,MoveInProgress,StartSession,CanStart,StoreFiles,CreateTimeline,ReadyForReview sessionNode
+    class ReviewBoard,ShareWithTeam,PlayerReview,Dashboard reviewNode
+    class note1,note2,note3 noteNode
