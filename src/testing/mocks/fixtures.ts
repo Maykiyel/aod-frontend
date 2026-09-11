@@ -1,10 +1,7 @@
 import type { Team, User } from '@/types/api';
 
-/**
- * Fixtures typed as the generated schemas, so a mock cannot describe a response
- * the API would never send — #14 asks for exactly that. The values are taken
- * from a real response from the seeded demo team.
- */
+/** Typed as the generated schemas so a mock cannot describe a response the API
+ *  would never send. Values taken from a real seeded-team response. */
 
 export const thunderbolts: Team = {
   id: 1,

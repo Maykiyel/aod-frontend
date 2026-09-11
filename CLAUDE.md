@@ -10,6 +10,9 @@ The five canonical triage roles, using the default label strings. See `docs/agen
 
 ### Project conventions
 
+Code comments are **one line where possible, three at the outside** — the what
+and the why, then stop. Long reasoning belongs in an ADR or a PR body.
+
 `pnpm` only, never `npm`. Architecture follows **bulletproof-react**, and file
 and folder names under `src` are kebab-case with `@/*` resolving to `./src/*`.
 Treat it as a **strong default, not law**, exactly like the two Vercel skills

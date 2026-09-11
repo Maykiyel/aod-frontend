@@ -2,19 +2,11 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { cx } from '@/utils/cx';
 import styles from './surface.module.css';
 
-/**
- * Elevation rung. A union rather than `number`, so an illegal level fails to
- * compile and autocomplete lists what is legal — the spec in #14 asks for this
- * explicitly.
- */
+/** Elevation rung. A union so an illegal level fails to compile (#14). */
 export type ElevationLevel = 0 | 1 | 2 | 3 | 4;
 
-/**
- * The substrate tokens a plate can sit on — the surface tints from colors.css.
- *
- * A union rather than `string` so a mistyped or invented token name fails to
- * compile, which is the other half of what #14 asks for alongside `level`.
- */
+/** Surface tints from colors.css. A union so a mistyped token fails to compile —
+ *  the other half of what #14 asks for alongside `level`. */
 export type SubstrateToken =
   | 'var(--void)'
   | 'var(--well)'
@@ -29,10 +21,8 @@ type SurfaceElement = 'div' | 'section' | 'aside' | 'main' | 'article' | 'header
 export interface SurfaceProps extends HTMLAttributes<HTMLElement> {
   /** 0 recessed, 1 structure, 2 module, 3 raised, 4 overlay. Default 2. */
   level?: ElevationLevel;
-  /**
-   * Override the groove count. Leave unset — the count equals the level by
-   * design. Pass 0 only for a plate too small to carry slots (under ~120px).
-   */
+  /** Override the groove count. Leave unset — it equals the level by design.
+   *  Pass 0 only for a plate too narrow to carry slots (under ~120px). */
   grooves?: number;
   /** Colour showing through the groove slots: the surface this one sits on. */
   behind?: SubstrateToken;
@@ -50,19 +40,9 @@ const LEVEL_CLASS: Record<ElevationLevel, string> = {
   4: styles.e4,
 };
 
-/**
- * The base plate: one rung of the elevation ladder plus the matching run of
- * edge grooves on its top edge. The only correct way to place something on the
- * ladder.
- *
- * Groove count is derived from `level` and is not a styling choice — the design
- * system fixes the relationship, so `grooves` exists only for plates too narrow
- * to carry slots.
- *
- * The grooves are real DOM nodes rather than pseudo-elements because the count
- * runs 0–4 and `::before`/`::after` give only two. `behind` and `padding` arrive
- * as custom properties so the stylesheet keeps every declaration (ADR 0002).
- */
+/** The base plate: one elevation rung plus its matching grooves. Groove count
+ *  derives from `level`, never chosen. Grooves are DOM nodes since the count runs
+ *  0–4 and pseudo-elements give two; `behind`/`padding` are custom properties. */
 export function Surface({
   level = 2,
   grooves,

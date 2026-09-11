@@ -59,6 +59,16 @@ src
 - Limit props; prefer composition through children or slots when a component
   starts collecting them.
 
+## Comments
+
+**One line where possible, three at the outside.** State the *what* and the
+*why* and stop. A comment that runs to a paragraph is a sign the reasoning
+belongs in an ADR, a PR body or a ticket — link to that instead of restating it.
+
+Worth a comment: a non-obvious constraint, a departure from a documented default
+and its reason, a trap the next reader would otherwise walk into. Not worth one:
+anything the code already says.
+
 ## Reconciliations already decided
 
 bulletproof-react leaves several choices open or suggests defaults this repo has

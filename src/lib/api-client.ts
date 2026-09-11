@@ -1,25 +1,10 @@
 import { env } from '@/config/env';
 import { clearToken, readToken } from '@/lib/auth-token';
 
-/**
- * The single configured HTTP client. Every call to the API goes through here.
- *
- * It exists to hold four facts in one place, so that no screen has to know them:
- *
- * 1. **The envelope.** Every endpoint answers `{ message, data, code, error }`.
- *    Callers receive `data`; nothing above this module knows the wrapper exists.
- * 2. **The bearer token** (ADR 0004). Attached when present, with credentials
- *    omitted and no CSRF handling — the API issues Sanctum tokens and keeps no
- *    session cookie. The design handoff says the opposite and is wrong.
- * 3. **What counts as logged out.** Only a 401 does. See `ApiError` below.
- * 4. **That failures arrive as one type**, whether they came from the server,
- *    the network, or a body that was not the envelope at all.
- *
- * Transport note: this uses `fetch`, while ADR 0004 says axios. The ADR's
- * substance is the bearer token, not the library, and the interface here is
- * deliberately small enough that swapping the transport touches only this file.
- * See the session notes on #1 — axios could not be installed when this landed.
- */
+/** The single configured HTTP client. Unwraps the `{ message, data, code, error }`
+ *  envelope so no screen sees it, attaches the bearer token (ADR 0004 — no cookies,
+ *  no CSRF), and turns every failure into ApiError. Uses fetch, not the axios
+ *  ADR 0004 names; the interface is small enough that swapping touches this file. */
 
 export interface ApiEnvelope<T> {
   message: string;
@@ -28,13 +13,8 @@ export interface ApiEnvelope<T> {
   error: boolean;
 }
 
-/**
- * Every failure this client produces, including network failures.
- *
- * `message` is server-authored wherever the server supplied one and is meant to
- * be shown to the user rather than replaced — the login failure text is the
- * clearest case.
- */
+/** Every failure, network ones included. `message` is server-authored where the
+ *  server supplied one, and is meant to be shown rather than replaced. */
 export class ApiError extends Error {
   readonly status: number;
   readonly fieldErrors: Readonly<Record<string, string[]>>;
@@ -46,14 +26,9 @@ export class ApiError extends Error {
     this.fieldErrors = fieldErrors;
   }
 
-  /**
-   * True when the server rejected the *input* rather than the caller's identity.
-   *
-   * Worth the named accessor because the obvious guess is wrong: bad login
-   * credentials come back as **422**, not 401. Laravel raises them as a
-   * validation failure on the `email` field. Treating them as 401 would log the
-   * user out mid-login and hide the server's own message.
-   */
+  /** Server rejected the input, not the identity. Named because the obvious guess
+   *  is wrong: bad credentials return 422, not 401. Treating them as 401 would log
+   *  the user out mid-login and hide the server's message. */
   get isValidation(): boolean {
     return this.status === 422;
   }
@@ -64,12 +39,8 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Called when a request comes back 401 — the token is already cleared by then.
- *
- * Injected rather than imported so this module stays free of the router: the
- * app layer decides what "return to login" means. See ADR 0007.
- */
+/** Called on 401, after the token is cleared. Injected rather than imported so
+ *  this module stays free of the router. */
 type UnauthorizedHandler = () => void;
 
 let onUnauthorized: UnauthorizedHandler | null = null;
@@ -96,11 +67,8 @@ async function readEnvelope(response: Response): Promise<ApiEnvelope<unknown> | 
   }
 }
 
-/**
- * Laravel puts validation failures at `data.errors` as field -> messages.
- * Note `data` is `[]` rather than `{}` when empty, because PHP cannot tell an
- * empty map from an empty list — hence the Array check.
- */
+/** Laravel puts validation failures at `data.errors`. `data` is `[]` not `{}` when
+ *  empty — PHP cannot tell an empty map from a list — hence the Array check. */
 function extractFieldErrors(envelope: ApiEnvelope<unknown> | null): Record<string, string[]> {
   const data = envelope?.data;
   if (typeof data !== 'object' || data === null || Array.isArray(data)) return {};

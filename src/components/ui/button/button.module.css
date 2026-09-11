@@ -1,8 +1,6 @@
-/* Ported from docs/design/_ds/source/components/core/Button.jsx.
-   The upstream file declared this transition on an inline style object, which
-   has no selector and so could never reach a second state. The values below are
-   the design system's own: --red-hover ships in colors.css and was referenced
-   by nothing before this port. */
+/* Ported from the vendored Button.jsx. Upstream declared this transition on an
+   inline style object, which has no selector and so never reached a second state.
+   --red-hover ships in colors.css and was referenced by nothing before this. */
 
 .button {
   display: inline-flex;
@@ -88,11 +86,10 @@
   border-color: var(--cyan);
 }
 
-/* Focus. The design's stated idiom is "focus lights the border red; no glow, no
-   ring" (Input.prompt.md), which the bordered variants can follow exactly.
-   primary and ghost carry no border, and clip-path on secondary would crop an
-   outline anyway, so the two borderless variants take a light outline instead.
-   That is an extension of the idiom, not a restatement of it — flagged. */
+/* Focus. The design's idiom is "border lights red, no ring" (Input.prompt.md),
+   which the bordered variants follow. primary and ghost have no border, and
+   clip-path would crop an outline on secondary, so those two take an outline —
+   an extension of the idiom rather than a restatement. */
 .secondary:focus-visible,
 .live:focus-visible {
   outline: none;

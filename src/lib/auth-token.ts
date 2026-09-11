@@ -1,11 +1,6 @@
-/**
- * The Sanctum plain-text token, persisted so a refresh does not cost a login
- * (ADR 0004). This module is the only place that names the storage key.
- *
- * Reads and writes are guarded: `localStorage` throws outright in some contexts
- * (private windows, embedded webviews, blocked site data) rather than returning
- * null, and an auth check is not worth crashing the app over.
- */
+/** The Sanctum token, persisted so a refresh costs no login (ADR 0004). The only
+ *  place naming the storage key. Every access is guarded: localStorage throws
+ *  outright in private windows and blocked-storage contexts. */
 
 // Versioned per the `client-localstorage-schema` guidance, so a future change to
 // what is stored can be recognised and discarded rather than misread.

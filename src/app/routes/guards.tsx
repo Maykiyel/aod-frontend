@@ -39,9 +39,3 @@ export function RequireAnonymous() {
   if (status === 'authenticated') return <Navigate to={target} replace />;
   return <Outlet />;
 }
-
-/**
- * The route table, exported so tests can mount it in a memory router at a
- * chosen path. That is the seam #14 commits to: a test drives the real routes,
- * the real providers and the real HTTP client, with only the network mocked.
- */

@@ -1,9 +1,6 @@
-/* Ported from docs/design/_ds/source/components/core/Input.jsx.
-   Upstream set `outline: none` with no replacement, because a replacement needs
-   :focus-visible and an inline style object has no selectors. The design did
-   specify the treatment — "focus lights the border red; no glow, no ring"
-   (Input.prompt.md) — so the rule below is the documented behaviour, restored,
-   not a new invention. */
+/* Ported from the vendored Input.jsx. Upstream set `outline: none` with no
+   replacement, since that needs :focus-visible and inline styles have no
+   selectors. The rule below is the design's documented treatment, restored. */
 
 .label {
   display: block;
