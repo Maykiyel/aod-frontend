@@ -1,5 +1,18 @@
+# pnpm 11 refuses to install until every dependency carrying a build script has
+# been ruled on, so an unreviewed postinstall can never run silently. The
+# decision is recorded here rather than approved interactively, so it lives in
+# version control instead of on one machine.
+#
+# msw: denied. Its postinstall installs the browser service worker used by
+# `msw/browser`. This project only uses `setupServer` from `msw/node`, in Vitest,
+# so the script has nothing to do here.
 allowBuilds:
-  msw: set this to true or false
+  msw: false
+
+# Added automatically by pnpm when these four were newer than the 24h
+# minimumReleaseAge default. They have since aged past it, so these entries no
+# longer do anything and can be deleted whenever convenient — keeping them only
+# narrows the policy for these exact versions.
 minimumReleaseAgeExclude:
   - baseline-browser-mapping@2.11.22
   - electron-to-chromium@1.5.427
