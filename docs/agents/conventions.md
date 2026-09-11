@@ -82,7 +82,8 @@ already settled. These are resolved, not open questions:
 | UI library | suggests adopting one (MUI, Radix, …) | **None.** The 16 primitives are authored here — ADR 0001 |
 | Testing | Vitest + Testing Library + MSW; integration tests are the focus | **Same**, narrowed to a single route-level seam — see the spec in #14 |
 | Server cache | React Query / SWR | **React Query.** One client per app instance, no automatic retry — `src/lib/react-query.ts` says why |
-| Auth state | no guidance given | Bearer token in `localStorage` — ADR 0004 |
+| Client state | no guidance given | **Zustand** — ADR 0010. Only for state that crosses routes; screen-local state stays local |
+| Auth state | no guidance given | Bearer token in `localStorage` — ADR 0004; the session itself is a Zustand store |
 | Storybook | recommended as a component catalogue | **Not adopted.** Three-week prototype; revisit if the primitives outlive it |
 
 ## Testing
