@@ -1,5 +1,11 @@
-/* Brand faces, self-hosted. Big Shoulders Display - display. Inter - prose.
-   JetBrains Mono - anything measured. No render-time dependency on a font host.
-   The @font-face rules live in public/fonts/fonts.css so the woff2 files are
-   served as-is rather than passing through the bundler. */
-@import url("/fonts/fonts.css");
+/* Brand faces: Big Shoulders Display for display, Inter for prose, JetBrains
+   Mono for anything measured.
+
+   The @font-face rules are NOT imported here. They are linked from index.html
+   so the woff2 files are served from public/ as-is, exactly as this comment
+   used to claim but did not do: importing them here put every file through the
+   bundler, which emitted a hashed copy while public/ shipped an unhashed one —
+   about 241 KB of the same fonts twice. Linking them also gives their URLs the
+   stability that preloading needs.
+
+   Nothing else should import this file expecting @font-face rules. */

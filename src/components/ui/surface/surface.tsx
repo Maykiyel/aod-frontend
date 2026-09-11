@@ -9,6 +9,20 @@ import styles from './surface.module.css';
  */
 export type ElevationLevel = 0 | 1 | 2 | 3 | 4;
 
+/**
+ * The substrate tokens a plate can sit on — the surface tints from colors.css.
+ *
+ * A union rather than `string` so a mistyped or invented token name fails to
+ * compile, which is the other half of what #14 asks for alongside `level`.
+ */
+export type SubstrateToken =
+  | 'var(--void)'
+  | 'var(--well)'
+  | 'var(--ash)'
+  | 'var(--steel)'
+  | 'var(--steel-2)'
+  | 'var(--steel-3)';
+
 /** Elements a plate is ever rendered as. Deliberately narrow. */
 type SurfaceElement = 'div' | 'section' | 'aside' | 'main' | 'article' | 'header' | 'footer' | 'nav';
 
@@ -21,7 +35,7 @@ export interface SurfaceProps extends HTMLAttributes<HTMLElement> {
    */
   grooves?: number;
   /** Colour showing through the groove slots: the surface this one sits on. */
-  behind?: string;
+  behind?: SubstrateToken;
   /** CSS padding. Default var(--space-6). */
   padding?: string;
   as?: SurfaceElement;

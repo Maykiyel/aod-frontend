@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { envelope } from '@/testing/mocks/handlers';
-import { authToken } from '@/testing/mocks/fixtures';
+import { authToken, mainCoach } from '@/testing/mocks/fixtures';
 import { server } from '@/testing/mocks/server';
 import { renderApp } from '@/testing/test-utils';
 import { env } from '@/config/env';
@@ -109,5 +109,35 @@ describe('authentication', () => {
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/could not reach the server/i);
+  });
+
+  it('does not send a request until the browser is satisfied with the input', async () => {
+    let loginAttempts = 0;
+    server.use(
+      http.post(`${env.apiUrl}/login`, () => {
+        loginAttempts += 1;
+        return envelope('Login successful.', { user: mainCoach, token: authToken });
+      }),
+    );
+
+    const { user } = renderApp('/login');
+    const submit = screen.getByRole('button', { name: 'Log in' });
+
+    // Both fields empty: `required` should stop this before the network.
+    await user.click(submit);
+    expect(loginAttempts).toBe(0);
+
+    // A malformed address is something the browser already knows is wrong, so
+    // the user should not wait on a round trip to be told.
+    await user.type(screen.getByLabelText('Email'), 'not-an-email');
+    await user.type(screen.getByLabelText('Password'), 'maincoach');
+    await user.click(submit);
+    expect(loginAttempts).toBe(0);
+
+    // Valid input does reach the network.
+    await user.clear(screen.getByLabelText('Email'));
+    await user.type(screen.getByLabelText('Email'), 'maincoach@example.com');
+    await user.click(submit);
+    await waitFor(() => expect(loginAttempts).toBe(1));
   });
 });
