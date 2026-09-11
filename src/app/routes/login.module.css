@@ -1,0 +1,39 @@
+.screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 380px;
+  background: var(--e1-surface);
+  border: var(--border-width) solid var(--e1-border);
+  box-shadow: var(--e1-shadow);
+  padding: var(--space-7);
+}
+
+.eyebrow {
+  margin: 0;
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.heading {
+  margin: 0 0 var(--space-2);
+  font: var(--type-display-m);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+/* An instrument reading in the signal red, not a browser alert. */
+.error {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+}
