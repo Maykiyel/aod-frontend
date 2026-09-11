@@ -27,4 +27,6 @@ export const mainCoach: User = {
   created_at: '2026-09-11T11:52:36.000000Z',
 };
 
-export const authToken = '1|4AT2TVTcC6UncL4v0sq5MN5dqBLWaJ71ACYkmGRUed90a6f5';
+/** Synthetic. Shaped like a Sanctum token so nothing is exercised differently,
+ *  but obviously not a real one — fixtures must never carry live credentials. */
+export const authToken = '1|test-token-not-a-real-credential';
