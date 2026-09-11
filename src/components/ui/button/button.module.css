@@ -1,0 +1,106 @@
+/* Ported from docs/design/_ds/source/components/core/Button.jsx.
+   The upstream file declared this transition on an inline style object, which
+   has no selector and so could never reach a second state. The values below are
+   the design system's own: --red-hover ships in colors.css and was referenced
+   by nothing before this port. */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-data);
+  /* 0.1em is not --track-tag (.08em) or --track-eyebrow (.16em); no token
+     matches, so the literal stands. --type-data already carries 12px. */
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius-none);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 120ms linear,
+    border-color 120ms linear,
+    color 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+
+/* :disabled rather than an opacity prop, so a surrounding <fieldset disabled>
+   is honoured too — the inline-style version could not see that. */
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--red);
+  color: var(--text-on-accent);
+  font-weight: 500;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--red-hover);
+}
+
+.secondary {
+  color: var(--text-primary);
+  border: var(--border-width) solid var(--border-raised);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--clip-button)),
+    calc(100% - var(--clip-button)) 100%,
+    0 100%
+  );
+}
+
+/* Inferred, not specified: the design names no hover for the bordered variants.
+   Stepping one rung up the border ladder keeps it inside the system rather than
+   inventing a colour. Worth confirming with the designer. */
+.secondary:hover:not(:disabled) {
+  border-color: var(--border-overlay);
+}
+
+.ghost {
+  color: var(--text-secondary);
+  padding: var(--space-3) var(--space-4);
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.live {
+  color: var(--cyan);
+  /* Upstream hard-coded rgba(63,225,214,.4) here, which is --cyan restated by
+     hand and would not follow the token if it changed. 11px has no spacing
+     token; 16px does. */
+  border: var(--border-width) solid color-mix(in srgb, var(--cyan) 40%, transparent);
+  padding: 11px var(--space-4);
+}
+
+.live:hover:not(:disabled) {
+  border-color: var(--cyan);
+}
+
+/* Focus. The design's stated idiom is "focus lights the border red; no glow, no
+   ring" (Input.prompt.md), which the bordered variants can follow exactly.
+   primary and ghost carry no border, and clip-path on secondary would crop an
+   outline anyway, so the two borderless variants take a light outline instead.
+   That is an extension of the idiom, not a restatement of it — flagged. */
+.secondary:focus-visible,
+.live:focus-visible {
+  outline: none;
+  border-color: var(--red);
+}
+
+.primary:focus-visible,
+.ghost:focus-visible {
+  outline: var(--border-width) solid var(--text-primary);
+  outline-offset: 2px;
+}

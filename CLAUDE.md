@@ -8,6 +8,14 @@ Issues live as GitHub issues in `Maykiyel/aod-frontend`, driven by the `gh` CLI.
 
 The five canonical triage roles, using the default label strings. See `docs/agents/triage-labels.md`.
 
+### Project conventions
+
+`pnpm` only, never `npm`. Architecture follows **bulletproof-react**, and file
+and folder names under `src` are kebab-case with `@/*` resolving to `./src/*`.
+Treat it as a **strong default, not law**, exactly like the two Vercel skills
+below. See `docs/agents/conventions.md` — it also records which bulletproof
+suggestions this repo has already decided against, and why.
+
 ### Domain docs
 
 Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

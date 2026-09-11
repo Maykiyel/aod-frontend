@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "aod-frontend", "runtimeExecutable": "pnpm", "runtimeArgs": ["dev"], "port": 5173 }
+  ]
+}
