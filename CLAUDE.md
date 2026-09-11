@@ -14,9 +14,11 @@ Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/
 
 ### Backend contract
 
-The API is a separate repo, `Joe-Zupo/aod-backend`, cloned locally at
-`D:\Projects\aod-backend`. It is the **authority** on endpoints, payload shapes,
-enum values, auth, broadcast channels and event names.
+The API is a separate repo, `Joe-Zupo/aod-backend`, checked out **as a sibling of
+this one** — `../aod-backend` from the repo root. Resolve it that way rather than
+by absolute path: this project is developed on more than one machine and the
+parent directory differs between them. It is the **authority** on endpoints,
+payload shapes, enum values, auth, broadcast channels and event names.
 
 Before writing anything that touches the API, read there:
 
@@ -27,7 +29,7 @@ Before writing anything that touches the API, read there:
 
 Never infer a contract from the design handoff or the diagrams; both are older
 than the backend and at least one is known to be wrong about it. If the backend
-clone is missing, say so rather than inventing the shape.
+checkout is missing, say so rather than inventing the shape.
 
 ### Design
 
@@ -35,6 +37,15 @@ Reference designs, the handoff spec and the design-system bundle are in
 `docs/design/` — see `docs/design/README.md` for what each is and how long it
 stays. Tokens are the contract: `src/styles/tokens.css` and the files under
 `src/styles/tokens/`. Never eyeball a value off a mock.
+
+The design system's own source is vendored at `docs/design/_ds/source/` — the 16
+primitives as `.jsx`, with a documented `.d.ts` and a usage `.prompt.md` each.
+**Port from there.** The upstream design-system repo is a remote-less local
+checkout that exists on only one of the development machines, so never assume it
+is present and never cite an absolute path to it; the vendored copy is the
+record. Read `docs/design/_ds/source/README.md` first — it carries the two traps
+(no hover states anywhere in the source, and one deliberate divergence in
+`NotchedCard`).
 
 ### Diagrams
 
