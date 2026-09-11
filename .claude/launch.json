@@ -1,11 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    {
-      "name": "aod-frontend",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js"],
-      "port": 5173
-    }
+    { "name": "aod-frontend", "runtimeExecutable": "pnpm", "runtimeArgs": ["dev"], "port": 5173 }
   ]
 }

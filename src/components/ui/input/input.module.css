@@ -8,6 +8,10 @@
 .label {
   display: block;
   font: var(--type-label);
+  /* NOTE: --type-label is 13px; this 12px override is inherited verbatim from
+     the vendored source, so every label in the design renders a pixel under
+     its own token. Kept to stay faithful to the reference screens — but it
+     means the token and the design disagree. Raised for the designer. */
   font-size: 12px;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
@@ -16,7 +20,9 @@
 }
 
 .field {
-  width: 100%;
+  /* Per-instance width arrives as a custom property rather than an inline
+     style declaration, which ADR 0002 rejects. */
+  width: var(--field-width, 100%);
   background: var(--e0-surface);
   border: var(--border-width) solid var(--e0-border);
   border-radius: var(--radius-none);
@@ -48,6 +54,8 @@
   border-color: var(--red);
 }
 
+/* Addition: the vendored source has no disabled treatment for the field at
+   all. Matched to Button's so the two agree. */
 .field:disabled {
   opacity: 0.4;
   cursor: not-allowed;

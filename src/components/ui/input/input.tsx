@@ -1,5 +1,6 @@
 import { useId } from 'react';
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, CSSProperties } from 'react';
+import { cx } from '@/utils/cx';
 import styles from './input.module.css';
 
 export interface InputProps extends ComponentPropsWithRef<'input'> {
@@ -17,7 +18,7 @@ export interface InputProps extends ComponentPropsWithRef<'input'> {
  * Recessed text or number field with an uppercase label. Always E0 — an input
  * that floats above the plate contradicts the elevation system.
  *
- * Two departures from the vendored source, both deliberate:
+ * Three departures from the vendored source, all deliberate:
  *
  * 1. The label is associated with the field via `useId`. Upstream rendered a
  *    bare <label> with no `htmlFor` and no `id` on the input, so the two were
@@ -26,6 +27,9 @@ export interface InputProps extends ComponentPropsWithRef<'input'> {
  *    as unlabelled.
  * 2. `unit` is wired as `aria-describedby`, so the trailing text is announced
  *    with the field rather than stranded beside it.
+ * 3. `width` sets a `--field-width` custom property rather than an inline
+ *    `width` declaration, which ADR 0002 rejects. The stylesheet still owns
+ *    the property; the caller only supplies the value.
  *
  * `mono` is kept as the boolean the design system documents, against
  * `architecture-avoid-boolean-props`. It selects a type face, not a structure,
@@ -53,10 +57,8 @@ export function Input({
       {...rest}
       id={inputId}
       aria-describedby={describedBy || undefined}
-      className={[styles.field, mono ? styles.mono : null, className]
-        .filter(Boolean)
-        .join(' ')}
-      style={width ? { ...style, width } : style}
+      className={cx(styles.field, mono ? styles.mono : null, className)}
+      style={width ? ({ ...style, '--field-width': width } as CSSProperties) : style}
     />
   );
 

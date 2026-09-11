@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react';
+import { cx } from '@/utils/cx';
 import styles from './button.module.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'live';
@@ -35,7 +36,7 @@ export function Button({
   return (
     <button
       {...rest}
-      className={[styles.button, styles[variant], className].filter(Boolean).join(' ')}
+      className={cx(styles.button, styles[variant], className)}
     >
       {icon}
       {children ? <span>{children}</span> : null}
