@@ -1,10 +1,11 @@
+import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import { env } from '@/config/env';
 import { clearToken, readToken } from '@/lib/auth-token';
 
 /** The single configured HTTP client. Unwraps the `{ message, data, code, error }`
  *  envelope so no screen sees it, attaches the bearer token (ADR 0004 — no cookies,
- *  no CSRF), and turns every failure into ApiError. Uses fetch, not the axios
- *  ADR 0004 names; the interface is small enough that swapping touches this file. */
+ *  no CSRF), and turns every failure into ApiError. */
 
 export interface ApiEnvelope<T> {
   message: string;
@@ -49,90 +50,91 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
   onUnauthorized = handler;
 }
 
-interface RequestOptions {
-  signal?: AbortSignal;
-}
+const client = axios.create({
+  baseURL: env.apiUrl,
+  headers: { Accept: 'application/json' },
+  // ADR 0004: bearer only. Cookies would invite the session/CSRF flow the design
+  // handoff describes and this backend does not implement.
+  withCredentials: false,
+});
 
-/** Parse the envelope, tolerating bodies that are not one (502 HTML, 204, empty). */
-async function readEnvelope(response: Response): Promise<ApiEnvelope<unknown> | null> {
-  if (response.status === 204) return null;
-
-  const text = await response.text();
-  if (!text) return null;
-
-  try {
-    return JSON.parse(text) as ApiEnvelope<unknown>;
-  } catch {
-    return null;
-  }
-}
+client.interceptors.request.use((config) => {
+  const token = readToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 /** Laravel puts validation failures at `data.errors`. `data` is `[]` not `{}` when
  *  empty — PHP cannot tell an empty map from a list — hence the Array check. */
-function extractFieldErrors(envelope: ApiEnvelope<unknown> | null): Record<string, string[]> {
-  const data = envelope?.data;
-  if (typeof data !== 'object' || data === null || Array.isArray(data)) return {};
-
-  const errors = (data as { errors?: unknown }).errors;
+function extractFieldErrors(payload: unknown): Record<string, string[]> {
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) return {};
+  const errors = (payload as { errors?: unknown }).errors;
   if (typeof errors !== 'object' || errors === null || Array.isArray(errors)) return {};
-
   return errors as Record<string, string[]>;
 }
 
-async function request<T>(
-  method: string,
-  path: string,
-  body?: unknown,
-  options?: RequestOptions,
-): Promise<T> {
-  const token = readToken();
-
-  const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  let response: Response;
-  try {
-    response = await fetch(`${env.apiUrl}${path}`, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      // ADR 0004: bearer only. Sending cookies would invite the session/CSRF
-      // flow the handoff describes and this backend does not implement.
-      credentials: 'omit',
-      signal: options?.signal,
-    });
-  } catch (cause) {
-    // An aborted request is the caller's own doing, not a network failure.
-    if (cause instanceof DOMException && cause.name === 'AbortError') throw cause;
-    throw new ApiError('Could not reach the server. Check your connection and try again.', 0);
+function toApiError(cause: unknown): ApiError {
+  if (!axios.isAxiosError(cause)) {
+    return new ApiError('Something went wrong. Try again.', 0);
   }
 
-  const envelope = await readEnvelope(response);
+  // No response at all means the request never landed.
+  if (!cause.response) {
+    return new ApiError('Could not reach the server. Check your connection and try again.', 0);
+  }
 
-  if (response.status === 401) {
+  const { status, data } = cause.response;
+  const envelope = typeof data === 'object' && data !== null ? (data as ApiEnvelope<unknown>) : null;
+  const message = envelope?.message;
+
+  if (status === 401) {
     clearToken();
     onUnauthorized?.();
-    throw new ApiError(envelope?.message ?? 'Your session has ended. Sign in again.', 401);
+    return new ApiError(message ?? 'Your session has ended. Sign in again.', 401);
   }
 
-  if (!response.ok || envelope?.error === true) {
-    throw new ApiError(
-      envelope?.message ?? `The server returned an unexpected response (${response.status}).`,
-      response.status,
-      extractFieldErrors(envelope),
-    );
-  }
+  return new ApiError(
+    message ?? `The server returned an unexpected response (${status}).`,
+    status,
+    extractFieldErrors(envelope?.data),
+  );
+}
 
-  return envelope?.data as T;
+async function request<T>(config: AxiosRequestConfig): Promise<T> {
+  try {
+    const response = await client.request<ApiEnvelope<T>>(config);
+    return response.data?.data as T;
+  } catch (cause) {
+    // An abort is the caller's own doing, so it passes through untranslated.
+    if (axios.isCancel(cause)) throw cause;
+    throw toApiError(cause);
+  }
+}
+
+interface RequestOptions {
+  signal?: AbortSignal;
+  /** Upload progress, 0-1. Needs XHR, which is why this client is axios (#8). */
+  onUploadProgress?: (fraction: number) => void;
+}
+
+function withOptions(options?: RequestOptions): AxiosRequestConfig {
+  if (!options) return {};
+  const { signal, onUploadProgress } = options;
+  return {
+    signal,
+    onUploadProgress: onUploadProgress
+      ? (event) => onUploadProgress(event.total ? event.loaded / event.total : 0)
+      : undefined,
+  };
 }
 
 export const api = {
-  get: <T>(path: string, options?: RequestOptions) => request<T>('GET', path, undefined, options),
-  post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>('POST', path, body, options),
-  put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>('PUT', path, body, options),
-  delete: <T>(path: string, options?: RequestOptions) =>
-    request<T>('DELETE', path, undefined, options),
+  get: <T>(url: string, options?: RequestOptions) =>
+    request<T>({ method: 'GET', url, ...withOptions(options) }),
+  post: <T>(url: string, data?: unknown, options?: RequestOptions) =>
+    request<T>({ method: 'POST', url, data, ...withOptions(options) }),
+  put: <T>(url: string, data?: unknown, options?: RequestOptions) =>
+    request<T>({ method: 'PUT', url, data, ...withOptions(options) }),
+  delete: <T>(url: string, options?: RequestOptions) =>
+    request<T>({ method: 'DELETE', url, ...withOptions(options) }),
 };
