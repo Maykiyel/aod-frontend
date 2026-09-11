@@ -1,58 +1,75 @@
+import type { components } from '@/types/api.generated';
+
 /**
- * PLACEHOLDER types, to be replaced by generated ones.
+ * The domain-facing view of the API's shapes.
  *
- * ADR 0003 says these are generated from the backend's OpenAPI document rather
- * than transcribed, precisely so a field rename surfaces as a type error. The
- * generator cannot run yet: it needs `composer install` and
- * `php artisan scramble:export` in the backend checkout.
+ * `api.generated.ts` is produced from the backend's own OpenAPI document by
+ * `pnpm gen:api` and must never be edited. This file is the thin layer over it:
+ * short names for the shapes screens actually name, plus the few narrowings the
+ * generator cannot express.
  *
- * Everything below was read directly from the backend's resource classes
- * (`UserResource`, `TeamResource`, `TeamMemberResource`) rather than from the
- * design handoff, so it is accurate as of writing — but it is exactly the
- * transcription ADR 0003 warns drifts silently. Replace it, do not extend it.
+ * ADR 0003 warns the spec under-describes the API, because Scramble reads
+ * validation rules and cannot see what a controller enforces. Two consequences
+ * are visible right here — see `MemberRole` and `MembershipStatus`.
  */
 
-/** Membership role. Not a DB enum — `member_role` is a string(32) whose values
- *  are set in application code (AuthController, TeamSeeder). Capabilities derive
- *  from this, never from `User.roles`. See ADR 0007. */
+type Schemas = components['schemas'];
+
+export type User = Schemas['UserResource'];
+export type Team = Schemas['TeamResource'];
+export type TeamMember = Schemas['TeamMemberResource'];
+export type TeamSettings = Schemas['TeamSettingsResource'];
+export type Session = Schemas['SessionResource'];
+
+/**
+ * Membership role — the basis for every capability in the app (ADR 0007).
+ *
+ * The generator types this as plain `string`: `member_role` is a `string(32)`
+ * column whose legal values live in application code, so nothing in the OpenAPI
+ * document narrows it. Hand-written here because a capability model branching on
+ * an unconstrained string is the bug this union exists to prevent.
+ *
+ * NOT the same vocabulary as `User.roles`, which is the global registration role
+ * (`Coach` / `Player`). Capabilities never derive from that.
+ */
 export type MemberRole = 'player' | 'assistant_coach' | 'main_coach';
 
-/** Membership status as seen in the backend's own writes. */
+/** Membership status, narrowed for the same reason as `MemberRole`. */
 export type MembershipStatus = 'pending' | 'active';
 
-export interface TeamMember {
-  id: number;
-  username: string;
-  user_code: string;
-  is_online: boolean;
+/**
+ * A team member whose role and status are narrowed to the unions above.
+ *
+ * Use this rather than `TeamMember` wherever the value is about to be branched
+ * on, and cross the gap with `toActiveMembership` so the narrowing happens once,
+ * at the edge, instead of as a cast at every call site.
+ */
+export interface Membership extends Omit<TeamMember, 'member_role' | 'status'> {
   member_role: MemberRole;
   status: MembershipStatus;
-  joined_at: string | null;
 }
 
-export interface Team {
-  id: number;
-  team_code: string;
-  team_name: string;
-  description: string | null;
-  disbanded_at: string | null;
-  created_at: string;
-  /** Only present on `GET /teams`. `activeTeams` elsewhere serialises without
-   *  members loaded, which is why `member_role` cannot be read off login. */
-  members?: TeamMember[];
+const MEMBER_ROLES: readonly string[] = ['player', 'assistant_coach', 'main_coach'];
+const MEMBERSHIP_STATUSES: readonly string[] = ['pending', 'active'];
+
+export function isMemberRole(value: string): value is MemberRole {
+  return MEMBER_ROLES.includes(value);
 }
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  user_code: string;
-  riot_id: string | null;
-  is_online: boolean;
-  /** Global registration role — `Coach` or `Player`. A different vocabulary from
-   *  `MemberRole` and NOT the basis for capabilities. */
-  roles?: string[];
-  /** Active teams, serialised without members. */
-  teams?: Team[];
-  created_at: string;
+export function isMembershipStatus(value: string): value is MembershipStatus {
+  return MEMBERSHIP_STATUSES.includes(value);
+}
+
+/**
+ * Narrow a member the API returned, or `null` if it carries a role or status
+ * this client does not know.
+ *
+ * Returning `null` rather than throwing is deliberate: an unrecognised role is
+ * a backend that has moved on, and one stale member should not take down a
+ * roster. Callers drop what they cannot place.
+ */
+export function toMembership(member: TeamMember): Membership | null {
+  if (!isMemberRole(member.member_role)) return null;
+  if (!isMembershipStatus(member.status)) return null;
+  return { ...member, member_role: member.member_role, status: member.status };
 }
