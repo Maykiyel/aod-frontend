@@ -5,9 +5,16 @@ import { envelope } from '@/testing/mocks/handlers';
 import { authToken, mainCoach } from '@/testing/mocks/fixtures';
 import { server } from '@/testing/mocks/server';
 import { renderApp } from '@/testing/test-utils';
+import type { UserEvent } from '@testing-library/user-event';
 import { env } from '@/config/env';
 
 const TOKEN_KEY = 'aod.auth.token.v1';
+
+/** Logging out lives behind the sidebar's profile block, not beside it. */
+async function logOut(user: UserEvent) {
+  await user.click(await screen.findByRole('button', { name: /maincoach/ }));
+  await user.click(await screen.findByRole('menuitem', { name: 'Log out' }));
+}
 
 /** The single seam from #14: render a route with the network mocked at the HTTP
  *  boundary and drive it as a person would. Controls found by accessible name;
@@ -20,8 +27,9 @@ describe('authentication', () => {
     await user.type(screen.getByLabelText('Password'), 'maincoach');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
-    expect(screen.getByText(/maincoach@example\.com/)).toBeInTheDocument();
+    // Landing inside the App Shell is what "reached the app" means (#14).
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
+    expect(screen.getByText('maincoach')).toBeInTheDocument();
   });
 
   it("surfaces the server's own message and stays put when credentials are wrong", async () => {
@@ -48,7 +56,7 @@ describe('authentication', () => {
 
     renderApp('/');
 
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
   });
 
@@ -66,7 +74,7 @@ describe('authentication', () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     const { user } = renderApp('/');
 
-    await user.click(await screen.findByRole('button', { name: 'Log out' }));
+    await logOut(user);
 
     expect(await screen.findByLabelText('Email')).toBeInTheDocument();
     expect(window.localStorage.getItem(TOKEN_KEY)).toBeNull();
@@ -77,7 +85,7 @@ describe('authentication', () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     const { user } = renderApp('/');
 
-    await user.click(await screen.findByRole('button', { name: 'Log out' }));
+    await logOut(user);
 
     // Failing to log out is not a state the user can act on.
     expect(await screen.findByLabelText('Email')).toBeInTheDocument();
@@ -92,7 +100,7 @@ describe('authentication', () => {
   it('sends an authenticated visitor away from login', async () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     renderApp('/login');
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
   });
 
   it('renders an error the user can act on when the network fails', async () => {

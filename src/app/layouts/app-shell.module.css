@@ -1,0 +1,32 @@
+.shell {
+  display: flex;
+  align-items: stretch;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--void);
+}
+
+/* Its own scroll container, so the sidebar is reachable from anywhere in a long
+   screen rather than scrolling away with the content. */
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  width: 100%;
+  max-width: var(--page-max);
+  padding: var(--space-7) var(--space-page-x) var(--space-section);
+}
+
+/* #14 story 29: a smaller desktop window keeps the shell usable. The gutter
+   gives way first; the sidebar's own width is fixed by the design. */
+@media (max-width: 1000px) {
+  .content {
+    padding-inline: var(--space-6);
+  }
+}

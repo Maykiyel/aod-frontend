@@ -1,0 +1,10 @@
+/* `aod-spin` is declared in tokens/base.css alongside the other system keyframes. */
+.spin {
+  animation: aod-spin 3.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}

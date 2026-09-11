@@ -1,0 +1,195 @@
+/* The sidebar, built against docs/design/Sidebar shell.dc.html. The px values
+   are the design's own — plate geometry, and small gaps no token carries. */
+
+.sidebar {
+  position: relative;
+  width: var(--size-sidebar);
+  min-width: var(--size-sidebar);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The plate device: a stepped silhouette, its ring and the void dots milled
+   into it. Decorative chrome, so it sits behind everything and takes no input. */
+.plate {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 298px;
+  pointer-events: none;
+  background: var(--plate-silhouette);
+  clip-path: polygon(0 9%, 12% 0, 44% 0, 44% 48%, 72% 48%, 100% 74%, 100% 100%, 0 100%);
+}
+
+.plateRing {
+  position: absolute;
+  left: 18px;
+  bottom: 26px;
+  width: 132px;
+  height: 132px;
+  border: var(--border-width) solid var(--plate-ring);
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+}
+
+.hole {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--void);
+  pointer-events: none;
+}
+
+.holeUpper { left: 12px; bottom: 262px; }
+.holeLower { left: 12px; bottom: 22px; }
+.holeRight { right: 14px; bottom: 22px; }
+
+.bolt {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--plate-bolt);
+}
+
+.boltTopLeft { top: 7px; left: 7px; }
+.boltTopRight { top: 7px; right: 7px; }
+.boltBottomLeft { bottom: 7px; left: 7px; }
+.boltBottomRight { bottom: 7px; right: 7px; }
+
+.body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-5) var(--space-4);
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) var(--space-5);
+}
+
+/* The wordmark's only mark: no logo exists, so the hexagon stands in for one. */
+.brandMark {
+  display: block;
+  width: 14px;
+  height: 15px;
+  background: var(--red);
+  clip-path: var(--clip-hex);
+}
+
+.brandName {
+  font: var(--type-display-s);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.teamBlock {
+  padding: 0 var(--space-2) var(--space-5);
+}
+
+.teamPlate {
+  display: block;
+  width: 100%;
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-muted);
+}
+
+.teamText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.teamLabel {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.teamName {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamCode {
+  font: var(--type-data);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navLink {
+  display: block;
+  color: inherit;
+}
+
+.navLink:hover {
+  color: inherit;
+}
+
+.navLink:focus-visible {
+  outline: var(--border-width) solid var(--red);
+  outline-offset: -1px;
+}
+
+.spacer {
+  flex: 1;
+  min-height: var(--space-6);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-2) 0;
+  border-top: var(--border-width) solid var(--border-soft);
+}
+
+.readings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.readingDot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--aligned);
+}
+

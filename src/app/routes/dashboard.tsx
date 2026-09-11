@@ -1,24 +1,42 @@
-import { Button } from '@/components/ui/button/button';
-import { useAuth } from '@/lib/auth-context';
+import { EmptyState, EmptyStateInstruction } from '@/components/states/empty-state/empty-state';
+import { InlineError } from '@/components/states/inline-error/inline-error';
+import { Skeleton } from '@/components/states/skeleton/skeleton';
+import { SectionHeader } from '@/components/ui/section-header/section-header';
+import { useMembership } from '@/features/team/hooks/use-membership';
 
-/** Placeholder. The role-aware shell and real empty state are #2; this exists so
- *  the authenticated half of the routing is reachable and logout exercisable. */
+/** Screens 06 and 07 are one route branching on capability (ADR 0007). This
+ *  chunk renders only its empty, loading and error states; the figures are #3. */
 export function DashboardRoute() {
-  const { user, logout } = useAuth();
+  const membership = useMembership();
 
-  return (
-    <main style={{ padding: 'var(--space-7)', display: 'grid', gap: 'var(--space-5)' }}>
-      <h1 style={{ font: 'var(--type-display-m)', textTransform: 'uppercase', margin: 0 }}>
-        Signed in
-      </h1>
-      <p style={{ font: 'var(--type-data)', color: 'var(--text-secondary)', margin: 0 }}>
-        {user?.username} · {user?.email}
-      </p>
-      <div>
-        <Button variant="secondary" onClick={() => void logout()}>
-          Log out
-        </Button>
-      </div>
-    </main>
-  );
+  switch (membership.status) {
+    case 'loading':
+      return <Skeleton label="Loading the team" />;
+
+    case 'error':
+      return <InlineError message={membership.message} onRetry={membership.retry} />;
+
+    case 'teamless':
+      return (
+        <EmptyState eyebrow="Membership" title="No team yet" reading="MEMBERSHIP:NONE">
+          <EmptyStateInstruction>
+            Create a team, or join one with its team code, to start recording sessions.
+          </EmptyStateInstruction>
+        </EmptyState>
+      );
+
+    case 'member':
+      return (
+        <>
+          <SectionHeader as="h1" eyebrow="Team dashboard" title={membership.team.team_name} />
+          <EmptyState eyebrow="Sessions" title="Nothing recorded yet" reading="0 SESSIONS LOGGED">
+            <EmptyStateInstruction>
+              {membership.capabilities.canConfigureSessions
+                ? 'Create a session to start recording. Figures appear here once the first session has been analysed.'
+                : "Figures appear here once your team's first session has been analysed."}
+            </EmptyStateInstruction>
+          </EmptyState>
+        </>
+      );
+  }
 }

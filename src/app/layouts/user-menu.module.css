@@ -1,0 +1,86 @@
+/* The account menu. Radix supplies the behaviour AOD Comms does not ship;
+   the tokens supply the look, at E3 — the rung the design reserves for
+   popovers and dropdowns. */
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  /* --size-hit-min is 44px; the 38px hex plus this padding clears it. */
+  min-height: var(--size-hit-min);
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-none);
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms linear;
+}
+
+.trigger:hover,
+.trigger[data-state='open'] {
+  background: var(--e0-surface);
+}
+
+.trigger:focus-visible {
+  outline: none;
+  border-color: var(--red);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.name {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.content {
+  min-width: 180px;
+  /* Clears the groove strip, which Surface draws across the top edge. */
+  padding: var(--space-4) 0 var(--space-2);
+  z-index: 10;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-hit-min);
+  padding: 0 var(--space-4);
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background 120ms linear,
+    color 120ms linear;
+}
+
+/* Radix marks the focused item, so pointer and keyboard land on one rule. */
+.item[data-highlighted] {
+  color: var(--text-primary);
+  background: var(--steel-2);
+  border-left: 2px solid var(--red);
+  padding-left: calc(var(--space-4) - 2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .item {
+    transition: none;
+  }
+}

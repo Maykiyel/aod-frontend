@@ -28,8 +28,10 @@ sentence in the code saying why.
 ```
 src
 ├── app            # routes, provider, router — the application layer
+│   └── layouts    # the App Shell; app-layer because it reads a feature
 ├── assets
 ├── components     # shared components used across the whole app
+│   ├── states     # loading, empty and error treatments (this repo's own)
 │   └── ui         # the design-system primitives
 ├── config
 ├── features
@@ -79,7 +81,7 @@ already settled. These are resolved, not open questions:
 | Styling | lists Tailwind, CSS-in-JS, component libraries | **CSS Modules over token custom properties** — ADR 0002 rejected Tailwind with reasons |
 | UI library | suggests adopting one (MUI, Radix, …) | **None.** The 16 primitives are authored here — ADR 0001 |
 | Testing | Vitest + Testing Library + MSW; integration tests are the focus | **Same**, narrowed to a single route-level seam — see the spec in #14 |
-| Server cache | React Query / SWR | React Query, when the first query lands |
+| Server cache | React Query / SWR | **React Query.** One client per app instance, no automatic retry — `src/lib/react-query.ts` says why |
 | Auth state | no guidance given | Bearer token in `localStorage` — ADR 0004 |
 | Storybook | recommended as a component catalogue | **Not adopted.** Three-week prototype; revisit if the primitives outlive it |
 

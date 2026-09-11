@@ -1,0 +1,25 @@
+/* Recessed, because that is what "nothing here yet" looks like in a system where
+   elevation is stacking order: the content has not risen to its plate yet. */
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bar {
+  height: var(--space-3);
+  background: var(--steel);
+  animation: aod-pulse 1.6s ease-in-out infinite;
+}
+
+/* Staggered so the block reads as several things loading, not one wash. */
+.bar:nth-child(2) { animation-delay: 0.2s; width: 72%; }
+.bar:nth-child(3) { animation-delay: 0.4s; width: 45%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+    opacity: 0.6;
+  }
+}

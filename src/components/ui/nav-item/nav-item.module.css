@@ -1,0 +1,50 @@
+/* Ported from docs/design/_ds/source/components/navigation/NavItem.jsx.
+   The hover rule is this port's addition: the source styles inline, which has
+   no selector to hang one on (ADR 0001). */
+
+.item {
+  display: flex;
+  align-items: center;
+  /* 11px gap and 18px inline padding carry no token; both are the source's. */
+  gap: 11px;
+  padding: 10px 18px;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  background: transparent;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    background 120ms linear,
+    color 120ms linear;
+}
+
+.item svg {
+  color: var(--text-muted);
+  transition: color 120ms linear;
+}
+
+.item:hover {
+  color: var(--text-primary);
+  background: var(--e0-surface);
+}
+
+/* Active is a steel fill plus a 2px red left edge — the only red in the sidebar. */
+.active,
+.active:hover {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  color: var(--text-primary);
+  background: var(--steel);
+  border-left-color: var(--red);
+}
+
+.active svg {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .item svg {
+    transition: none;
+  }
+}
