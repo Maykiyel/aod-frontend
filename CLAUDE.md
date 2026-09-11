@@ -41,3 +41,15 @@ stays. Tokens are the contract: `src/styles/tokens.css` and the files under
 `docs/diagrams/` holds the ERD and end-to-end flow, each in a no-Riot and a
 with-Riot variant. The no-Riot pair is current scope; the with-Riot pair is the
 reserved future shape.
+
+### Building the design-system primitives
+
+This repo authors the 16 AOD Comms primitives itself (see
+`docs/adr/0001-author-design-system-primitives-in-typescript.md`). When building
+or refactoring them, consult the `vercel-composition-patterns` and
+`vercel-react-best-practices` skills.
+
+Treat both as **strong defaults, not law.** Where a pattern they recommend fights
+the design system's constraints — the fixed elevation ladder, groove count equal
+to elevation level, comm-type colours fixed by the data model — the design system
+wins, and the departure is worth a sentence in the component saying why.
