@@ -30,7 +30,7 @@ export function useMembership(): MembershipState {
   if (query.error) {
     // resolveTeam() aborts 404 when the caller has no ACTIVE team, so a 404 is
     // the teamless state rather than a failure. A pending membership lands here
-    // too: no endpoint reports one back to its own user (#14 story 23).
+    // too, indistinguishably — Joe-Zupo/aod-backend#21.
     if (query.error instanceof ApiError && query.error.status === 404) {
       return { status: 'teamless' };
     }

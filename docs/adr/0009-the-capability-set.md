@@ -9,7 +9,7 @@ actual authority.
 | --- | --- | --- |
 | `canViewTeamData` | any active member | `TeamPolicy::view`, `SessionPolicy::viewAny` |
 | `canConfigureSessions` | `main_coach`, `assistant_coach` | `SessionPolicy::create`, `::start`, `::complete`, `::transition` |
-| `canAuthorAnnotations` | `main_coach`, `assistant_coach` — but see below | `SessionPolicy::annotateTimeline` |
+| `canAuthorAnnotations` | `main_coach`, `assistant_coach` | `SessionPolicy::annotateTimeline` |
 | `canConfigureTeamSettings` | `main_coach`, `assistant_coach` | `TeamSettingsPolicy::update` |
 | `canManageMembers` | `main_coach` | `TeamPolicy::manageMembers` |
 
@@ -24,11 +24,17 @@ capability's name, and it is precisely what ADR 0007 exists to prevent. Each fla
 names a distinct policy that can move on its own — `annotateTimeline` already
 diverges by session status in a way the others do not.
 
-`canAuthorAnnotations` is the loosest fit. The backend also lets a *player*
-annotate once a session is `analysis_ready`, so the real rule is session-scoped
-and this team-scoped flag only answers "may author while the timeline is under
-review". Ticket #9 or #10 will have to narrow it against a session; it is
-recorded here so that narrowing is a known job rather than a surprise.
+`canAuthorAnnotations` names authoring a **note**, which is coaching work: the
+coach writes the annotation and a player may only reply to it. Replying is
+therefore not this capability and does not get one here — it is gated by session
+status rather than by team role, so #9 or #10 settles it against a session.
+
+The backend is currently looser than that rule. `AnnotationController::store`
+and `::reply` share one `authorize('annotateTimeline', $session)` check, which
+admits a player once the session is `analysis_ready`, so the API would accept a
+player-authored note. Hiding the control is still correct and still safe — a
+flag only ever hides — but the two will have to be reconciled before #10, and
+the backend is the side that should move.
 
 ## Consequences
 
