@@ -1,0 +1,151 @@
+/* Layout read from docs/design/01 Log in.dc.html. */
+
+.screen {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--text-primary);
+  font: var(--type-body);
+  align-items: stretch;
+}
+
+.formSide {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(20px, 3vh, 44px);
+  padding: clamp(26px, 3.6vh, 48px) clamp(40px, 4.5vw, 96px);
+}
+
+/* Machined grid wash behind the form. */
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 140px);
+}
+
+.apiStatus {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.apiDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--aligned);
+  display: block;
+}
+
+.formBlock {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.eyebrowIndex {
+  color: var(--red);
+}
+
+.eyebrowRule {
+  width: 38px;
+  height: 1px;
+  background: var(--border-raised);
+}
+
+.heading {
+  margin: 0;
+  font: var(--type-display-l);
+  font-size: clamp(40px, 4vw, 58px);
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* An instrument reading in the signal red, not a browser alert. */
+.error {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.signUp {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.signUpLink {
+  color: var(--text-primary);
+  border-bottom: var(--border-width) solid var(--red);
+  padding-bottom: 1px;
+  text-decoration: none;
+  transition: color 120ms linear;
+}
+
+.signUpLink:hover,
+.signUpLink:focus-visible {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signUpLink { transition: none; }
+}
+
+.disclaimer {
+  position: relative;
+  margin: 0;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+  max-width: 520px;
+}

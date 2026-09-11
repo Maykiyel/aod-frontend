@@ -1,0 +1,61 @@
+/* Ported from docs/design/_ds/source/components/core/Surface.jsx.
+   The elevation ladder is fixed by the design system: surface, border and
+   shadow always travel together, and the groove count equals the level. */
+
+.surface {
+  position: relative;
+  background: var(--level-surface);
+  border: var(--border-width) solid var(--level-border);
+  box-shadow: var(--level-shadow);
+  padding: var(--surface-padding, var(--space-6));
+}
+
+.e0 {
+  --level-surface: var(--e0-surface);
+  --level-border: var(--e0-border);
+  --level-shadow: var(--e0-shadow);
+}
+
+.e1 {
+  --level-surface: var(--e1-surface);
+  --level-border: var(--e1-border);
+  --level-shadow: var(--e1-shadow);
+}
+
+.e2 {
+  --level-surface: var(--e2-surface);
+  --level-border: var(--e2-border);
+  --level-shadow: var(--e2-shadow);
+}
+
+.e3 {
+  --level-surface: var(--e3-surface);
+  --level-border: var(--e3-border);
+  --level-shadow: var(--e3-shadow);
+}
+
+.e4 {
+  --level-surface: var(--e4-surface);
+  --level-border: var(--e4-border);
+  --level-shadow: var(--e4-shadow);
+}
+
+.grooves {
+  position: absolute;
+  top: calc(var(--border-width) * -1);
+  left: var(--groove-inset);
+  display: flex;
+  gap: var(--groove-gap);
+  z-index: 2;
+}
+
+/* A slot reads as a cut only if the colour behind it is the plate underneath —
+   hence --surface-behind rather than a fixed value. */
+.groove {
+  display: block;
+  width: var(--groove-width);
+  height: var(--groove-depth);
+  background: var(--surface-behind);
+  border: var(--border-width) solid var(--level-border);
+  border-top: none;
+}
