@@ -1,21 +1,19 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
+import { BrandPanel } from '@/features/auth/components/brand-panel';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import styles from './login.module.css';
 
 /**
- * Screen 01. Copy is taken from the design reference, not invented.
+ * Screen 01, built against `docs/design/01 Log in.dc.html`.
  *
  * Email and password are validated by the browser (`type="email"`, `required`)
  * rather than by hand: the spec asks that a malformed address be caught "before
  * a request is sent … something the browser already knew".
- *
- * Not yet faithful to `docs/design/01 Log in.dc.html` at the design width — the
- * reference carries a left-hand brand panel and a timeline motif this does not
- * draw. User story 37 is outstanding.
  */
 export function LoginRoute() {
   const { login } = useAuth();
@@ -35,9 +33,7 @@ export function LoginRoute() {
       // nothing resets `pending` here deliberately.
     } catch (cause) {
       setError(
-        cause instanceof ApiError
-          ? cause
-          : new ApiError('Something went wrong. Try again.', 0),
+        cause instanceof ApiError ? cause : new ApiError('Something went wrong. Try again.', 0),
       );
       setPending(false);
     }
@@ -48,44 +44,78 @@ export function LoginRoute() {
   const errorText = error ? (error.fieldError('email') ?? error.message) : null;
 
   return (
-    <main className={styles.screen}>
-      <form className={styles.panel} onSubmit={handleSubmit} noValidate={false}>
-        <p className={styles.eyebrow}>SESSION ACCESS</p>
-        <h1 className={styles.heading}>Log in</h1>
+    <div className={styles.screen}>
+      <BrandPanel />
 
-        <Input
-          label="Email"
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="coach@aod.gg"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          disabled={pending}
-        />
+      <main className={styles.formSide}>
+        <div className={styles.grid} aria-hidden="true" />
 
-        <Input
-          label="Password"
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          disabled={pending}
-        />
+        {/* Static in this chunk. A real reading needs a health check the spec
+            does not ask for yet. */}
+        <div className={styles.apiStatus}>
+          <span className={styles.apiDot} />
+          API:OK
+        </div>
 
-        {errorText ? (
-          <p className={styles.error} role="alert">
-            {errorText}
-          </p>
-        ) : null}
+        <div className={styles.formBlock}>
+          <div className={styles.titleBlock}>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowIndex}>01</span>
+              <span className={styles.eyebrowRule} />
+              <span>SESSION ACCESS</span>
+            </div>
+            <h1 className={styles.heading}>Log in</h1>
+          </div>
 
-        <Button type="submit" disabled={pending}>
-          {pending ? 'Logging in' : 'Log in'}
-        </Button>
-      </form>
-    </main>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.fields}>
+              <Input
+                label="Email"
+                type="email"
+                name="email"
+                autoComplete="email"
+                placeholder="coach@aod.gg"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={pending}
+              />
+              <Input
+                label="Password"
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                placeholder="••••••••••"
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={pending}
+              />
+            </div>
+
+            {errorText ? (
+              <p className={styles.error} role="alert">
+                {errorText}
+              </p>
+            ) : null}
+
+            <div className={styles.actions}>
+              <Button type="submit" disabled={pending}>
+                {pending ? 'Logging in' : 'Log in'}
+              </Button>
+              <p className={styles.signUp}>
+                <span>New here?</span>
+                {/* #4 builds this route; until then the catch-all returns here. */}
+                <Link className={styles.signUpLink} to="/register">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <p className={styles.disclaimer}>NOT ENDORSED BY OR AFFILIATED WITH RIOT GAMES</p>
+      </main>
+    </div>
   );
 }

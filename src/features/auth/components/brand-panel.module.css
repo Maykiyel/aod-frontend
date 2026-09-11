@@ -1,0 +1,251 @@
+/* Geometry read from docs/design/01 Log in.dc.html. The clamp() expressions and
+   percentage positions are the reference's own; they are layout, not design
+   values, and no token exists for them. */
+
+.panel {
+  flex: 0 0 44%;
+  min-width: 520px;
+  position: relative;
+  overflow: hidden;
+}
+
+.plate {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.inner {
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(26px, 3.6vh, 48px) clamp(32px, 3vw, 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.statusRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status,
+.build {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-secondary);
+}
+
+.build {
+  color: var(--text-muted);
+}
+
+.statusMark {
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  display: block;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.wordmark {
+  font: var(--type-display-xl);
+  font-size: clamp(52px, 6.2vw, 122px);
+  line-height: 0.84;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.wordmarkRow {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+}
+
+.rule {
+  flex: 1;
+  height: 2px;
+  background: var(--red);
+  transform: translateY(-16px);
+}
+
+.strapline {
+  margin: 0;
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-secondary);
+  max-width: 520px;
+}
+
+.timelineBlock {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.timelineMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.track {
+  position: relative;
+  height: 74px;
+  overflow: hidden;
+}
+
+.trackLine,
+.trackLineLower {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.trackLine {
+  top: 24px;
+  background: var(--border);
+}
+
+.trackLineLower {
+  top: 52px;
+  background: var(--border-recessed);
+}
+
+.absence {
+  position: absolute;
+  top: 41px;
+  height: 22px;
+  background: var(--absence-fill);
+}
+
+.absenceHatch {
+  position: absolute;
+  inset: 0;
+  background: var(--absence-hatch);
+}
+
+.marker,
+.markerSelected {
+  position: absolute;
+  transform: rotate(45deg);
+}
+
+.marker {
+  top: 19px;
+  width: 10px;
+  height: 10px;
+}
+
+.markerSelected {
+  top: 16px;
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 4px rgba(255, 111, 168, 0.18);
+}
+
+.playhead {
+  position: absolute;
+  left: 47.5%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-primary);
+  opacity: 0.55;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.legendMark {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  display: block;
+}
+
+.legendAbsence {
+  width: 12px;
+  height: 7px;
+  background: var(--absence-fill);
+  border: var(--border-width) solid var(--absence);
+  display: block;
+}
+
+.plateEdge,
+.plateEdgeInner,
+.plateFoot {
+  position: absolute;
+  pointer-events: none;
+  background: var(--plate-silhouette);
+}
+
+.plateEdge {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 96%);
+}
+
+.plateEdgeInner {
+  right: 16px;
+  top: 8%;
+  bottom: 8%;
+  width: 36px;
+  clip-path: polygon(100% 0, 100% 100%, 0 92%, 0 8%);
+}
+
+.plateFoot {
+  left: 0;
+  bottom: 0;
+  width: 96px;
+  height: 22px;
+  clip-path: polygon(0 0, 82% 0, 100% 100%, 0 100%);
+}
+
+.bolt {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--plate-bolt);
+}
+
+.boltTopLeft { top: 7px; left: 7px; }
+.boltTopRight { top: 7px; right: 7px; }
+.boltBottomLeft { bottom: 7px; left: 7px; }
+.boltBottomRight { bottom: 7px; right: 7px; }
