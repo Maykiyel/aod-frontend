@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>aod-frontend</title>
+
+    <!-- Brand faces are served straight from public/ rather than through the
+         bundler, so their URLs are stable enough to preload. Preloading the
+         three latin faces is what keeps `font-display: swap` from actually
+         showing a fallback: the file is in cache before first paint. The
+         latin-ext faces are not preloaded — they only matter for extended
+         characters and would cost bandwidth on every load. -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/big-shoulders-display-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/inter-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/jetbrains-mono-latin.woff2" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
   </head>
   <body>
     <div id="root"></div>
