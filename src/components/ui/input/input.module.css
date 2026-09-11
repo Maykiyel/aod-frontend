@@ -7,12 +7,10 @@
 
 .label {
   display: block;
+  /* --type-label carries its own 13px. The vendored source overrode it to 12px
+     inline; that override is dropped here on the designer's call — the token is
+     the contract, so a component may not quietly render a pixel under it. */
   font: var(--type-label);
-  /* NOTE: --type-label is 13px; this 12px override is inherited verbatim from
-     the vendored source, so every label in the design renders a pixel under
-     its own token. Kept to stay faithful to the reference screens — but it
-     means the token and the design disagree. Raised for the designer. */
-  font-size: 12px;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--text-secondary);
