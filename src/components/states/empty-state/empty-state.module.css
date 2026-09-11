@@ -1,0 +1,21 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* The monospaced line #14 asks for: the measured fact under the title. */
+.reading {
+  font: var(--type-data);
+  letter-spacing: var(--track-tag);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.instruction {
+  font: var(--type-body);
+  color: var(--text-secondary);
+  max-width: 66ch;
+  text-wrap: pretty;
+  margin: 0;
+}

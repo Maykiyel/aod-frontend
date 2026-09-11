@@ -1,0 +1,28 @@
+/* Red is an instrument line, not a wash: the failure is a 2px edge and a mono
+   label, over the ordinary module surface. */
+
+.error {
+  border-left: 2px solid var(--red);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.label {
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.message {
+  font: var(--type-body);
+  color: var(--text-primary);
+  max-width: 66ch;
+  text-wrap: pretty;
+  margin: 0;
+}

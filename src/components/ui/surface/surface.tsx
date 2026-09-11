@@ -5,15 +5,22 @@ import styles from './surface.module.css';
 /** Elevation rung. A union so an illegal level fails to compile (#14). */
 export type ElevationLevel = 0 | 1 | 2 | 3 | 4;
 
-/** Surface tints from colors.css. A union so a mistyped token fails to compile —
- *  the other half of what #14 asks for alongside `level`. */
+/** Surface tints from colors.css, plus the elevation aliases from elevation.css
+ *  that name the same colours by rung — which is how a caller sitting on a plate
+ *  thinks. A union so a mistyped token fails to compile, the other half of what
+ *  #14 asks for alongside `level`. */
 export type SubstrateToken =
   | 'var(--void)'
   | 'var(--well)'
   | 'var(--ash)'
   | 'var(--steel)'
   | 'var(--steel-2)'
-  | 'var(--steel-3)';
+  | 'var(--steel-3)'
+  | 'var(--e0-surface)'
+  | 'var(--e1-surface)'
+  | 'var(--e2-surface)'
+  | 'var(--e3-surface)'
+  | 'var(--e4-surface)';
 
 /** Elements a plate is ever rendered as. Deliberately narrow. */
 type SurfaceElement = 'div' | 'section' | 'aside' | 'main' | 'article' | 'header' | 'footer' | 'nav';

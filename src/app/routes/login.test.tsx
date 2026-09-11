@@ -20,8 +20,9 @@ describe('authentication', () => {
     await user.type(screen.getByLabelText('Password'), 'maincoach');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
-    expect(screen.getByText(/maincoach@example\.com/)).toBeInTheDocument();
+    // Landing inside the App Shell is what "reached the app" means (#14).
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
+    expect(screen.getByText('maincoach')).toBeInTheDocument();
   });
 
   it("surfaces the server's own message and stays put when credentials are wrong", async () => {
@@ -48,7 +49,7 @@ describe('authentication', () => {
 
     renderApp('/');
 
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
   });
 
@@ -92,7 +93,7 @@ describe('authentication', () => {
   it('sends an authenticated visitor away from login', async () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     renderApp('/login');
-    expect(await screen.findByText('Signed in')).toBeInTheDocument();
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
   });
 
   it('renders an error the user can act on when the network fails', async () => {
