@@ -1,17 +1,8 @@
 import type { components } from '@/types/api.generated';
 
-/**
- * The domain-facing view of the API's shapes.
- *
- * `api.generated.ts` is produced from the backend's own OpenAPI document by
- * `pnpm gen:api` and must never be edited. This file is the thin layer over it:
- * short names for the shapes screens actually name, plus the few narrowings the
- * generator cannot express.
- *
- * ADR 0003 warns the spec under-describes the API, because Scramble reads
- * validation rules and cannot see what a controller enforces. Two consequences
- * are visible right here — see `MemberRole` and `MembershipStatus`.
- */
+/** Domain-facing view of the API. `api.generated.ts` comes from `pnpm gen:api`
+ *  and is never hand-edited; this is the thin layer over it, carrying the
+ *  narrowings the generator cannot express (ADR 0003). */
 
 type Schemas = components['schemas'];
 
@@ -21,29 +12,16 @@ export type TeamMember = Schemas['TeamMemberResource'];
 export type TeamSettings = Schemas['TeamSettingsResource'];
 export type Session = Schemas['SessionResource'];
 
-/**
- * Membership role — the basis for every capability in the app (ADR 0007).
- *
- * The generator types this as plain `string`: `member_role` is a `string(32)`
- * column whose legal values live in application code, so nothing in the OpenAPI
- * document narrows it. Hand-written here because a capability model branching on
- * an unconstrained string is the bug this union exists to prevent.
- *
- * NOT the same vocabulary as `User.roles`, which is the global registration role
- * (`Coach` / `Player`). Capabilities never derive from that.
- */
+/** Basis for every capability (ADR 0007). The generator emits plain `string`
+ *  because the legal values live in app code, not a DB enum. NOT `User.roles`,
+ *  which is the global registration role and never drives capabilities. */
 export type MemberRole = 'player' | 'assistant_coach' | 'main_coach';
 
 /** Membership status, narrowed for the same reason as `MemberRole`. */
 export type MembershipStatus = 'pending' | 'active';
 
-/**
- * A team member whose role and status are narrowed to the unions above.
- *
- * Use this rather than `TeamMember` wherever the value is about to be branched
- * on, and cross the gap with `toActiveMembership` so the narrowing happens once,
- * at the edge, instead of as a cast at every call site.
- */
+/** TeamMember with role and status narrowed. Cross the gap with `toMembership`
+ *  so the narrowing happens once, at the edge, not as a cast per call site. */
 export interface Membership extends Omit<TeamMember, 'member_role' | 'status'> {
   member_role: MemberRole;
   status: MembershipStatus;
@@ -60,14 +38,8 @@ export function isMembershipStatus(value: string): value is MembershipStatus {
   return MEMBERSHIP_STATUSES.includes(value);
 }
 
-/**
- * Narrow a member the API returned, or `null` if it carries a role or status
- * this client does not know.
- *
- * Returning `null` rather than throwing is deliberate: an unrecognised role is
- * a backend that has moved on, and one stale member should not take down a
- * roster. Callers drop what they cannot place.
- */
+/** Narrow a member, or null if its role or status is unknown here — a backend
+ *  that has moved on should not take down a whole roster. */
 export function toMembership(member: TeamMember): Membership | null {
   if (!isMemberRole(member.member_role)) return null;
   if (!isMembershipStatus(member.status)) return null;

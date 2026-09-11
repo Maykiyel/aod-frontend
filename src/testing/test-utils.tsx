@@ -4,14 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { AppProvider } from '@/app/provider';
 import { routes } from '@/app/route-table';
 
-/**
- * Mount the real application at `initialPath`.
- *
- * This is the only seam #14 sanctions. It exercises the route table, the
- * providers, the HTTP client, token handling and the rendered result together,
- * with the network mocked at the HTTP boundary and nothing else stubbed. No
- * test reaches past it into a hook or a store.
- */
+/** Mount the real app at `initialPath` — the only seam #14 sanctions. Exercises
+ *  routes, providers, HTTP client and token handling together, with the network
+ *  mocked at the HTTP boundary and nothing else stubbed. */
 export function renderApp(initialPath = '/') {
   const router = createMemoryRouter(routes, { initialEntries: [initialPath] });
 

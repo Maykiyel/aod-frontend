@@ -1,11 +1,8 @@
 import { Button } from '@/components/ui/button/button';
 import { useAuth } from '@/lib/auth-context';
 
-/**
- * Placeholder. The role-aware shell and the real empty state are #2 — this
- * exists so the authenticated half of the routing is reachable and testable,
- * and so logging out can be exercised.
- */
+/** Placeholder. The role-aware shell and real empty state are #2; this exists so
+ *  the authenticated half of the routing is reachable and logout exercisable. */
 export function DashboardRoute() {
   const { user, logout } = useAuth();
 

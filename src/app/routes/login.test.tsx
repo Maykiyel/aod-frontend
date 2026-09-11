@@ -9,11 +9,9 @@ import { env } from '@/config/env';
 
 const TOKEN_KEY = 'aod.auth.token.v1';
 
-/**
- * The single seam from #14: render a route with the network mocked at the HTTP
- * boundary and drive it the way a person would. Controls are found by their
- * accessible names. Nothing here imports a hook or reaches into state.
- */
+/** The single seam from #14: render a route with the network mocked at the HTTP
+ *  boundary and drive it as a person would. Controls found by accessible name;
+ *  nothing here imports a hook or reaches into state. */
 describe('authentication', () => {
   it('lands the user on the authenticated view when credentials are valid', async () => {
     const { user } = renderApp('/login');

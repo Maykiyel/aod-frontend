@@ -1,15 +1,9 @@
 import { Surface } from '@/components/ui/surface/surface';
 import styles from './brand-panel.module.css';
 
-/**
- * The left-hand plate on the auth screens: wordmark, strapline, and a static
- * timeline motif standing in for the product's core surface.
- *
- * The motif is decoration, not data — it is marked `aria-hidden` and its
- * positions come from the design reference rather than from any session.
- * Sign-up (#4) reuses this panel, which is why it is a feature component rather
- * than part of the log-in route.
- */
+/** Left-hand plate on the auth screens. The timeline motif is decoration, not
+ *  data — aria-hidden, positions from the design reference. A feature component
+ *  rather than part of the route because sign-up (#4) reuses it. */
 
 type CommType = 'informative' | 'declarative' | 'compound';
 
