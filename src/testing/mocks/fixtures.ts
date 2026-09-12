@@ -1,3 +1,7 @@
+import type {
+  DashboardHeaderResponse,
+  DashboardPlayersResponse,
+} from '@/features/dashboard/types';
 import type { MemberRole, Team, TeamMember, User } from '@/types/api';
 
 /** Typed as the generated schemas so a mock cannot describe a response the API
@@ -85,3 +89,74 @@ export const usersByToken = new Map<string, User>([
   [playerToken, playerOne],
   [teamlessToken, teamlessPlayer],
 ]);
+
+/** The two dashboard bodies, from a real seeded response (#3). Numbers are the
+ *  design's own readings so a screen can be checked against screens 06 and 07. */
+
+const analysisWindow = {
+  sessions_requested: 3,
+  sessions_analyzed: 3,
+  from: '2026-09-08T19:04:11.000000Z',
+  to: '2026-09-10T21:37:02.000000Z',
+};
+
+export const pooledHeader: DashboardHeaderResponse = {
+  identity: { team: thunderbolts, user: mainCoach, analysis_ready_count: 12 },
+  window: analysisWindow,
+  // informative + declarative + compound equals calls_classified; redundant is a
+  // flag over that same total, and absence is a period count, not a fourth type.
+  kpi: { comm_frequency: 18.43, alignment_rate: 87.25, absence_ms: 252481, calls_classified: 1842 },
+  comm_mix: {
+    informative: 774,
+    declarative: 571,
+    compound: 497,
+    redundant: 133,
+    absence: 12,
+    calls_classified: 1842,
+  },
+};
+
+/** A pool shorter than it asked for: the two data cards are replaced wholesale,
+ *  identity and window still render. What a fresh database answers. */
+export const shortPoolHeader: DashboardHeaderResponse = {
+  identity: { team: thunderbolts, user: mainCoach, analysis_ready_count: 1 },
+  window: { sessions_requested: 3, sessions_analyzed: 1, from: null, to: null },
+  kpi: { message: 'Insufficient sessions queried for KPI of Communication' },
+  comm_mix: { message: 'Insufficient sessions queried for Communication Mix' },
+};
+
+export const roster: DashboardPlayersResponse = {
+  window: analysisWindow,
+  players: [
+    {
+      user_id: 3,
+      username: 'playerone',
+      is_online: true,
+      comm_frequency: 21.6,
+      alignment_rate: 91.33,
+      calls_logged: 412,
+      sessions_played: 3,
+    },
+    {
+      user_id: 4,
+      username: 'playertwo',
+      is_online: false,
+      comm_frequency: 12.84,
+      alignment_rate: 79.5,
+      calls_logged: 238,
+      sessions_played: 2,
+    },
+  ],
+};
+
+/** What playerone gets from the same endpoint: their own line and the median. */
+export const ownLineAndMedian: DashboardPlayersResponse = {
+  window: analysisWindow,
+  you: { user_id: 3, comm_frequency: 21.6, alignment_rate: 91.33, calls_logged: 412 },
+  team_median: { comm_frequency: 17.22, alignment_rate: 85.42, calls_logged: 325 },
+};
+
+export const shortPoolPlayers: DashboardPlayersResponse = {
+  window: { sessions_requested: 3, sessions_analyzed: 1, from: null, to: null },
+  message: 'Insufficient sessions queried for Player Stats',
+};

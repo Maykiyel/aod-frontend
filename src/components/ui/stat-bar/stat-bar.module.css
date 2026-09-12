@@ -1,0 +1,62 @@
+/* The two halves interlock via a negative margin and mirrored clip paths —
+   never two rectangles with a gap between them. */
+.bar {
+  display: flex;
+  align-items: stretch;
+  height: var(--stat-bar-height);
+  min-width: 0;
+  margin: 0;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 calc(var(--stat-bar-skew) + var(--space-1)) 0 var(--space-4);
+  background: var(--e0-surface);
+  border: var(--border-width) solid var(--e0-border);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--stat-bar-skew)) 100%, 0 100%);
+  /* The source asks for .12em; --track-micro is the nearest token and stands. */
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-micro);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.value {
+  width: calc(var(--stat-bar-value-width) + var(--stat-bar-skew));
+  margin-left: calc(var(--stat-bar-skew) * -1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-4);
+  clip-path: polygon(var(--stat-bar-skew) 0, 100% 0, 100% 100%, 0 100%);
+  /* The source sizes the value at 0.68 x height — 30px at the default. That size
+     comes from a token here, at display weight 800 rather than the stat face's 900. */
+  font: var(--type-display-m);
+  white-space: nowrap;
+}
+
+.unit {
+  /* 13px in the source; --type-data is 12px and stands. */
+  font: var(--type-data);
+  margin-left: var(--space-1);
+}
+
+.white .value {
+  background: var(--text-primary);
+  color: var(--text-on-light);
+}
+
+.red .value {
+  background: var(--red);
+  color: var(--text-on-accent);
+}
+
+.aligned .value {
+  background: var(--aligned);
+  color: var(--text-on-light);
+}

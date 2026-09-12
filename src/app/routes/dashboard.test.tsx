@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
-import { envelope } from '@/testing/mocks/handlers';
+import { caller, envelope } from '@/testing/mocks/handlers';
 import {
   assistantCoachToken,
   authToken,
+  ownLineAndMedian,
   playerToken,
+  pooledHeader,
+  roster,
+  shortPoolHeader,
+  shortPoolPlayers,
   teamlessToken,
   thunderboltsRoster,
 } from '@/testing/mocks/fixtures';
@@ -14,6 +19,23 @@ import { server } from '@/testing/mocks/server';
 import { renderApp } from '@/testing/test-utils';
 
 const TOKEN_KEY = 'aod.auth.token.v1';
+
+/** Both endpoints answering with a pool shorter than it asked for — what a fresh
+ *  database returns, and what a demo opens on. */
+function shortPool(): void {
+  server.use(
+    // identity.user is the caller on the real endpoint, in this state too.
+    http.get(`${env.apiUrl}/dashboard/header`, ({ request }) =>
+      envelope('Dashboard header retrieved.', {
+        ...shortPoolHeader,
+        identity: { ...shortPoolHeader.identity, user: caller(request) },
+      }),
+    ),
+    http.get(`${env.apiUrl}/dashboard/players`, () =>
+      envelope('Dashboard players retrieved.', shortPoolPlayers),
+    ),
+  );
+}
 
 /** The destinations on offer, read the way a person reads a sidebar. The wait is
  *  for the membership: the shell renders before it resolves, and until it does
@@ -47,8 +69,6 @@ describe('the dashboard', () => {
 
     await expectNavigation(['Dashboard', 'Sessions', 'Team', 'Settings']);
     expect(await screen.findByText('MAIN COACH')).toBeInTheDocument();
-    // Configuring sessions is coaching work, so the instruction names it.
-    expect(screen.getByText(/create a session to start recording/i)).toBeInTheDocument();
   });
 
   it('offers an assistant coach the same destinations as the main coach', async () => {
@@ -69,9 +89,6 @@ describe('the dashboard', () => {
 
     await expectNavigation(['Dashboard', 'Sessions', 'Team']);
     expect(await screen.findByText('PLAYER')).toBeInTheDocument();
-    // Nor is a player told to do the one thing their role cannot do.
-    expect(screen.queryByText(/create a session/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/figures appear here once your team/i)).toBeInTheDocument();
   });
 
   it('marks the destination the user is actually on', async () => {
@@ -88,14 +105,295 @@ describe('the dashboard', () => {
     expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
   });
 
-  it('says plainly that a team with no sessions has nothing to show', async () => {
+  it('counts the communication mix rather than rounding it into percentages', async () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
 
     renderApp('/');
 
-    expect(await screen.findByText('0 SESSIONS LOGGED')).toBeInTheDocument();
-    // An empty dashboard is not a failure, and must not read as one.
+    const mix = await screen.findByRole('region', { name: 'Comm mix' });
+    expect(mix).toHaveTextContent('1,842 CALLS CLASSIFIED');
+
+    // The three types, in the order the data model fixes, then the redundant
+    // tally over that same total. Absence is a count of intervals, not a type.
+    expect(within(mix).getAllByRole('term').map((term) => term.textContent)).toEqual([
+      'INFORMATIVE',
+      'DECLARATIVE',
+      'COMPOUND',
+      'REDUNDANT',
+      'ABSENCE',
+    ]);
+    expect(within(mix).getAllByRole('definition').map((value) => value.textContent)).toEqual([
+      '774',
+      '571',
+      '497',
+      '133',
+      '12 INTERVALS',
+    ]);
+  });
+
+  it('gives a coach one line per active non-coach member', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    const roster = await screen.findByRole('table', { name: 'Team members' });
+    const rows = within(roster).getAllByRole('row');
+
+    // A header row, then the two players. Coaches log no communication events
+    // and are off the roster entirely.
+    expect(rows).toHaveLength(3);
+    expect(within(roster).queryByText('maincoach')).not.toBeInTheDocument();
+    expect(within(roster).queryByText('assistantcoach')).not.toBeInTheDocument();
+
+    // Frequency, alignment rate and state only: absence is team-wide by
+    // definition, and the per-player call and session counts are not wanted.
+    expect(within(roster).getAllByRole('columnheader').map((cell) => cell.textContent)).toEqual([
+      'PLAYER',
+      'COMMS/MIN',
+      'ALIGN RATE',
+      'STATE',
+    ]);
+
+    expect(rows[1]).toHaveTextContent('playerone');
+    expect(rows[1]).toHaveTextContent('21.6');
+    expect(rows[1]).toHaveTextContent('91.33');
+    expect(rows[1]).toHaveTextContent('ONLINE');
+    expect(rows[1]).not.toHaveTextContent('412');
+    expect(rows[2]).toHaveTextContent('playertwo');
+    expect(rows[2]).toHaveTextContent('12.84');
+    expect(rows[2]).toHaveTextContent('OFFLINE');
+
+    // A coach never sees the team median.
+    expect(screen.queryByRole('region', { name: 'You vs team median' })).not.toBeInTheDocument();
+  });
+
+  it('gives a player their own line against the team median, and no roster', async () => {
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    const card = await screen.findByRole('region', { name: 'You vs team median' });
+
+    const frequency = within(card).getByRole('figure', { name: 'COMM FREQUENCY' });
+    expect(frequency).toHaveTextContent('21.6');
+    expect(frequency).toHaveTextContent('17.22');
+    expect(within(card).getByRole('figure', { name: 'ALIGNMENT RATE' })).toHaveTextContent('91.33');
+    expect(within(card).getByRole('figure', { name: 'CALLS LOGGED' })).toHaveTextContent('412');
+
+    // Each bar carries a scale rather than filling its track: a rate is drawn
+    // against 100, the others against the larger reading plus a quarter again.
+    const rate = within(card).getByRole('meter', { name: 'ALIGNMENT RATE' });
+    expect(rate).toHaveAttribute('aria-valuenow', '91.33');
+    expect(rate).toHaveAttribute('aria-valuemax', '100');
+    expect(within(card).getByRole('meter', { name: 'CALLS LOGGED' })).toHaveAttribute(
+      'aria-valuemax',
+      '515',
+    );
+
+    // A player never sees the roster.
+    expect(screen.queryByRole('table', { name: 'Team members' })).not.toBeInTheDocument();
+    // Screen 07 names the player in the identity block, where 06 names the team.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('playerone');
+  });
+
+  it('shows a dash where the pool produced no reading at all', async () => {
+    // Nothing in the pool was assessed, and a median needs a population of two.
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/header`, () =>
+        envelope('Dashboard header retrieved.', {
+          ...pooledHeader,
+          kpi: { ...pooledHeader.kpi, alignment_rate: null },
+        }),
+      ),
+      // A member with no completed transcript anywhere in the pool, on a team
+      // whose population is too small for a median (ADR 0011).
+      http.get(`${env.apiUrl}/dashboard/players`, () =>
+        envelope('Dashboard players retrieved.', {
+          ...ownLineAndMedian,
+          you: { user_id: 3, comm_frequency: 0, alignment_rate: null, calls_logged: 0 },
+          team_median: { comm_frequency: null, alignment_rate: null, calls_logged: null },
+        }),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    const kpi = await screen.findByRole('region', { name: 'Communication KPI' });
+    // A dash, not a zero: no reading is not a reading of none.
+    expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).toHaveTextContent('—');
+    expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).not.toHaveTextContent('%');
+
+    const card = screen.getByRole('region', { name: 'You vs team median' });
+    expect(within(card).getAllByText('MEDIAN —')).toHaveLength(3);
+    // A metric with no scale is not a meter, so it claims no range it cannot fill.
+    expect(within(card).queryByRole('meter', { name: 'CALLS LOGGED' })).not.toBeInTheDocument();
+  });
+
+  it('renders an empty roster as an empty roster, not as a short pool', async () => {
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/players`, () =>
+        envelope('Dashboard players retrieved.', { ...roster, players: [] }),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // A team of coaches has no lines to draw, which is not the short-pool state.
+    expect(await screen.findByText('0 ON ROSTER · 0 ONLINE')).toBeInTheDocument();
+    expect(screen.queryByText(/insufficient sessions queried for player/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('renders a short session pool as a deliberate message, not a failure', async () => {
+    shortPool();
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // The server's own wording for each collapsed card, shown rather than replaced.
+    expect(
+      await screen.findByText('Insufficient sessions queried for KPI of Communication'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Insufficient sessions queried for Communication Mix'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Insufficient sessions queried for Player Stats')).toBeInTheDocument();
+
+    // The identity and pool blocks survive the collapse; the data cards do not.
+    expect(screen.getByRole('heading', { name: 'Thunderbolts' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Session pool' })).toHaveTextContent(
+      'ANALYSED 1 OF 3',
+    );
+    expect(screen.queryByRole('region', { name: 'Communication KPI' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Comm mix' })).not.toBeInTheDocument();
+
+    // A pool shorter than it asked for is a count, not an error.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('still names a player as a player when the pool is too short to shape a body', async () => {
+    shortPool();
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    // The short-pool body carries no role signal, so the screen must not fall
+    // back to the coach's framing — a fresh database is the demo's first screen.
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('playerone');
+    expect(screen.getByText('My dashboard — player')).toBeInTheDocument();
+    expect(screen.queryByText('Team dashboard — coach')).not.toBeInTheDocument();
+  });
+
+  it('offers a coach the one action that lengthens a short pool, and a player none', async () => {
+    shortPool();
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const coach = renderApp('/');
+
+    expect(await screen.findByText(/create a session to start recording/i)).toBeInTheDocument();
+    coach.unmount();
+
+    shortPool();
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    expect(await screen.findByRole('region', { name: 'Session pool' })).toBeInTheDocument();
+    // A player is never told to do the one thing their role cannot do.
+    expect(screen.queryByText(/create a session/i)).not.toBeInTheDocument();
+  });
+
+  it('pools the communication numbers over the analysed sessions', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    const kpi = await screen.findByRole('region', { name: 'Communication KPI' });
+    // Every reading carries its unit, and none is rounded to look tidier.
+    expect(within(kpi).getByRole('figure', { name: 'COMM FREQUENCY' })).toHaveTextContent(
+      '18.43/min',
+    );
+    expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).toHaveTextContent('87.25%');
+    // 252481 ms exactly, in the unit the reading is actually in.
+    expect(within(kpi).getByRole('figure', { name: 'ABSENCE TOTAL' })).toHaveTextContent(
+      '252.481s',
+    );
+    expect(within(kpi).getByRole('figure', { name: 'CALLS CLASSIFIED' })).toHaveTextContent(
+      '1,842calls',
+    );
+  });
+
+  it('re-reads the numbers when the pool changes, rather than once at mount', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    expect(await screen.findByRole('figure', { name: 'CALLS CLASSIFIED' })).toHaveTextContent(
+      '1,842calls',
+    );
+
+    // A session reaches analysis-ready, so the pool it all pools over moves.
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/header`, () =>
+        envelope('Dashboard header retrieved.', {
+          ...pooledHeader,
+          kpi: { ...pooledHeader.kpi, calls_classified: 2014 },
+        }),
+      ),
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Sessions' }));
+    await user.click(screen.getByRole('link', { name: 'Dashboard' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('figure', { name: 'CALLS CLASSIFIED' })).toHaveTextContent(
+        '2,014calls',
+      ),
+    );
+  });
+
+  it('keeps the team-wide numbers standing when only the breakdown fails', async () => {
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/players`, () =>
+        envelope('The player breakdown could not be loaded.', [], 500),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The player breakdown could not be loaded.',
+    );
+    // One card failing does not cost the screen the numbers that did arrive.
+    expect(screen.getByRole('region', { name: 'Communication KPI' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Session pool' })).toBeInTheDocument();
+  });
+
+  it('reports a failed dashboard header, and recovers', async () => {
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/header`, () =>
+        envelope('The dashboard could not be loaded.', [], 500),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The dashboard could not be loaded.',
+    );
+
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/header`, () =>
+        envelope('Dashboard header retrieved.', pooledHeader),
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByRole('region', { name: 'Communication KPI' })).toBeInTheDocument();
   });
 
   it('tells a user with no team to create or join one', async () => {

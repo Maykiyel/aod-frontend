@@ -1,7 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
-import { thunderboltsRoster, usersByToken } from '@/testing/mocks/fixtures';
-import type { User } from '@/types/api';
+import {
+  ownLineAndMedian,
+  pooledHeader,
+  roster,
+  thunderboltsRoster,
+  usersByToken,
+} from '@/testing/mocks/fixtures';
+import type { MemberRole, User } from '@/types/api';
 
 /** Wrap a payload the way every endpoint does: `{ message, data, code, error }`. */
 export function envelope(message: string, data: unknown, code = 200) {
@@ -10,11 +16,21 @@ export function envelope(message: string, data: unknown, code = 200) {
 
 const url = (path: string) => `${env.apiUrl}${path}`;
 
-/** Resolve the bearer the way Sanctum does, or null if it names nobody. */
-function caller(request: Request): User | null {
+/** Resolve the bearer the way Sanctum does, or null if it names nobody.
+ *  Exported so a test overriding a handler resolves the caller identically. */
+export function caller(request: Request): User | null {
   const header = request.headers.get('Authorization');
   if (!header?.startsWith('Bearer ')) return null;
   return usersByToken.get(header.slice('Bearer '.length)) ?? null;
+}
+
+const COACH_ROLES: readonly MemberRole[] = ['main_coach', 'assistant_coach'];
+
+/** The live team role, read off the roster exactly as the server reads the
+ *  pivot. Only `GET /dashboard/players` branches on it. */
+function isCoach(user: User): boolean {
+  const self = thunderboltsRoster.members?.find((member) => member.id === user.id);
+  return self ? COACH_ROLES.includes(self.member_role as MemberRole) : false;
 }
 
 /** Derived from the token map so an account is declared in one place only. The
@@ -59,6 +75,25 @@ export const handlers = [
     if (!user) return envelope('Unauthenticated.', [], 401);
     if (user.teams?.length === 0) return envelope('Team not found.', [], 404);
     return envelope('Team retrieved.', { team: thunderboltsRoster });
+  }),
+
+  // Both dashboard endpoints resolve the caller's active team and serve any
+  // active member; only `players` shapes its body by role (ADR 0011).
+  http.get(url('/dashboard/header'), ({ request }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+    if (user.teams?.length === 0) return envelope('Team not found.', [], 404);
+    return envelope('Dashboard header retrieved.', {
+      ...pooledHeader,
+      identity: { ...pooledHeader.identity, user },
+    });
+  }),
+
+  http.get(url('/dashboard/players'), ({ request }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+    if (user.teams?.length === 0) return envelope('Team not found.', [], 404);
+    return envelope('Dashboard players retrieved.', isCoach(user) ? roster : ownLineAndMedian);
   }),
 
   http.post(url('/logout'), () => envelope('Logout successful.', [])),

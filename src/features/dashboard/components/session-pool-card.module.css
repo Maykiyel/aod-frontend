@@ -1,0 +1,41 @@
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.eyebrow {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--red);
+  text-transform: uppercase;
+}
+
+.title {
+  font: var(--type-display-l);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.readings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+.note {
+  margin: var(--space-5) 0 0;
+  max-width: 62ch;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
