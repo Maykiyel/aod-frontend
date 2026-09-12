@@ -27,7 +27,7 @@
 
 .table {
   width: 100%;
-  min-width: 566px;
+  min-width: 440px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -78,7 +78,7 @@
 }
 
 .figure {
-  width: 96px;
+  width: 120px;
   text-align: right;
   font: var(--type-data);
   color: var(--text-primary);

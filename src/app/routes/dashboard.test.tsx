@@ -145,12 +145,23 @@ describe('the dashboard', () => {
     expect(within(roster).queryByText('maincoach')).not.toBeInTheDocument();
     expect(within(roster).queryByText('assistantcoach')).not.toBeInTheDocument();
 
+    // Frequency, alignment rate and state only: absence is team-wide by
+    // definition, and the per-player call and session counts are not wanted.
+    expect(within(roster).getAllByRole('columnheader').map((cell) => cell.textContent)).toEqual([
+      'PLAYER',
+      'COMMS/MIN',
+      'ALIGN RATE',
+      'STATE',
+    ]);
+
     expect(rows[1]).toHaveTextContent('playerone');
     expect(rows[1]).toHaveTextContent('21.6');
     expect(rows[1]).toHaveTextContent('91.33');
-    expect(rows[1]).toHaveTextContent('412');
+    expect(rows[1]).toHaveTextContent('ONLINE');
+    expect(rows[1]).not.toHaveTextContent('412');
     expect(rows[2]).toHaveTextContent('playertwo');
     expect(rows[2]).toHaveTextContent('12.84');
+    expect(rows[2]).toHaveTextContent('OFFLINE');
 
     // A coach never sees the team median.
     expect(screen.queryByRole('region', { name: 'You vs team median' })).not.toBeInTheDocument();

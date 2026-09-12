@@ -10,11 +10,9 @@ function initials(username: string): string {
   return username.slice(0, 2).toUpperCase();
 }
 
-/**
- * What a coach is shown: one line per active non-coach member, pooled over the
- * same sessions as the team-wide numbers. No absence column — dead air is
- * team-wide by definition, so there is no per-player figure to put there.
- */
+/** What a coach is shown: one line per active non-coach member, pooled over the
+ *  same sessions as the team-wide numbers. Frequency, alignment rate and state
+ *  only — absence is team-wide by definition, and the rest is not wanted here. */
 export function RosterTable({ players }: { players: PlayerLine[] }) {
   const online = players.filter((player) => player.is_online).length;
 
@@ -39,12 +37,6 @@ export function RosterTable({ players }: { players: PlayerLine[] }) {
               </th>
               <th scope="col" className={styles.figure}>
                 ALIGN RATE
-              </th>
-              <th scope="col" className={styles.figure}>
-                CALLS
-              </th>
-              <th scope="col" className={styles.figure}>
-                SESSIONS
               </th>
               <th scope="col" className={styles.state}>
                 STATE
@@ -71,8 +63,6 @@ export function RosterTable({ players }: { players: PlayerLine[] }) {
                 <td className={styles.figure}>
                   {player.alignment_rate === null ? NO_READING : `${player.alignment_rate}%`}
                 </td>
-                <td className={styles.figure}>{formatCount(player.calls_logged)}</td>
-                <td className={styles.figure}>{formatCount(player.sessions_played)}</td>
                 <td className={styles.state}>
                   <Tag tone={player.is_online ? 'aligned' : 'neutral'}>
                     {player.is_online ? 'ONLINE' : 'OFFLINE'}
