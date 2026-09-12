@@ -1,5 +1,5 @@
 import { StatBar } from '@/components/ui/stat-bar/stat-bar';
-import { formatCount, formatDuration, NO_READING } from '@/features/dashboard/format';
+import { formatCount, formatSeconds, NO_READING } from '@/features/dashboard/format';
 import type { CommunicationKpi } from '@/features/dashboard/types';
 import styles from './kpi-grid.module.css';
 
@@ -16,7 +16,9 @@ export function KpiGrid({ kpi }: { kpi: CommunicationKpi }) {
         unit={kpi.alignment_rate === null ? undefined : '%'}
         fill="aligned"
       />
-      <StatBar label="ABSENCE TOTAL" value={formatDuration(kpi.absence_ms)} unit="min" fill="red" />
+      {/* Dead air that was counted, never a failure. Seconds, so the unit is
+          the reading's own and not the design's self-contradicting `min`. */}
+      <StatBar label="ABSENCE TOTAL" value={formatSeconds(kpi.absence_ms)} unit="s" fill="red" />
       <StatBar label="CALLS CLASSIFIED" value={formatCount(kpi.calls_classified)} unit="calls" />
     </section>
   );

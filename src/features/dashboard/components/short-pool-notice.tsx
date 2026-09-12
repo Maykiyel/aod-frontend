@@ -12,12 +12,12 @@ interface ShortPoolNoticeProps {
 /** A data card the backend collapsed because the pool came up short. The empty
  *  treatment, not the error one: fewer sessions than asked for is a count, not
  *  a failure, and must not read as one. */
-export function ShortPoolNotice({ card, message, window: pool }: ShortPoolNoticeProps) {
+export function ShortPoolNotice({ card, message, window: analysisWindow }: ShortPoolNoticeProps) {
   return (
     <EmptyState
       eyebrow="Session pool"
       title={card}
-      reading={`ANALYSED ${pool.sessions_analyzed} OF ${pool.sessions_requested}`}
+      reading={`ANALYSED ${analysisWindow.sessions_analyzed} OF ${analysisWindow.sessions_requested}`}
     >
       <EmptyStateInstruction>{message}</EmptyStateInstruction>
     </EmptyState>

@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { Surface } from '@/components/ui/surface/surface';
 import { formatCount, NO_READING } from '@/features/dashboard/format';
 import type { OwnLine, TeamMedian } from '@/features/dashboard/types';
 import styles from './you-vs-median.module.css';
@@ -30,7 +31,10 @@ function reading(value: number | null, unit: string): string {
  *  and a bar with the median marked on it. */
 function ComparisonRow({ label, mine, median, unit, fill, ceiling }: Comparison) {
   const captionId = useId();
-  const share = (value: number | null) => (ceiling === 0 || value === null ? 0 : value / ceiling);
+  // Nothing to scale against — no reading, or a median below a population of
+  // two — so the track draws nothing and claims no range it cannot fill.
+  const scaled = ceiling > 0;
+  const share = (value: number | null) => (scaled && value !== null ? value / ceiling : 0);
 
   return (
     <figure className={styles.row} aria-labelledby={captionId}>
@@ -48,12 +52,14 @@ function ComparisonRow({ label, mine, median, unit, fill, ceiling }: Comparison)
           its scale, so it is worth something to a screen reader too. */}
       <div
         className={styles.track}
-        role="meter"
-        aria-labelledby={captionId}
-        aria-valuenow={mine ?? 0}
-        aria-valuemin={0}
-        aria-valuemax={ceiling}
-        aria-valuetext={`${reading(mine, unit)}, team median ${reading(median, unit)}`}
+        role={scaled ? 'meter' : undefined}
+        aria-labelledby={scaled ? captionId : undefined}
+        aria-valuenow={scaled ? (mine ?? 0) : undefined}
+        aria-valuemin={scaled ? 0 : undefined}
+        aria-valuemax={scaled ? ceiling : undefined}
+        aria-valuetext={
+          scaled ? `${reading(mine, unit)}, team median ${reading(median, unit)}` : undefined
+        }
       >
         <span className={styles.bar} style={{ width: `${share(mine) * 100}%`, background: fill }} />
         {median === null ? null : (
@@ -104,7 +110,7 @@ export function YouVsMedian({ you, teamMedian }: YouVsMedianProps) {
   ];
 
   return (
-    <section className={styles.card} aria-label="You vs team median">
+    <Surface as="section" level={2} behind="var(--void)" padding="0" aria-label="You vs team median">
       <div className={styles.head}>
         <h2 className={styles.title}>You vs team median</h2>
         <span className={styles.note}>MEDIAN OVER THE ANALYSED SESSIONS</span>
@@ -124,6 +130,6 @@ export function YouVsMedian({ you, teamMedian }: YouVsMedianProps) {
           TEAM MEDIAN
         </span>
       </div>
-    </section>
+    </Surface>
   );
 }

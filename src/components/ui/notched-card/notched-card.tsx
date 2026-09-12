@@ -21,12 +21,9 @@ const LEVEL_CLASS: Record<NotchedCardLevel, string> = {
   3: styles.e3,
 };
 
-/**
- * The signature device: a rectangular step cut from the top-left corner with a
- * disc nested in the clearance. One per screen, on the flagged item. The mask
- * clips the whole render tree, so the badge is a sibling of the masked panel
- * inside a shared relative wrapper — never a child of it.
- */
+/** A rectangular step cut from the top-left corner, a disc nested in the
+ *  clearance. One per screen, on the flagged item. The mask clips the whole
+ *  render tree, so the badge is a sibling of the panel, never a child. */
 export function NotchedCard({
   badge,
   level = 3,
@@ -42,8 +39,8 @@ export function NotchedCard({
   } as CSSProperties;
 
   return (
-    <div className={cx(styles.wrapper, className)} style={wrapperStyle}>
-      <div {...rest} className={cx(styles.panel, LEVEL_CLASS[level])}>
+    <div {...rest} className={cx(styles.wrapper, className)} style={wrapperStyle}>
+      <div className={cx(styles.panel, LEVEL_CLASS[level])}>
         {children}
       </div>
       {badge ? <div className={styles.badge}>{badge}</div> : null}

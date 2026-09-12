@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
-import { envelope } from '@/testing/mocks/handlers';
+import { caller, envelope } from '@/testing/mocks/handlers';
 import {
   assistantCoachToken,
   authToken,
+  ownLineAndMedian,
   playerToken,
   pooledHeader,
+  roster,
   shortPoolHeader,
   shortPoolPlayers,
   teamlessToken,
@@ -22,8 +24,12 @@ const TOKEN_KEY = 'aod.auth.token.v1';
  *  database returns, and what a demo opens on. */
 function shortPool(): void {
   server.use(
-    http.get(`${env.apiUrl}/dashboard/header`, () =>
-      envelope('Dashboard header retrieved.', shortPoolHeader),
+    // identity.user is the caller on the real endpoint, in this state too.
+    http.get(`${env.apiUrl}/dashboard/header`, ({ request }) =>
+      envelope('Dashboard header retrieved.', {
+        ...shortPoolHeader,
+        identity: { ...shortPoolHeader.identity, user: caller(request) },
+      }),
     ),
     http.get(`${env.apiUrl}/dashboard/players`, () =>
       envelope('Dashboard players retrieved.', shortPoolPlayers),
@@ -179,6 +185,56 @@ describe('the dashboard', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('playerone');
   });
 
+  it('shows a dash where the pool produced no reading at all', async () => {
+    // Nothing in the pool was assessed, and a median needs a population of two.
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/header`, () =>
+        envelope('Dashboard header retrieved.', {
+          ...pooledHeader,
+          kpi: { ...pooledHeader.kpi, alignment_rate: null },
+        }),
+      ),
+      // A member with no completed transcript anywhere in the pool, on a team
+      // whose population is too small for a median (ADR 0011).
+      http.get(`${env.apiUrl}/dashboard/players`, () =>
+        envelope('Dashboard players retrieved.', {
+          ...ownLineAndMedian,
+          you: { user_id: 3, comm_frequency: 0, alignment_rate: null, calls_logged: 0 },
+          team_median: { comm_frequency: null, alignment_rate: null, calls_logged: null },
+        }),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    const kpi = await screen.findByRole('region', { name: 'Communication KPI' });
+    // A dash, not a zero: no reading is not a reading of none.
+    expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).toHaveTextContent('—');
+    expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).not.toHaveTextContent('%');
+
+    const card = screen.getByRole('region', { name: 'You vs team median' });
+    expect(within(card).getAllByText('MEDIAN —')).toHaveLength(3);
+    // A metric with no scale is not a meter, so it claims no range it cannot fill.
+    expect(within(card).queryByRole('meter', { name: 'CALLS LOGGED' })).not.toBeInTheDocument();
+  });
+
+  it('renders an empty roster as an empty roster, not as a short pool', async () => {
+    server.use(
+      http.get(`${env.apiUrl}/dashboard/players`, () =>
+        envelope('Dashboard players retrieved.', { ...roster, players: [] }),
+      ),
+    );
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // A team of coaches has no lines to draw, which is not the short-pool state.
+    expect(await screen.findByText('0 ON ROSTER · 0 ONLINE')).toBeInTheDocument();
+    expect(screen.queryByText(/insufficient sessions queried for player/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('renders a short session pool as a deliberate message, not a failure', async () => {
     shortPool();
     window.localStorage.setItem(TOKEN_KEY, authToken);
@@ -204,6 +260,19 @@ describe('the dashboard', () => {
 
     // A pool shorter than it asked for is a count, not an error.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('still names a player as a player when the pool is too short to shape a body', async () => {
+    shortPool();
+    window.localStorage.setItem(TOKEN_KEY, playerToken);
+
+    renderApp('/');
+
+    // The short-pool body carries no role signal, so the screen must not fall
+    // back to the coach's framing — a fresh database is the demo's first screen.
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('playerone');
+    expect(screen.getByText('My dashboard — player')).toBeInTheDocument();
+    expect(screen.queryByText('Team dashboard — coach')).not.toBeInTheDocument();
   });
 
   it('offers a coach the one action that lengthens a short pool, and a player none', async () => {
@@ -236,8 +305,9 @@ describe('the dashboard', () => {
       '18.43/min',
     );
     expect(within(kpi).getByRole('figure', { name: 'ALIGNMENT RATE' })).toHaveTextContent('87.25%');
+    // 252481 ms exactly, in the unit the reading is actually in.
     expect(within(kpi).getByRole('figure', { name: 'ABSENCE TOTAL' })).toHaveTextContent(
-      '4:12.481min',
+      '252.481s',
     );
     expect(within(kpi).getByRole('figure', { name: 'CALLS CLASSIFIED' })).toHaveTextContent(
       '1,842calls',

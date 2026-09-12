@@ -16,8 +16,9 @@ export function envelope(message: string, data: unknown, code = 200) {
 
 const url = (path: string) => `${env.apiUrl}${path}`;
 
-/** Resolve the bearer the way Sanctum does, or null if it names nobody. */
-function caller(request: Request): User | null {
+/** Resolve the bearer the way Sanctum does, or null if it names nobody.
+ *  Exported so a test overriding a handler resolves the caller identically. */
+export function caller(request: Request): User | null {
   const header = request.headers.get('Authorization');
   if (!header?.startsWith('Bearer ')) return null;
   return usersByToken.get(header.slice('Bearer '.length)) ?? null;

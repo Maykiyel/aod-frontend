@@ -1,4 +1,5 @@
 import { HexSlot } from '@/components/ui/hex-slot/hex-slot';
+import { Surface } from '@/components/ui/surface/surface';
 import { Tag } from '@/components/ui/tag/tag';
 import { formatCount, NO_READING } from '@/features/dashboard/format';
 import type { PlayerLine } from '@/features/dashboard/types';
@@ -18,7 +19,7 @@ export function RosterTable({ players }: { players: PlayerLine[] }) {
   const online = players.filter((player) => player.is_online).length;
 
   return (
-    <div className={styles.card}>
+    <Surface level={2} behind="var(--void)" padding="0">
       <div className={styles.head}>
         <h2 className={styles.title}>Team members</h2>
         <span className={styles.count}>
@@ -82,6 +83,6 @@ export function RosterTable({ players }: { players: PlayerLine[] }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </Surface>
   );
 }

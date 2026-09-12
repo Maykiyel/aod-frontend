@@ -3,17 +3,18 @@
 
 const COUNT = new Intl.NumberFormat('en-US');
 
+/** Groups digits without rounding: a measurement keeps the precision it came with. */
+const COUNT_EXACT = new Intl.NumberFormat('en-US', { maximumFractionDigits: 20 });
+
 export function formatCount(value: number): string {
   return COUNT.format(value);
 }
 
-/** Dead air as `m:ss.mmm`. An interval that was counted, never a failure, so it
- *  keeps every millisecond the server summed. */
-export function formatDuration(ms: number): string {
-  const minutes = Math.floor(ms / 60_000);
-  const seconds = Math.floor((ms % 60_000) / 1000);
-  const millis = ms % 1000;
-  return `${minutes}:${String(seconds).padStart(2, '0')}.${String(millis).padStart(3, '0')}`;
+/** Dead air in seconds, the system's own idiom for it (`ABSENCE 6.4s`). The
+ *  design's `4:12` under a `min` label contradicts itself, and m:ss carries no
+ *  honest unit; every millisecond the server summed is kept either way. */
+export function formatSeconds(ms: number): string {
+  return COUNT_EXACT.format(ms / 1000);
 }
 
 /** Shown where the pool produced no value — an unassessed alignment rate, a

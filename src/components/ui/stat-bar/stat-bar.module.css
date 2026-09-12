@@ -13,7 +13,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  padding: 0 calc(var(--stat-bar-skew) + var(--space-1)) 0 14px;
+  padding: 0 calc(var(--stat-bar-skew) + var(--space-1)) 0 var(--space-4);
   background: var(--e0-surface);
   border: var(--border-width) solid var(--e0-border);
   clip-path: polygon(0 0, 100% 0, calc(100% - var(--stat-bar-skew)) 100%, 0 100%);

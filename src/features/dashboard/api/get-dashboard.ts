@@ -10,10 +10,9 @@ import { api } from '@/lib/api-client';
  *  the request always agree about what the numbers cover. */
 export const DEFAULT_POOL_SIZE = 3;
 
-/** One prefix for both endpoints, so a session reaching analysis-ready can
- *  invalidate the whole dashboard in one call when #5 wires broadcasts up. */
-export const dashboardKeys = {
-  all: ['dashboard'] as const,
+/** Both keys share a `dashboard` prefix, so #5 can invalidate the whole screen
+ *  on one broadcast without a key constant of its own. */
+const dashboardKeys = {
   header: (sessions: number) => ['dashboard', 'header', sessions] as const,
   players: (sessions: number) => ['dashboard', 'players', sessions] as const,
 };

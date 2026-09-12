@@ -2,13 +2,11 @@ import { Badge } from '@/components/ui/badge/badge';
 import { Icon } from '@/components/ui/icon/icon';
 import { NotchedCard } from '@/components/ui/notched-card/notched-card';
 import { Tag } from '@/components/ui/tag/tag';
-import { formatCount } from '@/features/dashboard/format';
 import type { DashboardWindow } from '@/features/dashboard/types';
 import styles from './session-pool-card.module.css';
 
 interface SessionPoolCardProps {
   window: DashboardWindow;
-  analysisReadyCount: number;
   /** Whether to offer the one action that lengthens the pool. Hides a control,
    *  never grants one — `SessionPolicy::create` is the authority. */
   canConfigureSessions: boolean;
@@ -20,11 +18,10 @@ interface SessionPoolCardProps {
  * and the card that still explains the screen when they are gone.
  */
 export function SessionPoolCard({
-  window: pool,
-  analysisReadyCount,
+  window: analysisWindow,
   canConfigureSessions,
 }: SessionPoolCardProps) {
-  const short = pool.sessions_analyzed < pool.sessions_requested;
+  const short = analysisWindow.sessions_analyzed < analysisWindow.sessions_requested;
 
   return (
     <section aria-label="Session pool">
@@ -40,23 +37,17 @@ export function SessionPoolCard({
         <div className={styles.head}>
           <div className={styles.identity}>
             <span className={styles.eyebrow}>SESSION POOL</span>
-            <span className={styles.title}>Last {pool.sessions_requested} sessions</span>
+            <span className={styles.title}>Last {analysisWindow.sessions_requested} sessions</span>
           </div>
           <div className={styles.readings}>
             <Tag tone={short ? 'alert' : 'neutral'}>
-              ANALYSED {pool.sessions_analyzed} OF {pool.sessions_requested}
+              ANALYSED {analysisWindow.sessions_analyzed} OF {analysisWindow.sessions_requested}
             </Tag>
-            <Tag>{formatCount(analysisReadyCount)} ANALYSIS READY</Tag>
           </div>
         </div>
 
-        {short ? (
-          <p className={styles.note}>
-            The team has {formatCount(analysisReadyCount)} analysis-ready{' '}
-            {analysisReadyCount === 1 ? 'session' : 'sessions'} and the pool asks for{' '}
-            {pool.sessions_requested}. The data cards stay collapsed until it has that many.
-            {canConfigureSessions ? ' Create a session to start recording.' : null}
-          </p>
+        {short && canConfigureSessions ? (
+          <p className={styles.note}>Create a session to start recording.</p>
         ) : null}
       </NotchedCard>
     </section>

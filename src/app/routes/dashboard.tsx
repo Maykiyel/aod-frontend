@@ -12,7 +12,7 @@ import { KpiGrid } from '@/features/dashboard/components/kpi-grid';
 import { PlayerBreakdownCard } from '@/features/dashboard/components/player-breakdown-card';
 import { SessionPoolCard } from '@/features/dashboard/components/session-pool-card';
 import { ShortPoolNotice } from '@/features/dashboard/components/short-pool-notice';
-import { formatSpan } from '@/features/dashboard/format';
+import { formatCount, formatSpan } from '@/features/dashboard/format';
 import type { DashboardHeader, PlayerBreakdown } from '@/features/dashboard/types';
 import type { Capabilities } from '@/features/team/capabilities';
 import { useMembership } from '@/features/team/hooks/use-membership';
@@ -58,10 +58,21 @@ function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
 
   return (
     <>
-      <DashboardIdentity header={header.data} breakdown={breakdown.data} />
+      <DashboardIdentity
+        header={header.data}
+        breakdown={breakdown.data}
+        capabilities={capabilities}
+      />
 
       <div className={styles.columns}>
         <div className={styles.main}>
+          {/* The single stat block screens 06 and 07 put above the grid. The
+              team-wide total, so it stands in both roles and in a short pool. */}
+          <div className={styles.statBlock}>
+            <span className={styles.statLabel}>SESSIONS LOGGED</span>
+            <span className={styles.statValue}>{formatCount(header.data.analysisReadyCount)}</span>
+          </div>
+
           {header.data.kpi.status === 'pooled' ? (
             <KpiGrid kpi={header.data.kpi.value} />
           ) : (
@@ -74,7 +85,6 @@ function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
 
           <SessionPoolCard
             window={header.data.window}
-            analysisReadyCount={header.data.analysisReadyCount}
             canConfigureSessions={capabilities.canConfigureSessions}
           />
 
@@ -101,17 +111,27 @@ function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
   );
 }
 
-/** The identity block. Its framing follows the shape `GET /dashboard/players`
- *  chose — the server's own role branch, which is the authority ADR 0007 points
- *  at, so the screen reads neither `member_role` nor a sixth capability. */
+/** Whether to frame the screen as screen 07 rather than 06. The shape
+ *  `GET /dashboard/players` chose is the server's own role branch and answers
+ *  first; a short pool shapes no body, so the coach capability stands in for
+ *  copy alone — it still hides nothing and grants nothing (ADR 0007). */
+function isPersonal(breakdown: PlayerBreakdown | undefined, capabilities: Capabilities): boolean {
+  if (breakdown?.status === 'comparison') return true;
+  if (breakdown?.status === 'roster') return false;
+  return !capabilities.canConfigureSessions;
+}
+
+/** The identity block: screen 06 names the team, screen 07 names the player. */
 function DashboardIdentity({
   header,
   breakdown,
+  capabilities,
 }: {
   header: DashboardHeader;
   breakdown: PlayerBreakdown | undefined;
+  capabilities: Capabilities;
 }) {
-  const personal = breakdown?.status === 'comparison';
+  const personal = isPersonal(breakdown, capabilities);
 
   return (
     <SectionHeader
