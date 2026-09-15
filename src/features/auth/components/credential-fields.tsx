@@ -10,18 +10,27 @@ export interface CredentialFieldsProps {
   disabled: boolean;
 }
 
+/** Named for whoever is filling them in: the reference only ever drew these on
+ *  the coach screen, so its examples address a coach. */
+const EXAMPLES = {
+  Coach: { username: 'Coach Juan', email: 'coach@teamnova.gg' },
+  Player: { username: 'Player A', email: 'player@teamnova.gg' },
+} as const;
+
 /** Username, email and password with its confirmation. Both profile screens
  *  carry this block: the drawn player screen collects no credentials at all and
  *  so cannot produce a valid registration (#31). Minimums match the backend's
  *  own rules, so malformed input never costs a round trip. */
 export function CredentialFields({ answers, onChange, errors, disabled }: CredentialFieldsProps) {
+  const example = EXAMPLES[answers.role ?? 'Coach'];
+
   return (
     <>
       <Field
         label="Username"
         name="username"
         autoComplete="username"
-        placeholder="Coach Juan"
+        placeholder={example.username}
         minLength={3}
         required
         disabled={disabled}
@@ -34,7 +43,7 @@ export function CredentialFields({ answers, onChange, errors, disabled }: Creden
         type="email"
         name="email"
         autoComplete="email"
-        placeholder="coach@teamnova.gg"
+        placeholder={example.email}
         required
         disabled={disabled}
         value={answers.email}
