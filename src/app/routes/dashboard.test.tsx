@@ -101,7 +101,13 @@ describe('the dashboard', () => {
 
     await user.click(screen.getByRole('link', { name: 'Sessions' }));
 
-    expect(screen.getByRole('link', { name: 'Sessions' })).toHaveAttribute('aria-current', 'page');
+    // A navigation now runs the auth middleware, so it settles a tick later.
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'Sessions' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      ),
+    );
     expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
   });
 

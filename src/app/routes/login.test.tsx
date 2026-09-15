@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
-import { envelope } from '@/testing/mocks/handlers';
+import { delay, http, HttpResponse } from 'msw';
+import { caller, envelope } from '@/testing/mocks/handlers';
 import { authToken, mainCoach } from '@/testing/mocks/fixtures';
 import { server } from '@/testing/mocks/server';
 import { renderApp } from '@/testing/test-utils';
@@ -23,7 +23,7 @@ describe('authentication', () => {
   it('lands the user on the authenticated view when credentials are valid', async () => {
     const { user } = renderApp('/login');
 
-    await user.type(screen.getByLabelText('Email'), 'maincoach@example.com');
+    await user.type(await screen.findByLabelText('Email'), 'maincoach@example.com');
     await user.type(screen.getByLabelText('Password'), 'maincoach');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
@@ -35,7 +35,7 @@ describe('authentication', () => {
   it("surfaces the server's own message and stays put when credentials are wrong", async () => {
     const { user } = renderApp('/login');
 
-    await user.type(screen.getByLabelText('Email'), 'maincoach@example.com');
+    await user.type(await screen.findByLabelText('Email'), 'maincoach@example.com');
     await user.type(screen.getByLabelText('Password'), 'wrong-password');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
@@ -97,6 +97,48 @@ describe('authentication', () => {
     expect(await screen.findByLabelText('Email')).toBeInTheDocument();
   });
 
+  it('holds the door shut while a stored token is still being proved', async () => {
+    // The one state a routing decision must not be taken in: a token exists but
+    // has not been proved, so neither answer is honest yet.
+    server.use(
+      http.get(`${env.apiUrl}/me`, async ({ request }) => {
+        await delay(120);
+        const user = caller(request);
+        return user
+          ? envelope('Profile retrieved.', { user })
+          : envelope('Unauthenticated.', [], 401);
+      }),
+    );
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // No flash of the anonymous UI, and no redirect taken on a guess.
+    expect(screen.getByRole('status')).toHaveTextContent('AUTHENTICATING');
+    expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
+
+    expect(await screen.findByRole('navigation', { name: 'Sections' })).toBeInTheDocument();
+  });
+
+  it('returns the user to the page they first asked for', async () => {
+    const { user } = renderApp('/sessions');
+
+    // The deep link survives the detour, carried as `?next=`.
+    await user.type(await screen.findByLabelText('Email'), 'maincoach@example.com');
+    await user.type(screen.getByLabelText('Password'), 'maincoach');
+    await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+    expect(await screen.findByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
+  });
+
+  it('says so when an address names nothing, rather than bouncing to the dashboard', async () => {
+    renderApp('/no-such-screen');
+
+    expect(await screen.findByRole('heading', { name: /no such page/i })).toBeInTheDocument();
+    // Not a login redirect either: an unknown address is not a protected one.
+    expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
+  });
+
   it('sends an authenticated visitor away from login', async () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
     renderApp('/login');
@@ -110,7 +152,7 @@ describe('authentication', () => {
     server.use(http.post(`${env.apiUrl}/login`, () => HttpResponse.error()));
     const { user } = renderApp('/login');
 
-    await user.type(screen.getByLabelText('Email'), 'maincoach@example.com');
+    await user.type(await screen.findByLabelText('Email'), 'maincoach@example.com');
     await user.type(screen.getByLabelText('Password'), 'maincoach');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
 
@@ -127,7 +169,7 @@ describe('authentication', () => {
     );
 
     const { user } = renderApp('/login');
-    const submit = screen.getByRole('button', { name: 'Log in' });
+    const submit = await screen.findByRole('button', { name: 'Log in' });
 
     // Both fields empty: `required` should stop this before the network.
     await user.click(submit);

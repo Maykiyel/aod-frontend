@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { AppSidebar } from '@/app/layouts/app-sidebar';
 import styles from './app-shell.module.css';
 

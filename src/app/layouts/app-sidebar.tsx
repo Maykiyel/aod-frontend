@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { Icon } from '@/components/ui/icon/icon';
 import { NavItem } from '@/components/ui/nav-item/nav-item';
 import { Surface } from '@/components/ui/surface/surface';

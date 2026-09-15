@@ -13,6 +13,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/testing/setup.ts'],
     restoreMocks: true,
+    // Every render now waits on the router's first navigation, which is where a
+    // stored token is proved. The default 5s is no longer enough for a test that
+    // drives four screens.
+    testTimeout: 15_000,
   },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

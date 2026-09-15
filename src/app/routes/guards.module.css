@@ -1,8 +1,0 @@
-.fallback {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  font: var(--type-eyebrow);
-  letter-spacing: var(--track-eyebrow);
-  color: var(--text-muted);
-}

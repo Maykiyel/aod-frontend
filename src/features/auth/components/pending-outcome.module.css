@@ -1,0 +1,29 @@
+/* The last screen of a join. The shell is shared with screens 02–05; only the
+   outcome itself is styled here. */
+
+.outcome {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  max-width: 560px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.reading {
+  font: var(--type-data);
+  color: var(--text-muted);
+}
+
+.instruction {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  line-height: 1.7;
+}

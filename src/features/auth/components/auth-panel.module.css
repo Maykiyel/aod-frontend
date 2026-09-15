@@ -1,0 +1,146 @@
+/* Geometry read from docs/design/01 Log in.dc.html and 02 Sign up role.dc.html.
+   The clamp() expressions and percentages are the references' own; they are
+   layout, not design values, and no token exists for them. The two screens size
+   the plate differently, so basis, minimum and wordmark size are knobs a
+   composing screen sets rather than a variant prop. */
+
+.panel {
+  flex: 0 0 var(--auth-panel-basis, 44%);
+  min-width: var(--auth-panel-min, 520px);
+  position: relative;
+  overflow: hidden;
+}
+
+.plate {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.inner {
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(26px, 3.6vh, 48px) clamp(32px, 3vw, 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.statusRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status,
+.build {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-secondary);
+}
+
+.build {
+  color: var(--text-muted);
+}
+
+.statusMark {
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  display: block;
+}
+
+.brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.wordmark {
+  font: var(--type-display-xl);
+  font-size: var(--auth-panel-wordmark, clamp(52px, 6.2vw, 122px));
+  line-height: 0.84;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.wordmarkRow {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+}
+
+.rule {
+  flex: 1;
+  height: 2px;
+  background: var(--red);
+  transform: translateY(-16px);
+}
+
+.strapline {
+  margin: 0;
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-secondary);
+  max-width: 520px;
+}
+
+.slot {
+  position: relative;
+  z-index: 1;
+}
+
+.plateEdge,
+.plateEdgeInner,
+.plateFoot {
+  position: absolute;
+  pointer-events: none;
+  background: var(--plate-silhouette);
+}
+
+.plateEdge {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 96%);
+}
+
+.plateEdgeInner {
+  right: 16px;
+  top: 8%;
+  bottom: 8%;
+  width: 36px;
+  clip-path: polygon(100% 0, 100% 100%, 0 92%, 0 8%);
+}
+
+.plateFoot {
+  left: 0;
+  bottom: 0;
+  width: 96px;
+  height: 22px;
+  clip-path: polygon(0 0, 82% 0, 100% 100%, 0 100%);
+}
+
+.bolt {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--plate-bolt);
+}
+
+.boltTopLeft { top: 7px; left: 7px; }
+.boltTopRight { top: 7px; right: 7px; }
+.boltBottomLeft { bottom: 7px; left: 7px; }
+.boltBottomRight { bottom: 7px; right: 7px; }

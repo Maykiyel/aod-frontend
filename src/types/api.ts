@@ -12,6 +12,10 @@ export type TeamMember = Schemas['TeamMemberResource'];
 export type TeamSettings = Schemas['TeamSettingsResource'];
 export type Session = Schemas['SessionResource'];
 
+/** The one atomic enrolment body (#31). Role-conditional in ways the schema
+ *  cannot express — `toRegistrationRequest` is where those rules are applied. */
+export type RegistrationRequest = Schemas['RegisterRequest'];
+
 /** Basis for every capability (ADR 0007). The generator emits plain `string`
  *  because the legal values live in app code, not a DB enum. NOT `User.roles`,
  *  which is the global registration role and never drives capabilities. */

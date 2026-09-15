@@ -1,42 +1,20 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Form, Link, useActionData, useNavigation } from 'react-router';
 import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
 import { BrandPanel } from '@/features/auth/components/brand-panel';
-import { ApiError } from '@/lib/api-client';
-import { login } from '@/lib/auth-store';
+import type { LoginActionData } from '@/app/routes/login-action';
 import styles from './login.module.css';
 
 /** Screen 01, built against `docs/design/01 Log in.dc.html`. The browser validates
  *  email and password (`type="email"`, `required`) — the spec asks that a malformed
  *  address be caught before a request, not after a round trip. */
 export function LoginRoute() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
+  const actionData = useActionData<LoginActionData>();
+  const navigation = useNavigation();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setPending(true);
-    setError(null);
-
-    try {
-      await login({ email, password });
-      // On success the route guard redirects, unmounting this component — so
-      // nothing resets `pending` here deliberately.
-    } catch (cause) {
-      setError(
-        cause instanceof ApiError ? cause : new ApiError('Something went wrong. Try again.', 0),
-      );
-      setPending(false);
-    }
-  }
-
-  // Bad credentials arrive as a 422 against `email`, so prefer the field
-  // message; fall back to the envelope's own, which is server-authored.
-  const errorText = error ? (error.fieldError('email') ?? error.message) : null;
+  // Stays true through the redirect that follows a success, not just the POST,
+  // so the button never re-enables under a user who is already on their way.
+  const pending = navigation.state !== 'idle';
 
   return (
     <div className={styles.screen}>
@@ -62,7 +40,7 @@ export function LoginRoute() {
             <h1 className={styles.heading}>Log in</h1>
           </div>
 
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <Form className={styles.form} method="post">
             <div className={styles.fields}>
               <Input
                 label="Email"
@@ -71,8 +49,6 @@ export function LoginRoute() {
                 autoComplete="email"
                 placeholder="coach@aod.gg"
                 required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
                 disabled={pending}
               />
               <Input
@@ -82,15 +58,13 @@ export function LoginRoute() {
                 autoComplete="current-password"
                 placeholder="••••••••••"
                 required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
                 disabled={pending}
               />
             </div>
 
-            {errorText ? (
+            {actionData?.error ? (
               <p className={styles.error} role="alert">
-                {errorText}
+                {actionData.error}
               </p>
             ) : null}
 
@@ -100,13 +74,12 @@ export function LoginRoute() {
               </Button>
               <p className={styles.signUp}>
                 <span>New here?</span>
-                {/* #4 builds this route; until then the catch-all returns here. */}
                 <Link className={styles.signUpLink} to="/register">
                   Sign up
                 </Link>
               </p>
             </div>
-          </form>
+          </Form>
         </div>
 
         <p className={styles.disclaimer}>NOT ENDORSED BY OR AFFILIATED WITH RIOT GAMES</p>
