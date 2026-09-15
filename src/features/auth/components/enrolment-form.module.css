@@ -1,0 +1,151 @@
+/* The form furniture screens 03–05 share. The px values are the references' own
+   layout, not design values, and no token exists for them. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 22px);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.2vh, 22px);
+  max-width: 440px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* An instrument reading in the signal red, not a browser alert. */
+.fieldError {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+}
+
+.formError {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+  max-width: 520px;
+}
+
+.attestation {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 440px;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  text-wrap: pretty;
+  cursor: pointer;
+}
+
+.attestationBox {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 3px 0 0;
+  appearance: none;
+  background: var(--e0-surface);
+  border: var(--border-width) solid var(--border-raised);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.attestationBox:checked {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.attestationBox:checked::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--text-on-accent);
+  transform: rotate(45deg);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.back {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  border: none;
+  background: none;
+  padding: 0 0 2px;
+  border-bottom: var(--border-width) solid var(--border-raised);
+  cursor: pointer;
+  transition: color 120ms linear;
+}
+
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  max-width: 520px;
+}
+
+.legalLink {
+  color: var(--text-primary);
+  border-bottom: var(--border-width) solid var(--red);
+  padding-bottom: 1px;
+  text-decoration: none;
+  transition: color 120ms linear;
+}
+
+.back:hover,
+.back:focus-visible,
+.legalLink:hover,
+.legalLink:focus-visible {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back,
+  .legalLink { transition: none; }
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: clamp(14px, 2.2vh, 22px);
+  border-top: var(--border-width) solid var(--border-soft);
+  max-width: 560px;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.noticeLabel {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.noticeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.noticeReading {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}

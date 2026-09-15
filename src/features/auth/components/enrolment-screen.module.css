@@ -1,4 +1,5 @@
-/* Layout read from docs/design/01 Log in.dc.html. */
+/* Layout read from docs/design/02–05. The clamp() expressions are the
+   references' own; they are layout, not design values. */
 
 .screen {
   display: flex;
@@ -13,6 +14,13 @@
   align-items: stretch;
 }
 
+/* Enrolment draws the plate narrower than login does, and its wordmark smaller. */
+.panel {
+  --auth-panel-basis: 34%;
+  --auth-panel-min: 380px;
+  --auth-panel-wordmark: clamp(40px, 4.4vw, 80px);
+}
+
 .formSide {
   flex: 1;
   min-height: 0;
@@ -22,7 +30,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: clamp(20px, 3vh, 44px);
-  padding: clamp(26px, 3.6vh, 48px) clamp(40px, 4.5vw, 96px);
+  padding: clamp(26px, 3.6vh, 48px) clamp(40px, 4.5vw, 88px);
 }
 
 /* Machined grid wash behind the form. */
@@ -52,13 +60,12 @@
   display: block;
 }
 
-.formBlock {
+.body {
   position: relative;
-  width: 100%;
-  max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-7);
+  gap: clamp(18px, 2.8vh, 36px);
+  max-width: 860px;
 }
 
 .titleBlock {
@@ -89,68 +96,37 @@
 .heading {
   margin: 0;
   font: var(--type-display-l);
-  font-size: clamp(40px, 4vw, 58px);
+  font-size: clamp(34px, 3.4vw, 52px);
   letter-spacing: -0.005em;
   text-transform: uppercase;
   color: var(--text-primary);
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-7);
-}
-
-.fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-/* An instrument reading in the signal red, not a browser alert. */
-.error {
+.lede {
   margin: 0;
-  font: var(--type-data);
-  color: var(--red);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-}
-
-.signUp {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
   font: var(--type-body-s);
   color: var(--text-secondary);
+  max-width: 520px;
 }
 
-.signUpLink {
-  color: var(--text-primary);
-  border-bottom: var(--border-width) solid var(--red);
-  padding-bottom: 1px;
-  text-decoration: none;
-  transition: color 120ms linear;
-}
-
-.signUpLink:hover,
-.signUpLink:focus-visible {
-  color: var(--red);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .signUpLink { transition: none; }
-}
-
-.disclaimer {
+.footer {
   position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.disclaimer,
+.stepCount {
   margin: 0;
   font: var(--type-micro);
   letter-spacing: var(--track-micro);
   color: var(--text-muted);
-  max-width: 520px;
+}
+
+.disclaimer {
+  max-width: 620px;
+  line-height: 1.7;
 }

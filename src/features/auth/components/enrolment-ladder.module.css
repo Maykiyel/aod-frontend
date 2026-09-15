@@ -1,0 +1,116 @@
+/* The ENROLMENT SEQUENCE block in the left plate, read from docs/design/02–05. */
+
+.ladder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.caption {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.rungs {
+  display: flex;
+  flex-direction: column;
+}
+
+.rung {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-3) 0;
+  border: none;
+  border-top: var(--border-width) solid var(--border-soft);
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.rungs > .rung:last-child {
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+.done {
+  cursor: pointer;
+  transition: color 120ms linear;
+}
+
+.done:hover .label,
+.done:focus-visible .label {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .done { transition: none; }
+}
+
+.index {
+  width: 22px;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.active .index {
+  color: var(--red);
+}
+
+.label {
+  flex: 1;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.done .label {
+  color: var(--text-secondary);
+}
+
+.active .label {
+  color: var(--text-primary);
+}
+
+.value {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+/* The hex pip: filled on the active rung, filled muted on a completed one,
+   hollow on one still to come. */
+.pip {
+  position: relative;
+  width: 10px;
+  height: 11px;
+  background: var(--border-raised);
+  clip-path: var(--clip-hex);
+  display: block;
+}
+
+.pip::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  background: var(--e1-surface);
+  clip-path: var(--clip-hex);
+  display: block;
+}
+
+.active .pip {
+  background: var(--red);
+}
+
+.done .pip {
+  background: var(--text-muted);
+}
+
+.active .pip::after,
+.done .pip::after {
+  display: none;
+}

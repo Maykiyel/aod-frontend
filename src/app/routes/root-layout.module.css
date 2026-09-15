@@ -1,0 +1,18 @@
+.fallback {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-muted);
+}
+
+/* A boundary or a not-found stands alone on the page, so it centres itself the
+   way the fallback does rather than sitting in a screen's layout. */
+.boundary {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--app-bg);
+}

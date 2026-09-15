@@ -1,0 +1,206 @@
+/* Screen 02. Two selectable plates, the choice retargeting Continue. The px
+   values below are the reference's own layout, not design values, and no token
+   exists for them — read from docs/design/02 Sign up role.dc.html. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.8vh, 40px);
+}
+
+.plates {
+  display: flex;
+  gap: clamp(12px, 1.6vw, 20px);
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+/* The group is named by the heading above it; the legend would repeat it. */
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.plate {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.control {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.surface {
+  height: 100%;
+  --surface-padding: clamp(16px, 2.4vh, 24px);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+  height: 100%;
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.glyph {
+  position: relative;
+  width: 40px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border-raised);
+  clip-path: var(--clip-hex);
+}
+
+.glyph::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: var(--e1-surface);
+  clip-path: var(--clip-hex);
+}
+
+.selected .glyph {
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+}
+
+.selected .glyph::before {
+  display: none;
+}
+
+.glyphIcon {
+  position: relative;
+  color: var(--text-secondary);
+}
+
+.selected .glyphIcon {
+  color: var(--red);
+}
+
+.naming {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.name {
+  font: var(--type-display-m);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.summary {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.affordances {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 12px);
+  margin: auto 0 0;
+  padding: clamp(12px, 2vh, 20px) 0 0;
+  border-top: var(--border-width) solid var(--border-soft);
+  list-style: none;
+}
+
+.affordance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-secondary);
+}
+
+.affordanceMark {
+  width: 7px;
+  height: 7px;
+  border: var(--border-width) solid var(--text-muted);
+  transform: rotate(45deg);
+  display: block;
+}
+
+.selected .affordanceMark {
+  background: var(--text-muted);
+}
+
+/* Selection recolours the elevation ladder's own border token, which carries the
+   plate edge and its grooves together — the groove count stays `level`'s to
+   decide, and nothing is drawn over the plate. */
+.selected .surface {
+  --level-border: var(--red);
+}
+
+/* The corner ticks the reference sets on the plate it lifts. Flush with the
+   hairline: the reference offsets by -1px only because it draws its border on a
+   separate overlay. */
+.corner {
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  background: var(--red);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.corner::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: var(--red);
+}
+
+.cornerTopLeft { top: 0; left: 0; }
+.cornerTopLeft::after { top: 0; left: 0; }
+.cornerBottomRight { bottom: 0; right: 0; }
+.cornerBottomRight::after { bottom: 0; right: 0; }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.backLink {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+  border-bottom: var(--border-width) solid var(--border-raised);
+  padding-bottom: 2px;
+  text-decoration: none;
+  transition: color 120ms linear;
+}
+
+.backLink:hover,
+.backLink:focus-visible {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backLink { transition: none; }
+}
