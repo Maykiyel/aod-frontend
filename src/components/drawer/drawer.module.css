@@ -1,0 +1,116 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--scrim);
+}
+
+/* The content column is exactly the design's rail width, since what this holds
+   is a rail panel's own content; the rest is the drawer's gutter. */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(calc(var(--size-rail) + var(--space-7) * 2), 100vw);
+  height: 100dvh;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* Clears the groove strip Surface draws across the top edge. */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-7) var(--space-5);
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+.title {
+  margin: 0;
+  font: var(--type-display-s);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--space-7);
+  height: var(--space-7);
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 120ms linear;
+}
+
+.close:hover {
+  color: var(--text-primary);
+}
+
+.close:focus-visible {
+  outline: none;
+  border-color: var(--red);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-7) var(--space-section);
+}
+
+/* The one motion this adds: a panel that arrives from the edge it lives on.
+   #5 asks for no motion beyond the grid's, so nothing else here moves. */
+.panel[data-state='open'] {
+  animation: drawer-in 160ms ease-out;
+}
+
+.panel[data-state='closed'] {
+  animation: drawer-out 120ms ease-in;
+}
+
+.scrim[data-state='open'] {
+  animation: scrim-in 160ms ease-out;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes drawer-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[data-state='open'],
+  .panel[data-state='closed'],
+  .scrim[data-state='open'],
+  .close {
+    animation: none;
+    transition: none;
+  }
+}
