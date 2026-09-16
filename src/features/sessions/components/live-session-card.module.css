@@ -1,4 +1,4 @@
-.head {
+.body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -13,29 +13,22 @@
   min-width: 0;
 }
 
-.eyebrow {
+/* Red, as screen 06 draws it: the code is the flagged card's own instrument line. */
+.code {
   font: var(--type-micro);
   letter-spacing: var(--track-micro);
   color: var(--red);
-  text-transform: uppercase;
 }
 
-.title {
+.name {
   font: var(--type-display-l);
   text-transform: uppercase;
   color: var(--text-primary);
 }
 
-.readings {
+.actions {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
   align-items: flex-end;
-}
-
-.note {
-  margin: var(--space-5) 0 0;
-  max-width: 62ch;
-  font: var(--type-body-s);
-  color: var(--text-secondary);
 }

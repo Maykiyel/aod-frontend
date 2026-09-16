@@ -7,6 +7,8 @@ import { loginAction } from '@/app/routes/login-action';
 import { NotBuiltRoute } from '@/app/routes/not-built';
 import { RegisterRoute } from '@/app/routes/register';
 import { registerAction } from '@/app/routes/register-action';
+import { SessionRoute } from '@/app/routes/session';
+import { SessionsRoute } from '@/app/routes/sessions';
 import {
   AppErrorBoundary,
   NotFoundRoute,
@@ -50,10 +52,11 @@ export const routes: RouteObject[] = [
         ErrorBoundary: AppErrorBoundary,
         children: [
           { index: true, Component: DashboardRoute },
-          // One route per concept (ADR 0007). These three are the sidebar's other
-          // destinations, holding their URLs until their screens are written —
-          // #6 builds Sessions; Team and Settings have no ticket yet.
-          { path: '/sessions', element: <NotBuiltRoute title="Sessions" /> },
+          { path: '/sessions', Component: SessionsRoute },
+          { path: '/sessions/:sessionId', Component: SessionRoute },
+          // One route per concept (ADR 0007). These two are the sidebar's other
+          // destinations, holding their URLs until their screens are written;
+          // neither has a ticket yet.
           { path: '/team', element: <NotBuiltRoute title="Team" /> },
           { path: '/settings', element: <NotBuiltRoute title="Settings" /> },
         ],

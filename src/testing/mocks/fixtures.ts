@@ -2,7 +2,7 @@ import type {
   DashboardHeaderResponse,
   DashboardPlayersResponse,
 } from '@/features/dashboard/types';
-import type { MemberRole, Team, TeamMember, User } from '@/types/api';
+import type { MemberRole, Session, Team, TeamMember, User } from '@/types/api';
 
 /** Typed as the generated schemas so a mock cannot describe a response the API
  *  would never send. Values taken from a real seeded-team response. */
@@ -160,3 +160,59 @@ export const shortPoolPlayers: DashboardPlayersResponse = {
   window: { sessions_requested: 3, sessions_analyzed: 1, from: null, to: null },
   message: 'Insufficient sessions queried for Player Stats',
 };
+
+/** The team's sessions, shaped as `GET /teams/{team}/sessions` serialises them.
+ *  Values follow the demo seeder `Joe-Zupo/aod-backend#20` added, extended to
+ *  every status so the list has all six states to draw. */
+
+function session(
+  id: number,
+  session_name: string,
+  status: string,
+  created_at: string,
+  transcription?: { total: number; completed: number; failed: number },
+): Session {
+  return {
+    id,
+    team_id: thunderbolts.id,
+    created_by: mainCoach.id,
+    // SESSION_ plus the id zero-padded to three, as Session::codeForId writes it.
+    session_code: `SESSION_${String(id).padStart(3, '0')}`,
+    session_name,
+    status,
+    created_at,
+    ...(transcription ? { transcription } : {}),
+  };
+}
+
+/** The team's one non-terminal session. Queuing, so it is in the lobby. */
+export const lobbySession = session(48, 'Scrim vs Ronin Squad', 'queuing', '2026-09-16T18:02:00.000000Z');
+
+/** The other non-terminal status. Never in the list beside `lobbySession` — a
+ *  team holds one at a time — so a test swaps one for the other. */
+export const recordingSession = session(49, 'Scrim vs Kestrel', 'in_progress', '2026-09-16T19:41:00.000000Z');
+
+/** Two of five transcripts done. The only status carrying a transcription figure. */
+export const processingSession = session(
+  44,
+  'Scrim vs Vertex GG',
+  'processing',
+  '2026-09-15T20:15:00.000000Z',
+  { total: 5, completed: 2, failed: 0 },
+);
+
+export const reviewSession = session(47, 'Scrim vs Team Nova II', 'timeline_ready', '2026-09-14T21:08:00.000000Z');
+export const analysedSession = session(45, 'Scrim vs Apex Order', 'analysis_ready', '2026-09-13T19:52:00.000000Z');
+export const cancelledSession = session(46, 'Scrim vs Halcyon', 'cancelled', '2026-09-12T20:30:00.000000Z');
+
+/** Date-descending, the order the index returns them in — and deliberately NOT
+ *  id order, so a screen that sorted by anything of its own would fail. */
+export const pastSessions: Session[] = [
+  processingSession,
+  reviewSession,
+  analysedSession,
+  cancelledSession,
+];
+
+/** Everything the team holds: the live session and the four terminal ones. */
+export const teamSessions: Session[] = [lobbySession, ...pastSessions];

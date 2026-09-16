@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
-import { caller, envelope } from '@/testing/mocks/handlers';
+import { caller, envelope, resetSessions } from '@/testing/mocks/handlers';
 import {
   assistantCoachToken,
   authToken,
   ownLineAndMedian,
+  pastSessions,
   playerToken,
   pooledHeader,
   roster,
@@ -267,11 +268,10 @@ describe('the dashboard', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Insufficient sessions queried for Player Stats')).toBeInTheDocument();
 
-    // The identity and pool blocks survive the collapse; the data cards do not.
+    // The identity block survives the collapse; the data cards do not. Each
+    // notice carries the pool it came up short of, so the count is still said.
     expect(screen.getByRole('heading', { name: 'Thunderbolts' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Session pool' })).toHaveTextContent(
-      'ANALYSED 1 OF 3',
-    );
+    expect(screen.getAllByText('ANALYSED 1 OF 3')).toHaveLength(3);
     expect(screen.queryByRole('region', { name: 'Communication KPI' })).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Comm mix' })).not.toBeInTheDocument();
 
@@ -292,22 +292,16 @@ describe('the dashboard', () => {
     expect(screen.queryByText('Team dashboard — coach')).not.toBeInTheDocument();
   });
 
-  it('offers a coach the one action that lengthens a short pool, and a player none', async () => {
-    shortPool();
-    window.localStorage.setItem(TOKEN_KEY, authToken);
-
-    const coach = renderApp('/');
-
-    expect(await screen.findByText(/create a session to start recording/i)).toBeInTheDocument();
-    coach.unmount();
-
+  it('sends anyone looking at a short pool to the sessions screen', async () => {
     shortPool();
     window.localStorage.setItem(TOKEN_KEY, playerToken);
 
     renderApp('/');
 
-    expect(await screen.findByRole('region', { name: 'Session pool' })).toBeInTheDocument();
-    // A player is never told to do the one thing their role cannot do.
+    // #3 answered a short pool with a line of copy telling a coach to create a
+    // session. #6 removed the card that carried it: the rail links to the screen
+    // where the control actually is, and it links there for both roles.
+    expect(await screen.findByRole('link', { name: 'All sessions' })).toBeInTheDocument();
     expect(screen.queryByText(/create a session/i)).not.toBeInTheDocument();
   });
 
@@ -375,7 +369,7 @@ describe('the dashboard', () => {
     );
     // One card failing does not cost the screen the numbers that did arrive.
     expect(screen.getByRole('region', { name: 'Communication KPI' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Session pool' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Comm mix' })).toBeInTheDocument();
   });
 
   it('reports a failed dashboard header, and recovers', async () => {
@@ -478,5 +472,61 @@ describe('the dashboard', () => {
     renderApp('/');
 
     expect(await screen.findByRole('status', { name: 'Loading the team' })).toBeInTheDocument();
+  });
+
+  /** The handoff's system rules fix one inward notch per screen, on the flagged
+   *  item, so which item carries it is a decision rather than a default (#6). */
+  it('flags the live session, and nothing else, when the team has one', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    const flagged = await screen.findAllByRole('img', { name: 'Flagged' });
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0].closest('section')).toHaveAccessibleName('Live session');
+    expect(screen.getByRole('region', { name: 'Live session' })).toHaveTextContent('SESSION_048');
+  });
+
+  it('flags nothing at all when no session is live', async () => {
+    resetSessions(pastSessions);
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    // The rule caps a screen at one notch, on the flagged item; it does not
+    // require one, and screens 06 and 07 draw it only on the live session.
+    await screen.findByRole('list', { name: 'Sessions' });
+    expect(screen.queryByRole('img', { name: 'Flagged' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Live session' })).not.toBeInTheDocument();
+  });
+
+  it('carries a short sessions list in the rail that links on to the full screen', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    const list = await screen.findByRole('list', { name: 'Sessions' });
+    // The rail is a summary: the reference draws three items, not the whole list.
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3);
+
+    await user.click(screen.getByRole('link', { name: 'All sessions' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Sessions', level: 1 })).toBeInTheDocument(),
+    );
+    expect(within(await screen.findByRole('list', { name: 'Sessions' })).getAllByRole('listitem'))
+      .toHaveLength(5);
+  });
+
+  it('opens the live session straight from the dashboard', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    await user.click(await screen.findByRole('link', { name: 'Open session' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Session lobby' })).toBeInTheDocument(),
+    );
   });
 });

@@ -1,0 +1,50 @@
+.bar {
+  min-width: 0;
+}
+
+/* Matched to the Input primitive's own label, which this replaces: that one sits
+   over the field alone, and the row needs one name over both controls. */
+.label {
+  display: block;
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 7px;
+}
+
+/* stretch, not flex-end: the field's height is the primitive's own and the
+   action matches it exactly rather than landing a couple of pixels short. */
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.action {
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.error {
+  margin: var(--space-3) 0 0;
+  font: var(--type-data);
+  color: var(--red);
+}
+
+.notice {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.code {
+  font: var(--type-eyebrow);
+  color: var(--text-primary);
+}
