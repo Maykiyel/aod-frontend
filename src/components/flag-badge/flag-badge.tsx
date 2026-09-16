@@ -1,0 +1,15 @@
+import { Badge } from '@/components/ui/badge/badge';
+import { Icon } from '@/components/ui/icon/icon';
+
+/** The disc a notched card nests in its clearance. Named, so the flagged item is
+ *  perceivable rather than only visible — there is one per screen and which item
+ *  carries it is a decision (HANDOFF.md, non-negotiable system rules).
+ *  Shared rather than a primitive: two features need it and neither may import
+ *  the other, and the sixteen are fixed (ADR 0001). */
+export function FlagBadge() {
+  return (
+    <Badge role="img" aria-label="Flagged">
+      <Icon name="flagAdd" size={14} />
+    </Badge>
+  );
+}

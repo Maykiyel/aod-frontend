@@ -65,9 +65,10 @@ function TeamDashboard({ teamId, capabilities }: { teamId: number; capabilities:
     return <InlineError message={header.error.message} onRetry={() => void header.refetch()} />;
   }
 
-  // Until the index answers there is no live session to flag, so the notch stays
-  // where #3 put it rather than jumping once the request lands.
+  // Which item is flagged is not known until the index lands, so nothing carries
+  // the notch until it does — it appears once rather than moving.
   const live = sessions.data?.live ?? null;
+  const flagPool = !sessions.isPending && !live;
 
   return (
     <>
@@ -98,13 +99,13 @@ function TeamDashboard({ teamId, capabilities }: { teamId: number; capabilities:
 
           {live ? <LiveSessionCard session={live} /> : null}
 
-          {live ? (
-            <SessionPoolCard
+          {flagPool ? (
+            <FlaggedSessionPoolCard
               window={header.data.window}
               canConfigureSessions={capabilities.canConfigureSessions}
             />
           ) : (
-            <FlaggedSessionPoolCard
+            <SessionPoolCard
               window={header.data.window}
               canConfigureSessions={capabilities.canConfigureSessions}
             />

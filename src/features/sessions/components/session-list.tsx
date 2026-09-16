@@ -2,9 +2,10 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Surface } from '@/components/ui/surface/surface';
 import { Tag } from '@/components/ui/tag/tag';
-import { formatSessionDate, formatTranscription } from '@/features/sessions/format';
+import { formatTranscription } from '@/features/sessions/format';
 import { sessionState } from '@/features/sessions/session-state';
 import type { Session } from '@/types/api';
+import { formatDay } from '@/utils/format-date';
 import styles from './session-list.module.css';
 
 export interface SessionListProps {
@@ -41,7 +42,9 @@ export function SessionList({ label, sessions, action }: SessionListProps) {
 }
 
 /** Name, a meta line of date and Session code, and the state tag. The per-item
- *  statistics row screens 06 and 07 draw is dropped, as #6 records. */
+ *  statistics row screens 06 and 07 draw is dropped, as #6 records. Processing
+ *  adds its transcription figure to the meta line: #6 requires the progress on
+ *  the list, and the tag is the only other slot an item has. */
 function SessionListItem({ session }: { session: Session }) {
   const state = sessionState(session.status);
 
@@ -51,7 +54,7 @@ function SessionListItem({ session }: { session: Session }) {
         <span className={styles.identity}>
           <span className={styles.name}>{session.session_name}</span>
           <span className={styles.meta}>
-            <span>{formatSessionDate(session.created_at)}</span>
+            <span>{formatDay(session.created_at)}</span>
             {session.session_code ? (
               <>
                 <span aria-hidden="true">·</span>

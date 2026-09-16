@@ -1,5 +1,5 @@
-import { FlagBadge } from '@/components/ui/badge/badge';
-import { ButtonLink } from '@/components/ui/button/button';
+import { ButtonLink } from '@/components/button-link/button-link';
+import { FlagBadge } from '@/components/flag-badge/flag-badge';
 import { NotchedCard } from '@/components/ui/notched-card/notched-card';
 import { Tag } from '@/components/ui/tag/tag';
 import { sessionState } from '@/features/sessions/session-state';

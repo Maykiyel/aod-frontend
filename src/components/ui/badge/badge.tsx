@@ -1,5 +1,4 @@
 import type { CSSProperties, HTMLAttributes } from 'react';
-import { Icon } from '@/components/ui/icon/icon';
 import { cx } from '@/utils/cx';
 import styles from './badge.module.css';
 
@@ -38,16 +37,5 @@ export function Badge({
     >
       {children}
     </span>
-  );
-}
-
-/** The badge a notched card nests in its clearance. Named, so the flagged item
- *  is perceivable rather than only visible — there is one per screen and which
- *  item carries it is a decision (HANDOFF.md, non-negotiable system rules). */
-export function FlagBadge() {
-  return (
-    <Badge role="img" aria-label="Flagged">
-      <Icon name="flagAdd" size={14} />
-    </Badge>
   );
 }

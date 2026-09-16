@@ -8,19 +8,20 @@ export interface SessionIndexResponse {
   pagination: {
     current_page: number;
     total_pages: number;
-    count: string;
+    // `$paginated->count()`, an int. The generator emits `string` here.
+    count: number;
     per_page: number;
     total: number;
   };
 }
 
 /** What both surfaces read. `all` is the order each draws — the live Session,
- *  then the past ones in the order the server returned them. */
+ *  then the past ones in the order the server returned them. Only the first page:
+ *  paging is out of scope, so nothing here reports a total it does not list. */
 export interface SessionIndex {
   live: Session | null;
   past: Session[];
   all: Session[];
-  total: number;
 }
 
 /** Split once at the edge, the way `toMembership` does, so no Screen tests for
@@ -29,10 +30,5 @@ export function toSessionIndex(response: SessionIndexResponse): SessionIndex {
   const live = response.live_session;
   const past = response.past_sessions;
 
-  return {
-    live,
-    past,
-    all: live ? [live, ...past] : past,
-    total: response.pagination.total + (live ? 1 : 0),
-  };
+  return { live, past, all: live ? [live, ...past] : past };
 }

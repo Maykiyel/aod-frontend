@@ -1,6 +1,4 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react';
-import { Link } from 'react-router';
-import type { LinkProps } from 'react-router';
 import { cx } from '@/utils/cx';
 import styles from './button.module.css';
 
@@ -34,28 +32,5 @@ export function Button({
       {icon}
       {children ? <span>{children}</span> : null}
     </button>
-  );
-}
-
-export interface ButtonLinkProps extends LinkProps {
-  variant?: ButtonVariant;
-  icon?: ReactNode;
-}
-
-/** A destination drawn as a Button — the reference's `Open session` is a
- *  secondary button that navigates. A <button> inside an <a> is invalid, so the
- *  link takes the Button's own styles rather than a second copy of them. */
-export function ButtonLink({
-  variant = 'secondary',
-  icon,
-  children,
-  className,
-  ...rest
-}: ButtonLinkProps) {
-  return (
-    <Link {...rest} className={cx(styles.button, styles[variant], className)}>
-      {icon}
-      {children ? <span>{children}</span> : null}
-    </Link>
   );
 }

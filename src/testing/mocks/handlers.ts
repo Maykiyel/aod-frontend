@@ -313,7 +313,7 @@ export const handlers = [
       pagination: {
         current_page: 1,
         total_pages: 1,
-        count: String(past.length),
+        count: past.length,
         per_page: 15,
         total: past.length,
       },

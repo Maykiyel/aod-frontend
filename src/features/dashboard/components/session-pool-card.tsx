@@ -1,4 +1,4 @@
-import { FlagBadge } from '@/components/ui/badge/badge';
+import { FlagBadge } from '@/components/flag-badge/flag-badge';
 import { NotchedCard } from '@/components/ui/notched-card/notched-card';
 import { Surface } from '@/components/ui/surface/surface';
 import { Tag } from '@/components/ui/tag/tag';

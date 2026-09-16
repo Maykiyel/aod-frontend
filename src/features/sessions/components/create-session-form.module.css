@@ -32,7 +32,6 @@
 }
 
 .code {
-  font: var(--type-data);
-  font-size: 11px;
+  font: var(--type-eyebrow);
   color: var(--text-secondary);
 }

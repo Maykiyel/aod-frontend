@@ -52,7 +52,7 @@ function TeamSessions({ team, capabilities }: { team: Team; capabilities: Capabi
     return <InlineError message={index.error.message} onRetry={() => void index.refetch()} />;
   }
 
-  const { all, live, total } = index.data;
+  const { all, live } = index.data;
 
   return (
     <>
@@ -62,7 +62,7 @@ function TeamSessions({ team, capabilities }: { team: Team; capabilities: Capabi
         <SectionHeader
           as="h1"
           eyebrow={team.team_name}
-          index={`${total} SESSIONS`}
+          index={`${all.length} SESSIONS`}
           title="Sessions"
         />
         {capabilities.canConfigureSessions ? (
