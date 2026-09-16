@@ -10,9 +10,14 @@ import {
   SessionPlaceholder,
   UnknownSession,
 } from '@/features/sessions/components/session-placeholder';
+import { SessionLobby } from '@/features/sessions/components/session-lobby';
 import { sessionState } from '@/features/sessions/session-state';
+import { TeamSettingsPanel } from '@/features/team-settings/components/team-settings-panel';
 import { useMembership } from '@/features/team/hooks/use-membership';
+import { useAuth } from '@/lib/auth-store';
 import type { Session } from '@/types/api';
+
+const NOT_YOUR_TEAM = 'This session belongs to a team you are not an active member of.';
 
 const NOT_A_SESSION = 'That address does not name a session.';
 
@@ -45,7 +50,7 @@ export function SessionRoute() {
 function ReadableSession({ session }: { session: Session }) {
   switch (sessionState(session.status).screen) {
     case 'lobby':
-      return <SessionPlaceholder session={session} destination="Session lobby" />;
+      return <Lobby session={session} />;
     case 'recording':
       return <SessionPlaceholder session={session} destination="Recording" />;
     case 'review':
@@ -58,6 +63,40 @@ function ReadableSession({ session }: { session: Session }) {
       return <ProcessingSession session={session} />;
     case 'unknown':
       return <UnknownSession session={session} />;
+  }
+}
+
+/** The roster, the caller's capabilities and the Team Settings module are all
+ *  resolved here: the lobby lives in the sessions feature, and a feature may not
+ *  import another feature (conventions.md). */
+function Lobby({ session }: { session: Session }) {
+  const membership = useMembership();
+  const { user } = useAuth();
+
+  switch (membership.status) {
+    case 'loading':
+      return <Skeleton label="Loading the team" />;
+
+    case 'error':
+      return <InlineError message={membership.message} onRetry={membership.retry} />;
+
+    // The endpoint denies an outsider as not found, so only a membership that
+    // failed to resolve reaches this — it still gets an answer.
+    case 'teamless':
+      return <InlineError message={NOT_YOUR_TEAM} />;
+
+    case 'member':
+      return (
+        <SessionLobby
+          session={session}
+          members={membership.team.members ?? []}
+          selfId={user?.id ?? null}
+          canRunSession={membership.capabilities.canConfigureSessions}
+          settings={
+            membership.capabilities.canConfigureTeamSettings ? <TeamSettingsPanel /> : undefined
+          }
+        />
+      );
   }
 }
 
