@@ -193,3 +193,9 @@
   background: var(--aligned);
 }
 
+/* A dropped connection is a state, not a failure of the app, so it takes the
+   muted dot rather than the signal red. */
+.readingDotDown {
+  background: var(--text-muted);
+}
+
