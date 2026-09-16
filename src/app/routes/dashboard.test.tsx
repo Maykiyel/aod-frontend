@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import { env } from '@/config/env';
-import { caller, envelope } from '@/testing/mocks/handlers';
+import { caller, envelope, resetSessions } from '@/testing/mocks/handlers';
 import {
   assistantCoachToken,
   authToken,
   ownLineAndMedian,
+  pastSessions,
   playerToken,
   pooledHeader,
   roster,
@@ -478,5 +479,60 @@ describe('the dashboard', () => {
     renderApp('/');
 
     expect(await screen.findByRole('status', { name: 'Loading the team' })).toBeInTheDocument();
+  });
+
+  /** The handoff's system rules fix one inward notch per screen, on the flagged
+   *  item, so which item carries it is a decision rather than a default (#6). */
+  it('flags the live session, and nothing else, when the team has one', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    const flagged = await screen.findAllByRole('img', { name: 'Flagged' });
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0].closest('section')).toHaveAccessibleName('Live session');
+    expect(screen.getByRole('region', { name: 'Live session' })).toHaveTextContent('SESSION_048');
+  });
+
+  it('returns the flag to the session pool when no session is live', async () => {
+    resetSessions(pastSessions);
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    renderApp('/');
+
+    const flagged = await screen.findAllByRole('img', { name: 'Flagged' });
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0].closest('section')).toHaveAccessibleName('Session pool');
+    expect(screen.queryByRole('region', { name: 'Live session' })).not.toBeInTheDocument();
+  });
+
+  it('carries a short sessions list in the rail that links on to the full screen', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    const list = await screen.findByRole('list', { name: 'Sessions' });
+    // The rail is a summary: the reference draws three items, not the whole list.
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3);
+
+    await user.click(screen.getByRole('link', { name: 'All sessions' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Sessions', level: 1 })).toBeInTheDocument(),
+    );
+    expect(within(await screen.findByRole('list', { name: 'Sessions' })).getAllByRole('listitem'))
+      .toHaveLength(5);
+  });
+
+  it('opens the live session straight from the dashboard', async () => {
+    window.localStorage.setItem(TOKEN_KEY, authToken);
+
+    const { user } = renderApp('/');
+
+    await user.click(await screen.findByRole('link', { name: 'Open session' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Session lobby' })).toBeInTheDocument(),
+    );
   });
 });

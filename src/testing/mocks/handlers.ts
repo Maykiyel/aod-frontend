@@ -6,6 +6,7 @@ import {
   roster,
   shortPoolHeader,
   shortPoolPlayers,
+  teamSessions,
   thunderbolts,
   thunderboltsRoster,
   usersByToken,
@@ -14,6 +15,7 @@ import type {
   MemberRole,
   MembershipStatus,
   RegistrationRequest,
+  Session,
   Team,
   User,
 } from '@/types/api';
@@ -57,6 +59,25 @@ export function resetRegistrations(): void {
   registeredUsers.clear();
   registeredTeams.clear();
 }
+
+/** The sessions each team holds. Writable because #6 is the first ticket that
+ *  creates one and then reads it back out of the index. */
+const sessionsByTeam = new Map<number, Session[]>();
+
+const NON_TERMINAL: readonly string[] = ['queuing', 'in_progress'];
+
+let lastSessionId = 200;
+
+/** Put the seeded team back to `rows`. Called with no argument between tests;
+ *  a test wanting a different starting point — an empty team, a session that is
+ *  recording rather than in the lobby — passes its own. */
+export function resetSessions(rows: Session[] = teamSessions): void {
+  sessionsByTeam.clear();
+  sessionsByTeam.set(thunderbolts.id, rows.map((row) => ({ ...row })));
+  lastSessionId = 200;
+}
+
+resetSessions();
 
 const COACH_ROLES: readonly MemberRole[] = ['main_coach', 'assistant_coach'];
 
@@ -271,6 +292,101 @@ export const handlers = [
       { user, team, team_membership_status: status, token },
       201,
     );
+  }),
+
+  // Session routes bind {team}/{session} explicitly and authorize against that
+  // team, not the caller's "active team" — an outsider is denied as not found.
+  http.get(url('/teams/:teamId/sessions'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const teamId = Number(params.teamId);
+    if (activeTeamOf(user)?.id !== teamId) return envelope('Not found.', [], 404);
+
+    const rows = sessionsByTeam.get(teamId) ?? [];
+    const live = rows.find((row) => NON_TERMINAL.includes(row.status)) ?? null;
+    const past = rows.filter((row) => row !== live);
+
+    return envelope('Sessions retrieved.', {
+      live_session: live,
+      past_sessions: past,
+      pagination: {
+        current_page: 1,
+        total_pages: 1,
+        count: String(past.length),
+        per_page: 15,
+        total: past.length,
+      },
+    });
+  }),
+
+  http.post(url('/teams/:teamId/sessions'), async ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const teamId = Number(params.teamId);
+    if (activeTeamOf(user)?.id !== teamId) return envelope('Not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+
+    const body = (await request.json()) as { session_name?: string };
+    const name = body.session_name;
+
+    if (!name) {
+      return envelope(
+        'The given data was invalid.',
+        { errors: { session_name: ['The session name field is required.'] } },
+        422,
+      );
+    }
+    if (name.length > 255) {
+      return envelope(
+        'The given data was invalid.',
+        { errors: { session_name: ['The session name field must not be greater than 255 characters.'] } },
+        422,
+      );
+    }
+
+    const rows = sessionsByTeam.get(teamId) ?? [];
+    // Session::createForTeam returns null when one is already open, and the
+    // controller turns that into a 422 with no field errors on it.
+    if (rows.some((row) => NON_TERMINAL.includes(row.status))) {
+      return envelope('This team already has an active session.', [], 422);
+    }
+
+    const id = (lastSessionId += 1);
+    const session: Session = {
+      id,
+      team_id: teamId,
+      created_by: user.id,
+      session_code: `SESSION_${String(id).padStart(3, '0')}`,
+      session_name: name,
+      status: 'queuing',
+      created_at: new Date().toISOString(),
+    };
+
+    sessionsByTeam.set(teamId, [session, ...rows]);
+
+    return envelope('Session created.', { session }, 201);
+  }),
+
+  // Refused with 409 while processing: the pipeline is mid-run and there is no
+  // coherent view to return. Progress is on the team session index instead.
+  http.get(url('/sessions/:sessionId'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const sessionId = Number(params.sessionId);
+    const team = activeTeamOf(user);
+    const session = team
+      ? (sessionsByTeam.get(team.id) ?? []).find((row) => row.id === sessionId)
+      : undefined;
+
+    if (!session) return envelope('Not found.', [], 404);
+    if (session.status === 'processing') {
+      return envelope('This session is still processing.', [], 409);
+    }
+
+    return envelope('Session retrieved.', { session });
   }),
 
   http.post(url('/logout'), () => envelope('Logout successful.', [])),

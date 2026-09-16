@@ -1,0 +1,38 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.error {
+  margin: 0;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--red);
+}
+
+.notice {
+  margin: 0;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+  max-width: 34ch;
+}
+
+.code {
+  font: var(--type-data);
+  font-size: 11px;
+  color: var(--text-secondary);
+}

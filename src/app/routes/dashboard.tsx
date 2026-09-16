@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import { EmptyState, EmptyStateInstruction } from '@/components/states/empty-state/empty-state';
 import { InlineError } from '@/components/states/inline-error/inline-error';
 import { Skeleton } from '@/components/states/skeleton/skeleton';
@@ -10,10 +11,17 @@ import {
 import { CommMixCard } from '@/features/dashboard/components/comm-mix-card';
 import { KpiGrid } from '@/features/dashboard/components/kpi-grid';
 import { PlayerBreakdownCard } from '@/features/dashboard/components/player-breakdown-card';
-import { SessionPoolCard } from '@/features/dashboard/components/session-pool-card';
+import {
+  FlaggedSessionPoolCard,
+  SessionPoolCard,
+} from '@/features/dashboard/components/session-pool-card';
 import { ShortPoolNotice } from '@/features/dashboard/components/short-pool-notice';
 import { formatCount, formatSpan } from '@/features/dashboard/format';
 import type { DashboardHeader, PlayerBreakdown } from '@/features/dashboard/types';
+import { teamSessionsQuery } from '@/features/sessions/api/get-sessions';
+import { LiveSessionCard } from '@/features/sessions/components/live-session-card';
+import { SessionList } from '@/features/sessions/components/session-list';
+import type { SessionIndex } from '@/features/sessions/types';
 import type { Capabilities } from '@/features/team/capabilities';
 import { useMembership } from '@/features/team/hooks/use-membership';
 import styles from './dashboard.module.css';
@@ -39,22 +47,27 @@ export function DashboardRoute() {
       );
 
     case 'member':
-      return <TeamDashboard capabilities={membership.capabilities} />;
+      return <TeamDashboard teamId={membership.team.id} capabilities={membership.capabilities} />;
   }
 }
 
 /** The numbers, pooled over the team's most recent analysis-ready sessions.
  *  Mounted only once a membership resolves, so it never asks for a dashboard the
- *  caller has no team for. Both queries are issued together, not in sequence. */
-function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
+ *  caller has no team for. All three queries are issued together, not in sequence. */
+function TeamDashboard({ teamId, capabilities }: { teamId: number; capabilities: Capabilities }) {
   const header = useQuery(dashboardHeaderQuery());
   const breakdown = useQuery(dashboardPlayersQuery());
+  const sessions = useQuery(teamSessionsQuery(teamId));
 
   if (header.isPending) return <Skeleton label="Loading the dashboard" />;
 
   if (header.error) {
     return <InlineError message={header.error.message} onRetry={() => void header.refetch()} />;
   }
+
+  // Until the index answers there is no live session to flag, so the notch stays
+  // where #3 put it rather than jumping once the request lands.
+  const live = sessions.data?.live ?? null;
 
   return (
     <>
@@ -83,10 +96,19 @@ function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
             />
           )}
 
-          <SessionPoolCard
-            window={header.data.window}
-            canConfigureSessions={capabilities.canConfigureSessions}
-          />
+          {live ? <LiveSessionCard session={live} /> : null}
+
+          {live ? (
+            <SessionPoolCard
+              window={header.data.window}
+              canConfigureSessions={capabilities.canConfigureSessions}
+            />
+          ) : (
+            <FlaggedSessionPoolCard
+              window={header.data.window}
+              canConfigureSessions={capabilities.canConfigureSessions}
+            />
+          )}
 
           <PlayerBreakdownCard
             breakdown={breakdown.data}
@@ -105,6 +127,12 @@ function TeamDashboard({ capabilities }: { capabilities: Capabilities }) {
               window={header.data.window}
             />
           )}
+
+          <SessionsRail
+            index={sessions.data}
+            error={sessions.error}
+            onRetry={() => void sessions.refetch()}
+          />
         </aside>
       </div>
     </>
@@ -139,6 +167,36 @@ function DashboardIdentity({
       eyebrow={personal ? 'My dashboard — player' : 'Team dashboard — coach'}
       index={formatSpan(header.window.from, header.window.to) ?? undefined}
       title={personal ? header.user.username : header.team.team_name}
+    />
+  );
+}
+
+/** The reference draws three items in the rail and an onward link. It points at
+ *  the coach's session-setup screen, which is stale; the Sessions Screen is where
+ *  it goes (spec #33). */
+const RAIL_SESSIONS = 3;
+
+function SessionsRail({
+  index,
+  error,
+  onRetry,
+}: {
+  index: SessionIndex | undefined;
+  error: Error | null;
+  onRetry: () => void;
+}) {
+  if (error) return <InlineError message={error.message} onRetry={onRetry} label="Sessions" />;
+  if (!index) return <Skeleton label="Loading the sessions" />;
+
+  return (
+    <SessionList
+      label="Sessions"
+      sessions={index.all.slice(0, RAIL_SESSIONS)}
+      action={
+        <Link to="/sessions" className={styles.railLink}>
+          All sessions
+        </Link>
+      }
     />
   );
 }

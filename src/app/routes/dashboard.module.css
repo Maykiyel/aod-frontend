@@ -40,3 +40,18 @@
   line-height: 1;
   color: var(--text-primary);
 }
+
+/* The rail's onward link, drawn as the reference's ALL. Spelled out in the DOM
+   so the accessible name says where it goes, and uppercased here. */
+.railLink {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.railLink:hover,
+.railLink:focus-visible {
+  color: var(--text-primary);
+}

@@ -1,0 +1,13 @@
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.control {
+  flex: 0 1 380px;
+  min-width: 0;
+}
