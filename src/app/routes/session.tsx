@@ -43,23 +43,28 @@ export function SessionRoute() {
     return <InlineError message={read.error.message} onRetry={() => void read.refetch()} />;
   }
 
-  return read.data.status === 'processing' ? (
-    <ProcessingReading sessionId={sessionId} />
-  ) : (
-    <ReadableSession session={read.data.session} />
-  );
-}
+  // A processing Session serves no body, so it is narrowed out here rather than
+  // branched around the recovery notice.
+  const readable = read.data.status === 'readable' ? read.data.session : null;
 
-function ReadableSession({ session }: { session: Session }) {
   return (
     <div className={styles.stack}>
-      {/* Above whichever Screen the status dispatches to: a recording left by a
-          Session that has already ended is offered on that Session's own. */}
-      <RecoveredTake session={session} />
-      <SessionScreen session={session} />
+      {/* Above whichever Screen the status dispatches to, processing included:
+          a Coach who completes puts every player's Session there, so it is the
+          commonest place an orphan's owner will ever look again. */}
+      <RecoveredTake sessionId={sessionId} live={readable ? isLive(readable.status) : false} />
+      {readable ? (
+        <SessionScreen session={readable} />
+      ) : (
+        <ProcessingReading sessionId={sessionId} />
+      )}
     </div>
   );
 }
+
+/** A Session still taking deliveries. Anything else can no longer be delivered
+ *  to, which is the difference the recovery notice has to state. */
+const isLive = (status: string) => ['queuing', 'in_progress', 'delivering'].includes(status);
 
 function SessionScreen({ session }: { session: Session }) {
   switch (sessionState(session.status).screen) {

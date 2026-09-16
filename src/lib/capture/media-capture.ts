@@ -146,6 +146,10 @@ async function assemble(runId: string, kind: ChunkKind, mimeType: string): Promi
 }
 
 export function createMediaCapture(): Capture {
+  // The run this browser is recording right now, which is never recoverable:
+  // offering it back would hand the player the take they are still making.
+  let active: string | null = null;
+
   return {
     async start(sessionId: number): Promise<CaptureStart> {
       let display: MediaStream;
@@ -176,11 +180,13 @@ export function createMediaCapture(): Capture {
         return refusalFor('microphone', cause);
       }
 
-      return { granted: true, run: openRun(sessionId, microphone, display) };
+      const run = openRun(sessionId, microphone, display);
+      active = run.id;
+      return { granted: true, run };
     },
 
     async recoverable(): Promise<CaptureOrphan[]> {
-      const runs = await listRuns();
+      const runs = (await listRuns()).filter((run) => run.id !== active);
 
       return Promise.all(
         runs.map(async (run) => ({
@@ -213,7 +219,12 @@ function offer(blob: Blob, filename: string): void {
   URL.revokeObjectURL(href);
 }
 
-function openRun(sessionId: number, microphone: MediaStream, display: MediaStream): CaptureRun {
+/** The run, plus the id the port needs to keep it out of `recoverable()`. */
+function openRun(
+  sessionId: number,
+  microphone: MediaStream,
+  display: MediaStream,
+): CaptureRun & { id: string } {
   const runId = `${sessionId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const startedAt = new Date().toISOString();
   const audioType = supported(AUDIO_TYPES);
@@ -255,6 +266,7 @@ function openRun(sessionId: number, microphone: MediaStream, display: MediaStrea
   }
 
   return {
+    id: runId,
     startedAt,
     devices: { microphone: describe(micTrack, 'microphone'), display: describe(displayTrack, 'display') },
     preview: { microphone, display },

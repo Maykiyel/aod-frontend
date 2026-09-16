@@ -77,9 +77,10 @@ ADR 0011 made for subscribe and release.
   the capture table, the meter, the elapsed clock and the recovery offer are all
   assertable in rendered output.
 - The adapter itself is not covered by any test, which is the price of the seam.
-  The duration repair in `webm-duration.ts` and the chunk store are the two
-  places where that costs most; both are pure enough to be moved behind their own
-  tests if a defect ever turns up there.
+  The one exception is `webm-duration.ts`, which has its own file: it is pure, and
+  `conventions.md`'s reason for testing only at the route — a primitive's
+  correctness shows up in the screen that uses it — cannot hold for a function the
+  port hides and jsdom cannot exercise. The chunk store is the remaining gap.
 - A player who never saves a recovered take keeps it in IndexedDB until they do.
   That is deliberate: it is the fallback ADR 0006 describes, and it is
   same-browser-same-device only.

@@ -8,6 +8,7 @@ import {
   authToken,
   cancelledSession,
   pastSessions,
+  processingSession,
   playerToken,
   recordingParticipants,
   recordingSession,
@@ -206,6 +207,26 @@ describe('capturing a session', () => {
 
     expect(await within(panel).findByRole('alert')).toHaveTextContent('Your microphone stopped');
     expect(panel).toHaveTextContent('NO SIGNAL — DEVICE LEVEL ONLY');
+  });
+
+  it('lets a player whose permission was revoked start again, keeping what it captured', async () => {
+    runHolds(recordingParticipants);
+    signIn(playerToken);
+    const { user, capture } = renderApp(PATH);
+
+    await startCapturing(user);
+    capture.endTrack('microphone');
+
+    const panel = screen.getByRole('region', { name: 'Your capture' });
+    await user.click(await within(panel).findByRole('button', { name: 'Start capturing again' }));
+
+    // The dead run is released before the new one asks, so it stops holding its
+    // streams, and what it captured is offered back rather than dropped.
+    await waitFor(() => expect(capture.started).toHaveLength(2));
+    expect(capture.released).toEqual([SESSION_ID]);
+    expect(
+      await screen.findByRole('region', { name: 'Unfinished recording' }),
+    ).toHaveTextContent('keeps only what your current recorder captures');
   });
 
   it("counts the clock from the recorder's zero, not from when the screen mounted", async () => {
@@ -604,6 +625,42 @@ describe('a recording a reload left behind', () => {
     // at its own zero and the recovered take is the player's to keep.
     expect(elapsed).toHaveTextContent('00:00:00');
     expect(screen.getByRole('region', { name: 'Unfinished recording' })).toBeInTheDocument();
+  });
+
+  it('offers one on a session the coach has already completed', async () => {
+    signIn(playerToken);
+    // The commonest place an orphan's owner looks again: completing moves every
+    // player's Session to processing, which serves no body at all.
+    renderApp(`/sessions/${processingSession.id}`, {
+      capture: (double) => double.seedOrphan({ ...orphan, sessionId: processingSession.id }),
+    });
+
+    const notice = await screen.findByRole('region', { name: 'Unfinished recording' });
+    expect(notice).toHaveTextContent('can no longer be delivered');
+    expect(within(notice).getByRole('button', { name: 'Save recording' })).toBeInTheDocument();
+  });
+
+  it('stops offering one once it has been handed over, even after a remount', async () => {
+    runHolds(recordingParticipants);
+    signIn(playerToken);
+    const { user } = renderApp(PATH, { capture: (double) => double.seedOrphan(orphan) });
+
+    const notice = await screen.findByRole('region', { name: 'Unfinished recording' });
+    await user.click(within(notice).getByRole('button', { name: 'Save recording' }));
+    await waitFor(() => expect(notice).toHaveTextContent('SAVED'));
+
+    await user.click(screen.getByRole('link', { name: 'Sessions' }));
+    await screen.findByRole('heading', { name: 'Sessions' });
+    const list = await screen.findByRole('list', { name: 'Sessions' });
+    await user.click(within(list).getByText('SESSION_049').closest('a') as HTMLElement);
+
+    // The browser no longer holds it, so re-offering it would be a lie.
+    await openTable();
+    expect(
+      within(screen.getByRole('region', { name: 'Unfinished recording' })).queryByRole('button', {
+        name: 'Save recording',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it('offers one from a session that has ended, with the reason it cannot be delivered', async () => {

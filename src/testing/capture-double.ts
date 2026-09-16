@@ -55,7 +55,9 @@ export function createCaptureDouble(): CaptureDouble {
 
   function openRun(sessionId: number) {
     const watchers = new Set<() => void>();
+    const runStartedAt = startedAt;
     let reading: CaptureReading = { level: 0, microphone: true, display: true };
+    let handedOver = false;
 
     function announce(next: Partial<CaptureReading>): void {
       reading = { ...reading, ...next };
@@ -81,10 +83,14 @@ export function createCaptureDouble(): CaptureDouble {
         };
       },
       async delivered() {
+        handedOver = true;
         delivered.push(sessionId);
       },
       release() {
         released.push(sessionId);
+        // Storage outlives a release and is cleared only by delivery, so a run
+        // that ends any other way becomes recoverable (ADR 0012).
+        if (!handedOver) orphans.push({ sessionId, startedAt: runStartedAt, bytes: 4_000_000 });
         if (live?.run === run) live = null;
       },
     };
@@ -110,6 +116,9 @@ export function createCaptureDouble(): CaptureDouble {
         ...orphan,
         async save() {
           saved.push(orphan.sessionId);
+          // Handed over is gone: the adapter drops the run once it has been
+          // saved, so a double that kept it would model a browser that lies.
+          orphans.splice(orphans.indexOf(orphan), 1);
         },
       }));
     },

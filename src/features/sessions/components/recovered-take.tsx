@@ -1,43 +1,39 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button/button';
 import { Surface } from '@/components/ui/surface/surface';
 import { formatBytes, formatClock } from '@/features/sessions/recording';
 import { useCapture } from '@/lib/capture/hooks';
-import type { Session } from '@/types/api';
 import styles from './recovered-take.module.css';
 
-const LIVE_SESSIONS: readonly string[] = ['queuing', 'in_progress', 'delivering'];
-
-/** A reload leaves the player holding two takes, and the endpoint stores one
- *  file per participant. Only one of them can ever reach the Session, so the
- *  earlier one is offered as a file to save and a fresh recorder starts.
- *  Uploading it and letting the continuation overwrite it was rejected: it
- *  destroys something the player was told was safe (spec #40). */
+/** A reload leaves the player holding two takes and the endpoint stores one per
+ *  participant, so the earlier one is offered as a file and a fresh recorder
+ *  starts. Uploading it and overwriting it later was rejected (spec #40). */
 const STILL_RUNNING =
   'This session keeps only what your current recorder captures. The minutes before your reload cannot be delivered, so save them now if you want them.';
 
 const ALREADY_OVER =
   'This session has already ended, so this recording can no longer be delivered to it. Save it now, or it stays in this browser.';
 
-export function RecoveredTake({ session }: { session: Session }) {
+export function RecoveredTake({ sessionId, live }: { sessionId: number; live: boolean }) {
   const capture = useCapture();
-  const [saved, setSaved] = useState(false);
+  const queryClient = useQueryClient();
+  const key = ['capture', 'recoverable', sessionId];
 
   // Read once on arrival, and before any run this Screen starts: a fresh
   // recorder never collides with an orphan, but a Screen that asked afterwards
   // would be offering back the take it had just begun.
   const found = useQuery({
-    queryKey: ['capture', 'recoverable', session.id],
+    queryKey: key,
     queryFn: async () => {
       const orphans = await capture.recoverable();
-      return orphans.find((orphan) => orphan.sessionId === session.id) ?? null;
+      const held = orphans.find((orphan) => orphan.sessionId === sessionId);
+      return held ? { orphan: held, saved: false } : null;
     },
     staleTime: Infinity,
   });
 
-  const orphan = found.data;
-  if (!orphan) return null;
+  if (!found.data) return null;
+  const { orphan, saved } = found.data;
 
   return (
     <Surface
@@ -53,9 +49,7 @@ export function RecoveredTake({ session }: { session: Session }) {
         UNFINISHED RECORDING FOUND IN THIS BROWSER
       </span>
 
-      <p className={styles.body}>
-        {LIVE_SESSIONS.includes(session.status) ? STILL_RUNNING : ALREADY_OVER}
-      </p>
+      <p className={styles.body}>{live ? STILL_RUNNING : ALREADY_OVER}</p>
 
       <dl className={styles.readings}>
         <div className={styles.reading}>
@@ -74,7 +68,9 @@ export function RecoveredTake({ session }: { session: Session }) {
         <Button
           variant="secondary"
           onClick={() => {
-            void orphan.save().then(() => setSaved(true));
+            // Written to the cache rather than to local state: the orphan is
+            // gone from the browser afterwards, so a remount must not re-offer it.
+            void orphan.save().then(() => queryClient.setQueryData(key, { orphan, saved: true }));
           }}
         >
           Save recording

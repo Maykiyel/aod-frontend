@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button/button';
 import { Surface } from '@/components/ui/surface/surface';
 import { LevelMeter } from '@/features/sessions/components/level-meter';
+import { SourceCaption } from '@/features/sessions/components/source-caption';
 import { formatElapsed } from '@/features/sessions/recording';
 import { useElapsed } from '@/features/sessions/hooks/use-elapsed';
 import { useCaptureReading } from '@/lib/capture/hooks';
@@ -31,10 +32,24 @@ const BLOCKED =
 const UNAVAILABLE = 'This browser did not offer it. Nothing is being recorded for you.';
 
 /** The player's own panel: what is being captured, the device behind it, and a
- *  meter that moves with their voice. These are `getUserMedia` facts about this
- *  browser's own capture, which is why they are honestly renderable here and
- *  unsupportable on the Coach's table (spec #40). */
+ *  meter that moves with their voice. All `getUserMedia` facts about this
+ *  browser, which is why the Coach's table cannot carry them (spec #40). */
 export function CapturePanel({ state, onBegin }: { state: CaptureState; onBegin: () => void }) {
+  if (state.phase === 'capturing') {
+    return (
+      <Surface
+        as="section"
+        level={2}
+        behind="var(--void)"
+        padding="var(--space-6)"
+        aria-label="Your capture"
+        className={styles.panel}
+      >
+        <Capturing run={state.run} onBegin={onBegin} />
+      </Surface>
+    );
+  }
+
   return (
     <Surface
       as="section"
@@ -44,11 +59,7 @@ export function CapturePanel({ state, onBegin }: { state: CaptureState; onBegin:
       aria-label="Your capture"
       className={styles.panel}
     >
-      {state.phase === 'capturing' ? (
-        <Capturing run={state.run} />
-      ) : (
-        <Waiting state={state} onBegin={onBegin} />
-      )}
+      <Waiting state={state} onBegin={onBegin} />
     </Surface>
   );
 }
@@ -83,9 +94,10 @@ function refusalCopy({ source, refusal }: { source: CaptureSource; refusal: Capt
   return `Your ${SOURCE_NAMES[source]} was not granted. Nothing is being recorded for you.`;
 }
 
-function Capturing({ run }: { run: CaptureRun }) {
+function Capturing({ run, onBegin }: { run: CaptureRun; onBegin: () => void }) {
   const reading = useCaptureReading(run);
   const elapsed = useElapsed(run.startedAt);
+  const stopped = !reading.microphone || !reading.display;
 
   return (
     <div className={styles.live}>
@@ -113,12 +125,6 @@ function Capturing({ run }: { run: CaptureRun }) {
           </div>
 
           <LevelMeter run={run} />
-
-          {reading.microphone ? null : (
-            <p className={styles.alert} role="alert">
-              Your microphone stopped. Leave and rejoin the session to record again.
-            </p>
-          )}
         </div>
 
         <div className={styles.source}>
@@ -129,12 +135,36 @@ function Capturing({ run }: { run: CaptureRun }) {
 
           <Preview stream={run.preview.display} />
 
-          <p className={styles.caption} data-present={reading.display ? 'true' : undefined}>
-            <span className={styles.captionMark} aria-hidden="true" />
+          <SourceCaption live={reading.display}>
             {reading.display ? 'CAPTURING THIS WINDOW' : 'WINDOW SHARING ENDED'}
-          </p>
+          </SourceCaption>
         </div>
       </div>
+
+      {stopped ? <Stopped reading={reading} onBegin={onBegin} /> : null}
+    </div>
+  );
+}
+
+/** A permission revoked mid-run. The Coach's table still reads CAPTURING until
+ *  this player acts, because the only endpoint that would move it discards their
+ *  take (backend ADR 0013), and #40 ships no control that does that. */
+function Stopped({
+  reading,
+  onBegin,
+}: {
+  reading: { microphone: boolean; display: boolean };
+  onBegin: () => void;
+}) {
+  const source = !reading.microphone ? 'microphone' : 'game window';
+
+  return (
+    <div className={styles.stopped}>
+      <p className={styles.alert} role="alert">
+        Your {source} stopped, so nothing is being captured for it. Starting again begins a
+        fresh recording; what this one captured stays in this browser and is offered back below.
+      </p>
+      <Button onClick={onBegin}>Start capturing again</Button>
     </div>
   );
 }
