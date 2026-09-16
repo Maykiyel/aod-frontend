@@ -253,12 +253,8 @@ export const emptyLobbySession: Session = {
 };
 
 /** Every capture state and every delivery state at once, which is what the two
- *  tautology traps #40 names need: a table drawn from one happy fixture agrees
- *  with itself. Six players — four capture states across five joined rows, plus
- *  `playertwo`, who is rostered and never joined.
- *
- *  Delivery separates the three readings it can give: `playerone` delivered
- *  both, `formermember` delivered audio only, `latecomer` delivered nothing. */
+ *  tautology traps #40 names need: four capture states across five joined rows
+ *  plus the rostered `playertwo`, and delivery split both / audio only / none. */
 export const recordingParticipants: SessionParticipant[] = [
   participant(1, 'maincoach', 'main_coach', 'ready'),
   participant(3, 'playerone', 'player', 'recording', {

@@ -5,13 +5,12 @@ import type { Session, SessionParticipant, TeamMember } from '@/types/api';
  *  endpoint returns only Members who have joined, so the roster is merged in the
  *  way the lobby merges it: a Coach needs to see who never arrived (spec #40). */
 
-/** The four states `participant_status` can honestly say about capture. The
- *  design also draws a MIC column and a WINDOW column; device state lives inside
- *  each player's browser and no endpoint or broadcast carries it, so the table
- *  reads the one field that does. */
-export type CaptureReading = 'capturing' | 'not-capturing' | 'not-agreed' | 'not-joined';
+/** The four states `participant_status` can honestly say about one player. Named
+ *  apart from the port's `CaptureReading`, which is this browser's own device
+ *  state: the two are different facts and only one of them can leave the machine. */
+export type PlayerCapture = 'capturing' | 'not-capturing' | 'not-agreed' | 'not-joined';
 
-export const CAPTURE_LABELS: Record<CaptureReading, string> = {
+export const CAPTURE_LABELS: Record<PlayerCapture, string> = {
   capturing: 'CAPTURING',
   'not-capturing': 'NOT CAPTURING',
   'not-agreed': 'NOT AGREED',
@@ -25,14 +24,14 @@ export interface CaptureRow {
   userId: number;
   username: string;
   isSelf: boolean;
-  capture: CaptureReading;
+  capture: PlayerCapture;
   delivery: DeliveryReading;
   /** Total delivered, so the table says "AUDIO + VIDEO — 451 MB" rather than a
    *  tick (aod-backend ADR 0015). */
   bytes: number;
 }
 
-function captureOf(status: string): CaptureReading {
+function captureOf(status: string): PlayerCapture {
   if (status === 'recording') return 'capturing';
   return status === 'needs_consent' ? 'not-agreed' : 'not-capturing';
 }
@@ -41,6 +40,22 @@ function deliveryOf(row: SessionParticipant): DeliveryReading {
   if (row.aod && row.vod) return 'both';
   if (row.aod) return 'audio-only';
   return row.vod ? 'video-only' : 'nothing';
+}
+
+/** One row, from a participant if they joined and from the roster alone if they
+ *  did not. Both sources build the same shape, so both build it here. */
+function rowFor(
+  identity: { userId: number; username: string },
+  participant: SessionParticipant | undefined,
+  selfId: number | null,
+): CaptureRow {
+  return {
+    ...identity,
+    isSelf: identity.userId === selfId,
+    capture: participant ? captureOf(participant.participant_status) : 'not-joined',
+    delivery: participant ? deliveryOf(participant) : 'nothing',
+    bytes: (participant?.aod?.size_bytes ?? 0) + (participant?.vod?.size_bytes ?? 0),
+  };
 }
 
 /** A run is not a fact about the Coach who watches it, so their rows are left
@@ -52,7 +67,7 @@ const activePlayers = (session: Session) =>
 /** Capturing first, then the rest by name, so the rows a Coach has to act on
  *  are not scattered and the table does not reshuffle as people start. */
 function compare(a: CaptureRow, b: CaptureRow): number {
-  const order: CaptureReading[] = ['capturing', 'not-capturing', 'not-agreed', 'not-joined'];
+  const order: PlayerCapture[] = ['capturing', 'not-capturing', 'not-agreed', 'not-joined'];
   const rank = order.indexOf(a.capture) - order.indexOf(b.capture);
   return rank !== 0 ? rank : a.username.localeCompare(b.username);
 }
@@ -66,17 +81,9 @@ export function captureRows(
 
   const fromRoster = members
     .filter((member) => !isCoachRole(member.member_role) || joined.has(member.id))
-    .map((member): CaptureRow => {
-      const row = joined.get(member.id);
-      return {
-        userId: member.id,
-        username: member.username,
-        isSelf: member.id === selfId,
-        capture: row ? captureOf(row.participant_status) : 'not-joined',
-        delivery: row ? deliveryOf(row) : 'nothing',
-        bytes: row ? (row.aod?.size_bytes ?? 0) + (row.vod?.size_bytes ?? 0) : 0,
-      };
-    });
+    .map((member) =>
+      rowFor({ userId: member.id, username: member.username }, joined.get(member.id), selfId),
+    );
 
   const rostered = new Set(members.map((member) => member.id));
 
@@ -84,15 +91,8 @@ export function captureRows(
   // the Session will be analysed on, so they are drawn rather than dropped.
   const offRoster = [...joined.values()]
     .filter((row) => !rostered.has(row.user_id))
-    .map(
-      (row): CaptureRow => ({
-        userId: row.user_id,
-        username: row.username ?? `User ${row.user_id}`,
-        isSelf: row.user_id === selfId,
-        capture: captureOf(row.participant_status),
-        delivery: deliveryOf(row),
-        bytes: (row.aod?.size_bytes ?? 0) + (row.vod?.size_bytes ?? 0),
-      }),
+    .map((row) =>
+      rowFor({ userId: row.user_id, username: row.username ?? `User ${row.user_id}` }, row, selfId),
     );
 
   return [...fromRoster, ...offRoster].sort(compare);

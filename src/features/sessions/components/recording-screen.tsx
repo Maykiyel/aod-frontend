@@ -1,9 +1,9 @@
 import { SectionHeader } from '@/components/ui/section-header/section-header';
 import { CapturePanel } from '@/features/sessions/components/capture-panel';
 import { CaptureTable } from '@/features/sessions/components/capture-table';
-import { DeliveryReadout } from '@/features/sessions/components/delivery-readout';
 import {
   CoachRunControls,
+  DeliveryReadout,
   LeaveRunControl,
   RunReadings,
 } from '@/features/sessions/components/run-controls';
@@ -23,10 +23,9 @@ export interface RecordingScreenProps {
   canRunSession: boolean;
 }
 
-/** The recording Screen, at the route #6 built. One Screen for both drawn
- *  Screens — the design's own footer note on each says 11 is 10 with the
- *  player's capture panel swapped for the Coach's controls, and the capture
- *  table is the bulk of both. */
+/** The recording Screen, at the route #6 built. One Screen for both drawn ones:
+ *  the design's own footer note on each says 11 is 10 with the player's capture
+ *  panel swapped for the Coach's controls, and the table is the bulk of both. */
 export function RecordingScreen({
   session,
   members,

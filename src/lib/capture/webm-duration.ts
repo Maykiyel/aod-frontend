@@ -1,8 +1,6 @@
-/** A `MediaRecorder` WebM written in chunks carries no Duration, so the file
- *  seeks as unknown and every downstream player inherits that. The duration is
- *  known at stop time, so it is written into the container before the blob
- *  leaves the browser (spec #40). Written rather than taken as a dependency:
- *  the whole job is one EBML element in one place. */
+/** A `MediaRecorder` WebM written in chunks carries no Duration, so it seeks as
+ *  unknown and every downstream player inherits that. Known at stop time, so it
+ *  is written in before the blob leaves the browser. One EBML element, so no dependency. */
 
 const SEGMENT = 0x18538067;
 const INFO = 0x1549a966;

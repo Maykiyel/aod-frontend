@@ -4,22 +4,21 @@ import { Surface } from '@/components/ui/surface/surface';
 import { ConnectionReading } from '@/features/sessions/components/connection-reading';
 import { initialsOf } from '@/features/sessions/lobby';
 import { CAPTURE_LABELS, deliveryLabel } from '@/features/sessions/recording';
-import type { CaptureReading, CaptureRow } from '@/features/sessions/recording';
+import type { CaptureRow, PlayerCapture } from '@/features/sessions/recording';
 import styles from './capture-table.module.css';
 
 /** Slot state and accent per reading, in one table rather than two that have to
  *  be kept in step. */
-const READING_STYLE: Record<CaptureReading, { slot: HexSlotState; tone: string }> = {
+const READING_STYLE: Record<PlayerCapture, { slot: HexSlotState; tone: string }> = {
   capturing: { slot: 'active', tone: 'capturing' },
   'not-capturing': { slot: 'idle', tone: 'waiting' },
   'not-agreed': { slot: 'idle', tone: 'waiting' },
   'not-joined': { slot: 'offline', tone: 'absent' },
 };
 
-/** Who is actually capturing and who has actually delivered. Both columns read
- *  `participant_status` and Delivery State off the Session, which broadcast on
- *  every change; the design's per-player MIC and WINDOW columns are dropped
- *  because no endpoint or broadcast carries device state (spec #40). */
+/** Who is actually capturing and who has actually delivered, both read off the
+ *  Session and both broadcast on every change. The design's per-player MIC and
+ *  WINDOW columns are dropped: no endpoint carries device state (spec #40). */
 export function CaptureTable({
   rows,
   sessionStatus,

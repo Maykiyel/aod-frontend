@@ -10,10 +10,9 @@ import { resetAuthStore, setSessionEndedHandler } from '@/lib/auth-store';
 import { createCaptureDouble } from '@/testing/capture-double';
 import { createLiveUpdatesDouble } from '@/testing/live-updates-double';
 
-/** Mount the real app at `initialPath` — the seam #14 sanctions, plus the one
- *  #38 adds, and the capture port #40 adds. Exercises routes, providers, HTTP
- *  client and token handling together, with the network mocked at the HTTP
- *  boundary and both declared ports supplied as doubles. */
+/** Mount the real app at `initialPath` — the seam #14 sanctions. Routes,
+ *  providers, HTTP client and token handling together, with the network mocked
+ *  at the HTTP boundary and both declared ports supplied as doubles. */
 export function renderApp(
   initialPath = '/',
   options: {

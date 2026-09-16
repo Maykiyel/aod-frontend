@@ -95,7 +95,6 @@
 .capture,
 .delivery {
   font: var(--type-data);
-  font-size: 11px;
   text-align: right;
   white-space: nowrap;
   overflow: hidden;

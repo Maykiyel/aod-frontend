@@ -7,6 +7,7 @@ import { sessionKeys } from '@/features/sessions/api/get-sessions';
 import { endRun, leaveRun } from '@/features/sessions/api/session-actions';
 import type { Discarded } from '@/features/sessions/api/session-actions';
 import { useSessionAction } from '@/features/sessions/hooks/use-session-action';
+import type { DeliveryState } from '@/features/sessions/hooks/use-delivery';
 import { formatClock } from '@/features/sessions/recording';
 import type { Session, SessionParticipant } from '@/types/api';
 import styles from './run-controls.module.css';
@@ -43,12 +44,9 @@ export function CoachRunControls({ session }: { session: Session }) {
   );
 }
 
-/** A Coach's sense of time. Not an elapsed clock: two people on one run would
- *  read different numbers in the same treatment, and only a player has a
- *  recorder to count (spec #40).
- *
- *  The design also draws DEAD AIR THRESHOLD and KEYWORD SETS here. Both come
- *  from `GET /teams/settings`, which answers a player 403, so neither is drawn. */
+/** A Coach's sense of time, and not an elapsed clock: only a player has a
+ *  recorder to count. The design's DEAD AIR THRESHOLD and KEYWORD SETS readings
+ *  are dropped: #40's rail is the wall clock, and both are wrong in the mock. */
 export function RunReadings({ session }: { session: Session }) {
   return (
     <RailPanel title="Session">
@@ -143,6 +141,57 @@ export function LeaveRunControl({
         <p className={styles.error} role="alert">
           {leave.error.message}
         </p>
+      ) : null}
+    </RailPanel>
+  );
+}
+
+const WAITING =
+  'Your take is delivered when the coach ends the run. Nothing is uploaded before then.';
+
+/** The browser's own warning can only say its own generic sentence, so the real
+ *  one sits beside it. */
+const KEEP_OPEN = 'KEEP THIS TAB OPEN UNTIL YOUR TAKE HAS LANDED';
+
+/** One player's own delivery, as it happens. Progress is rendered because a
+ *  player deciding whether to close the tab needs to know whether to wait. */
+export function DeliveryReadout({ state, onRetry }: { state: DeliveryState; onRetry: () => void }) {
+  return (
+    <RailPanel title="Your delivery">
+      {state.phase === 'holding' ? <p className={styles.lede}>{WAITING}</p> : null}
+
+      {state.phase === 'finishing' ? (
+        <p className={styles.reading}>FINISHING YOUR RECORDING</p>
+      ) : null}
+
+      {state.phase === 'uploading' ? (
+        <>
+          <p className={styles.reading}>UPLOADING — {Math.round(state.progress * 100)}%</p>
+          <span
+            className={styles.bar}
+            role="progressbar"
+            aria-label="Upload progress"
+            aria-valuenow={Math.round(state.progress * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <span className={styles.barFill} style={{ inlineSize: `${state.progress * 100}%` }} />
+          </span>
+          <span className={styles.micro}>{KEEP_OPEN}</span>
+        </>
+      ) : null}
+
+      {state.phase === 'delivered' ? <p className={styles.delivered}>DELIVERED</p> : null}
+
+      {state.phase === 'failed' ? (
+        <>
+          {/* Three attempts, then stop and say so: retrying forever hides a dead
+              connection behind a spinner (spec #40). */}
+          <p className={styles.error} role="alert">
+            {state.message}
+          </p>
+          <Button onClick={onRetry}>Upload again</Button>
+        </>
       ) : null}
     </RailPanel>
   );

@@ -1,7 +1,6 @@
 /** Where a recording lives while it is being made. Chunks are appended as they
- *  arrive rather than held in memory, so a closed tab or a sleeping laptop costs
- *  the last timeslice instead of the whole take (ADR 0006). Same-browser,
- *  same-device: a fallback, never a backup. */
+ *  arrive rather than held in memory, so a closed tab costs the last timeslice
+ *  instead of the whole take (ADR 0006). Same-browser-same-device only. */
 
 const DB_NAME = 'aod-capture';
 const DB_VERSION = 1;

@@ -378,7 +378,7 @@ const lobbyHandlers = [
       return envelope('Only a live session can be cancelled.', [], 422);
     }
 
-    // Aborting a live session discards every take stored for it (ADR 0012).
+    // Aborting a live session discards every take stored for it (backend ADR 0012).
     session.status = 'cancelled';
     for (const row of active(session)) {
       row.left_at = JOINED_AT;

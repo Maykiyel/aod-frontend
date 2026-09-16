@@ -82,6 +82,8 @@
 }
 
 .elapsedValue {
+  /* The one hand-set size on this Screen: a measurement is mono, and --type-stat
+     is 44px in the display face. No mono token reaches the design's 44px. */
   font: var(--type-data-l);
   font-size: 44px;
   line-height: 1;
@@ -146,7 +148,6 @@
 
 .device {
   font: var(--type-data);
-  font-size: 11px;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -173,27 +174,14 @@
   object-fit: contain;
 }
 
-.caption {
+.stopped {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0;
-  font: var(--type-micro);
-  letter-spacing: var(--track-micro);
-  color: var(--text-muted);
-}
-
-.captionMark {
-  display: block;
-  flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--border-raised);
-}
-
-.caption[data-present] .captionMark {
-  background: var(--aligned);
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+  width: 100%;
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border-soft);
 }
 
 .alert {

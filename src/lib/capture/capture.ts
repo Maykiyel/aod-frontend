@@ -1,8 +1,6 @@
-/** The app's third seam (spec #40). `getUserMedia`, `getDisplayMedia`,
- *  `MediaRecorder`, IndexedDB and the level meter's analyser are all unreachable
- *  from the HTTP boundary every other test mocks at, and none of them exists
- *  usefully in jsdom. What the app needs of them is declared here: a media
- *  adapter supplies it in production, a double in tests. */
+/** The app's third seam. The five browser APIs behind capture are unreachable
+ *  from the HTTP boundary every other test mocks at, so what the app needs of
+ *  them is declared here (ADR 0012): a media adapter in production, a double in tests. */
 
 export type CaptureSource = 'microphone' | 'display';
 

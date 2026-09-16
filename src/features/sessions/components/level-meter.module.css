@@ -32,26 +32,3 @@
 .bar[data-lit][data-peak] {
   background: var(--text-primary);
 }
-
-.caption {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0;
-  font: var(--type-micro);
-  letter-spacing: var(--track-micro);
-  color: var(--text-muted);
-}
-
-.mark {
-  display: block;
-  flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--border-raised);
-}
-
-.caption[data-present] .mark {
-  background: var(--aligned);
-}

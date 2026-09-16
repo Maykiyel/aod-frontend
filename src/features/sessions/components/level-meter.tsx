@@ -1,4 +1,5 @@
 import { Surface } from '@/components/ui/surface/surface';
+import { SourceCaption } from '@/features/sessions/components/source-caption';
 import { useCaptureReading } from '@/lib/capture/hooks';
 import type { CaptureRun } from '@/lib/capture/capture';
 import styles from './level-meter.module.css';
@@ -13,12 +14,9 @@ const THRESHOLDS = Array.from({ length: BARS }, (_, index) => (index + 1) / BARS
 const SIGNAL_PRESENT = 'SIGNAL PRESENT — DEVICE LEVEL ONLY';
 const NO_SIGNAL = 'NO SIGNAL — DEVICE LEVEL ONLY';
 
-/** Device feedback, so a player finds out their microphone is dead in the first
- *  ten seconds rather than in the report. It is not an analysis, and the caption
- *  says so: nothing on this Screen measures anything (spec #40).
- *
- *  It subscribes to the port itself rather than taking a level as a prop, so the
- *  capture table around it does not re-render at the meter's frame rate. */
+/** Device feedback, so a dead microphone shows up in the first ten seconds
+ *  rather than in the report; the caption says so, because nothing here measures
+ *  anything. Subscribed here, so the table does not redraw at the meter's rate. */
 export function LevelMeter({ run }: { run: CaptureRun }) {
   const reading = useCaptureReading(run);
   const present = reading.microphone && reading.level > 0;
@@ -38,10 +36,7 @@ export function LevelMeter({ run }: { run: CaptureRun }) {
         </div>
       </Surface>
 
-      <p className={styles.caption} data-present={present ? 'true' : undefined}>
-        <span className={styles.mark} aria-hidden="true" />
-        {present ? SIGNAL_PRESENT : NO_SIGNAL}
-      </p>
+      <SourceCaption live={present}>{present ? SIGNAL_PRESENT : NO_SIGNAL}</SourceCaption>
     </div>
   );
 }
