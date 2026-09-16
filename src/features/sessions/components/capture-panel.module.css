@@ -1,0 +1,203 @@
+.panel {
+  display: block;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.waiting,
+.live {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.clock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.status[data-tone='recording'] {
+  color: var(--red);
+}
+
+.status[data-tone='idle'] {
+  color: var(--text-muted);
+}
+
+.dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+/* The one continuous motion the design allows in the app, at its fixed rate. */
+.status[data-tone='recording'] .dot {
+  animation: pulse 1.8s linear infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status[data-tone='recording'] .dot {
+    animation: none;
+  }
+}
+
+.elapsed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.elapsedValue {
+  font: var(--type-data-l);
+  font-size: 44px;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.elapsedLabel {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.lede {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.instruction {
+  margin: 0;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--red);
+  font: var(--type-body-s);
+  color: var(--text-primary);
+}
+
+.micro {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  width: 100%;
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border-soft);
+}
+
+.source {
+  display: flex;
+  flex: 1 1 220px;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sourceHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sourceLabel {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.device {
+  font: var(--type-data);
+  font-size: 11px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewPlate {
+  display: block;
+  box-sizing: border-box;
+}
+
+.preview {
+  position: relative;
+  height: 72px;
+  overflow: hidden;
+  background-image:
+    repeating-linear-gradient(to right, var(--plate-grid) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(to bottom, var(--plate-grid) 0 1px, transparent 1px 44px);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.captionMark {
+  display: block;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--border-raised);
+}
+
+.caption[data-present] .captionMark {
+  background: var(--aligned);
+}
+
+.alert {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--red);
+}

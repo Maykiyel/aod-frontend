@@ -1,0 +1,57 @@
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 44px;
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 20%;
+  background: var(--border-raised);
+  /* 120ms linear, the one transition rate the design system fixes. */
+  transition: height 120ms linear, background 120ms linear;
+}
+
+.bar[data-lit] {
+  height: 100%;
+  background: var(--text-secondary);
+}
+
+.bar[data-lit][data-peak] {
+  background: var(--text-primary);
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.mark {
+  display: block;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--border-raised);
+}
+
+.caption[data-present] .mark {
+  background: var(--aligned);
+}
