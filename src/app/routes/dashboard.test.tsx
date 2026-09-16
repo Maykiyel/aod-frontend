@@ -213,7 +213,7 @@ describe('the dashboard', () => {
         }),
       ),
       // A member with no completed transcript anywhere in the pool, on a team
-      // whose population is too small for a median (ADR 0011).
+      // whose population is too small for a median (aod-backend ADR 0011).
       http.get(`${env.apiUrl}/dashboard/players`, () =>
         envelope('Dashboard players retrieved.', {
           ...ownLineAndMedian,

@@ -78,7 +78,7 @@ interface YouVsMedianProps {
 /**
  * What a player is shown in place of the roster. Three metrics, not the design's
  * four: dead air is team-wide by definition, so there is no personal absence
- * figure to compare (ADR 0011 puts one out of scope).
+ * figure to compare (aod-backend ADR 0011 puts one out of scope).
  */
 export function YouVsMedian({ you, teamMedian }: YouVsMedianProps) {
   const comparisons: Comparison[] = [

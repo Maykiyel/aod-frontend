@@ -501,7 +501,7 @@ export const handlers = [
   }),
 
   // Both dashboard endpoints resolve the caller's active team and serve any
-  // active member; only `players` shapes its body by role (ADR 0011).
+  // active member; only `players` shapes its body by role (aod-backend ADR 0011).
   http.get(url('/dashboard/header'), ({ request }) => {
     const user = caller(request);
     if (!user) return envelope('Unauthenticated.', [], 401);

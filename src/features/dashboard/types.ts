@@ -26,7 +26,7 @@ export interface CommMix {
   informative: number;
   declarative: number;
   compound: number;
-  /** A tally over `calls_classified`, not a fourth comm type (ADR 0011). */
+  /** A tally over `calls_classified`, not a fourth comm type (aod-backend ADR 0011). */
   redundant: number;
   /** Dead-air periods counted; their duration is `kpi.absence_ms`. */
   absence: number;
