@@ -9,8 +9,22 @@ type Schemas = components['schemas'];
 export type User = Schemas['UserResource'];
 export type Team = Schemas['TeamResource'];
 export type TeamMember = Schemas['TeamMemberResource'];
-export type TeamSettings = Schemas['TeamSettingsResource'];
+
+/** Declared by hand rather than taken from the generator, which types every
+ *  field as `string` and misses that the keyword lists are arrays. Regenerating
+ *  is #36; until it lands this is the narrowing ADR 0003 sanctions. */
+export interface TeamSettings {
+  team_id: number;
+  dead_air_threshold_ms: number;
+  comm_event_padding_ms: number;
+  game_alignment_window_ms: number;
+  informative_keywords: string[];
+  declarative_keywords: string[];
+  updated_at: string | null;
+}
+
 export type Session = Schemas['SessionResource'];
+export type SessionParticipant = Schemas['SessionParticipantResource'];
 
 /** The one atomic enrolment body (#31). Role-conditional in ways the schema
  *  cannot express — `toRegistrationRequest` is where those rules are applied. */
@@ -33,6 +47,14 @@ export interface Membership extends Omit<TeamMember, 'member_role' | 'status'> {
 
 const MEMBER_ROLES: readonly string[] = ['player', 'assistant_coach', 'main_coach'];
 const MEMBERSHIP_STATUSES: readonly string[] = ['pending', 'active'];
+
+const COACH_ROLES: readonly string[] = ['main_coach', 'assistant_coach'];
+
+/** Both Coach roles. Takes a plain string because the same two values arrive as
+ *  a `member_role` and as the participant-role snapshot the API types loosely. */
+export function isCoachRole(role: string): boolean {
+  return COACH_ROLES.includes(role);
+}
 
 export function isMemberRole(value: string): value is MemberRole {
   return MEMBER_ROLES.includes(value);
