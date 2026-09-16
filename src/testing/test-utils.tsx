@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { AppProvider } from '@/app/provider';
 import { routes } from '@/app/route-table';
 import { routerFuture } from '@/app/router-future';
+import type { CaptureDouble } from '@/testing/capture-double';
 import type { ConnectionStatus } from '@/lib/live-updates/live-updates';
 import { resetAuthStore, setSessionEndedHandler } from '@/lib/auth-store';
 import { createCaptureDouble } from '@/testing/capture-double';
@@ -13,7 +14,15 @@ import { createLiveUpdatesDouble } from '@/testing/live-updates-double';
  *  #38 adds, and the capture port #40 adds. Exercises routes, providers, HTTP
  *  client and token handling together, with the network mocked at the HTTP
  *  boundary and both declared ports supplied as doubles. */
-export function renderApp(initialPath = '/', options: { connection?: ConnectionStatus } = {}) {
+export function renderApp(
+  initialPath = '/',
+  options: {
+    connection?: ConnectionStatus;
+    /** Arrange the capture double before the first render: a Screen reads what
+     *  a previous run left behind on mount, so seeding it afterwards is a race. */
+    capture?: (double: CaptureDouble) => void;
+  } = {},
+) {
   // The session store and its one-shot restoration both outlive a render, so
   // mounting a fresh app means starting them fresh too — and the store reads the
   // token the test has just planted.
@@ -21,6 +30,7 @@ export function renderApp(initialPath = '/', options: { connection?: ConnectionS
 
   const live = createLiveUpdatesDouble(options.connection);
   const capture = createCaptureDouble();
+  options.capture?.(capture);
 
   const router = createMemoryRouter(routes, {
     initialEntries: [initialPath],

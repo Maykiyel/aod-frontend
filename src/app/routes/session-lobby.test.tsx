@@ -321,7 +321,9 @@ describe('the session lobby', () => {
     lobbyHolds(asReady(lobbyParticipants), 'in_progress');
     live.emit(CHANNEL, SESSION_EVENTS.sessionStatusChanged);
 
-    expect(await screen.findByRole('heading', { name: 'Recording' })).toBeInTheDocument();
+    // The Screen is replaced, not the route, for the third time (spec #40).
+    expect(await screen.findByRole('list', { name: 'Capture status' })).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Participants' })).not.toBeInTheDocument();
   });
 
   it('takes the coach who cancels to the terminal statement', async () => {

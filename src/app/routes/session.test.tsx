@@ -27,7 +27,8 @@ describe('opening a session', () => {
 
     renderApp('/sessions/49');
 
-    expect(await screen.findByRole('heading', { name: 'Recording' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Scrim vs Kestrel' })).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Capture status' })).toBeInTheDocument();
   });
 
   it('sends a session under review to the review board', async () => {
