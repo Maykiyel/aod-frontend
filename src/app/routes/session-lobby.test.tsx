@@ -54,6 +54,8 @@ const joined = (
   participant_status,
   joined_at: '2026-09-16T18:20:00.000000Z',
   left_at: null,
+  aod: null,
+  vod: null,
 });
 
 /** Every request that left, from the moment this was called. */

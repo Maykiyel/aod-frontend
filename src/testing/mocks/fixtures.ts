@@ -4,6 +4,7 @@ import type {
 } from '@/features/dashboard/types';
 import type {
   MemberRole,
+  RecordingMeta,
   Session,
   SessionParticipant,
   Team,
@@ -189,7 +190,20 @@ function session(
     session_name,
     status,
     created_at,
+    // When the current run began. Null until a Coach starts it (ADR 0015).
+    started_at: null,
     ...(transcription ? { transcription } : {}),
+  };
+}
+
+/** One stored file, as `RecordingMetaResource` serialises it. */
+function delivered(id: number, kind: 'audio' | 'video', size_bytes: number): RecordingMeta {
+  return {
+    id,
+    original_filename: `${kind}.webm`,
+    mime_type: `${kind}/webm`,
+    size_bytes,
+    client_started_at: RUN_STARTED_AT,
   };
 }
 
@@ -198,6 +212,7 @@ function participant(
   username: string,
   participant_role: MemberRole,
   participant_status: string,
+  delivery: { aod?: RecordingMeta; vod?: RecordingMeta } = {},
 ): SessionParticipant {
   return {
     user_id,
@@ -206,8 +221,14 @@ function participant(
     participant_status,
     joined_at: '2026-09-16T18:04:00.000000Z',
     left_at: null,
+    // Both null for a Coach, and null again after any discard (ADR 0015).
+    aod: delivery.aod ?? null,
+    vod: delivery.vod ?? null,
   };
 }
+
+/** When the seeded run began, and the zero every delivered file carries. */
+const RUN_STARTED_AT = '2026-09-16T19:41:00.000000Z';
 
 /** The lobby's starting roll, shaped so the two tautology traps #38 names go red
  *  when they are wrong: `playertwo` is rostered and has NOT joined, and
@@ -231,9 +252,32 @@ export const emptyLobbySession: Session = {
   participants: [participant(1, 'maincoach', 'main_coach', 'ready')],
 };
 
+/** Every capture state and every delivery state at once, which is what the two
+ *  tautology traps #40 names need: a table drawn from one happy fixture agrees
+ *  with itself. Six players — four capture states across five joined rows, plus
+ *  `playertwo`, who is rostered and never joined.
+ *
+ *  Delivery separates the three readings it can give: `playerone` delivered
+ *  both, `formermember` delivered audio only, `latecomer` delivered nothing. */
+export const recordingParticipants: SessionParticipant[] = [
+  participant(1, 'maincoach', 'main_coach', 'ready'),
+  participant(3, 'playerone', 'player', 'recording', {
+    aod: delivered(1, 'audio', 19_922_944),
+    vod: delivered(2, 'video', 452_984_832),
+  }),
+  participant(7, 'formermember', 'player', 'recording', { aod: delivered(3, 'audio', 18_874_368) }),
+  participant(8, 'latecomer', 'player', 'recording'),
+  participant(10, 'sidelined', 'player', 'ready'),
+  participant(11, 'unagreed', 'player', 'needs_consent'),
+];
+
 /** The other non-terminal status. Never in the list beside `lobbySession` — a
  *  team holds one at a time — so a test swaps one for the other. */
-export const recordingSession = session(49, 'Scrim vs Kestrel', 'in_progress', '2026-09-16T19:41:00.000000Z');
+export const recordingSession: Session = {
+  ...session(49, 'Scrim vs Kestrel', 'in_progress', '2026-09-16T19:30:00.000000Z'),
+  started_at: RUN_STARTED_AT,
+  participants: recordingParticipants,
+};
 
 /** Two of five transcripts done. The only status carrying a transcription figure. */
 export const processingSession = session(
