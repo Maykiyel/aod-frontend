@@ -56,16 +56,10 @@ function SessionListItem({ session }: { session: Session }) {
           <span className={styles.meta}>
             <span>{formatDay(session.created_at)}</span>
             {session.session_code ? (
-              <>
-                <span aria-hidden="true">·</span>
-                <span className={styles.code}>{session.session_code}</span>
-              </>
+              <span className={styles.code}>{session.session_code}</span>
             ) : null}
             {session.transcription ? (
-              <>
-                <span aria-hidden="true">·</span>
-                <span className={styles.code}>{formatTranscription(session.transcription)}</span>
-              </>
+              <span className={styles.code}>{formatTranscription(session.transcription)}</span>
             ) : null}
           </span>
         </span>

@@ -49,6 +49,13 @@
   border-color: var(--red);
 }
 
+/* Addition, like the disabled rule below: the vendored source has no invalid
+   state either, and a field the server has objected to was showing nothing.
+   Red border is the design's own error idiom (Input.prompt.md). */
+.field[aria-invalid='true'] {
+  border-color: var(--red);
+}
+
 /* Addition: the vendored source has no disabled treatment for the field at
    all. Matched to Button's so the two agree. */
 .field:disabled {

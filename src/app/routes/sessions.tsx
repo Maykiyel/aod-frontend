@@ -55,22 +55,19 @@ function TeamSessions({ team, capabilities }: { team: Team; capabilities: Capabi
   const { all, live } = index.data;
 
   return (
-    <>
-      <div className={styles.head}>
-        {/* The screen names itself in the h1: the dashboard already takes the
-            team name, and two routes with one heading tell the reader nothing. */}
-        <SectionHeader
-          as="h1"
-          eyebrow={team.team_name}
-          index={`${all.length} SESSIONS`}
-          title="Sessions"
-        />
-        {capabilities.canConfigureSessions ? (
-          <div className={styles.control}>
-            <CreateControl teamId={team.id} live={live} />
-          </div>
-        ) : null}
-      </div>
+    <div className={styles.screen}>
+      {/* The screen names itself in the h1: the dashboard already takes the team
+          name, and two routes with one heading tell the reader nothing. */}
+      <SectionHeader
+        as="h1"
+        eyebrow={team.team_name}
+        index={`${all.length} SESSIONS`}
+        title="Sessions"
+      />
+
+      {capabilities.canConfigureSessions ? (
+        <CreateControl teamId={team.id} live={live} />
+      ) : null}
 
       {all.length > 0 ? (
         <SessionList label="Sessions" sessions={all} />
@@ -83,7 +80,7 @@ function TeamSessions({ team, capabilities }: { team: Team; capabilities: Capabi
           </EmptyStateInstruction>
         </EmptyState>
       )}
-    </>
+    </div>
   );
 }
 
