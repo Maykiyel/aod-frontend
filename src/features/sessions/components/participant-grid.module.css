@@ -1,0 +1,165 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* #5: a row that appears animates briefly rather than popping, and no other
+   motion is added. */
+.row {
+  min-width: 0;
+  animation: row-enter 200ms ease-out;
+}
+
+.card {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+/* The state accent is a rule down the card's leading edge, pulled out over the
+   plate's own padding so it sits on the edge rather than inside it. */
+.accent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-left: var(--space-4);
+  margin-left: calc(-1 * var(--space-4));
+  border-left: 2px solid var(--border-raised);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.name {
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--border-soft);
+  animation: reading-enter 200ms ease-out;
+}
+
+/* Outer hex carries the edge colour; the absent state punches it hollow with
+   the 45° hatch, never a solid fill (HANDOFF.md). */
+.mark {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 18px;
+  clip-path: var(--clip-hex);
+}
+
+.reading {
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-label);
+}
+
+.waiting .accent {
+  border-left-color: var(--red);
+}
+
+.waiting .mark {
+  background: var(--red);
+}
+
+.waiting .reading {
+  color: var(--red);
+}
+
+.ready .accent {
+  border-left-color: var(--aligned);
+}
+
+.ready .mark {
+  background: var(--aligned);
+}
+
+.ready .reading {
+  color: var(--aligned);
+}
+
+.absent .accent {
+  border-left-color: var(--border-raised);
+}
+
+.absent .mark {
+  background: var(--absence);
+}
+
+.absent .mark::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  display: block;
+  clip-path: var(--clip-hex);
+  background-color: var(--e2-surface);
+  background-image: var(--absence-hatch);
+}
+
+.absent .reading {
+  color: var(--text-muted);
+}
+
+/* Held for one animation by the grid, so a row that genuinely disappears reads
+   as leaving rather than popping out. */
+.departing {
+  pointer-events: none;
+  animation: row-leave 200ms ease-in forwards;
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes row-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes reading-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .departing,
+  .status {
+    animation: none;
+  }
+}
