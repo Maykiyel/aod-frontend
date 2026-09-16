@@ -11,10 +11,6 @@ import {
 import { CommMixCard } from '@/features/dashboard/components/comm-mix-card';
 import { KpiGrid } from '@/features/dashboard/components/kpi-grid';
 import { PlayerBreakdownCard } from '@/features/dashboard/components/player-breakdown-card';
-import {
-  FlaggedSessionPoolCard,
-  SessionPoolCard,
-} from '@/features/dashboard/components/session-pool-card';
 import { ShortPoolNotice } from '@/features/dashboard/components/short-pool-notice';
 import { formatCount, formatSpan } from '@/features/dashboard/format';
 import type { DashboardHeader, PlayerBreakdown } from '@/features/dashboard/types';
@@ -65,10 +61,9 @@ function TeamDashboard({ teamId, capabilities }: { teamId: number; capabilities:
     return <InlineError message={header.error.message} onRetry={() => void header.refetch()} />;
   }
 
-  // Which item is flagged is not known until the index lands, so nothing carries
-  // the notch until it does — it appears once rather than moving.
+  // The screen's one notch, on the live session. With none there is no flagged
+  // item at all: the rule caps a screen at one, it does not require one.
   const live = sessions.data?.live ?? null;
-  const flagPool = !sessions.isPending && !live;
 
   return (
     <>
@@ -98,18 +93,6 @@ function TeamDashboard({ teamId, capabilities }: { teamId: number; capabilities:
           )}
 
           {live ? <LiveSessionCard session={live} /> : null}
-
-          {flagPool ? (
-            <FlaggedSessionPoolCard
-              window={header.data.window}
-              canConfigureSessions={capabilities.canConfigureSessions}
-            />
-          ) : (
-            <SessionPoolCard
-              window={header.data.window}
-              canConfigureSessions={capabilities.canConfigureSessions}
-            />
-          )}
 
           <PlayerBreakdownCard
             breakdown={breakdown.data}
