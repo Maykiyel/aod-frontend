@@ -433,10 +433,12 @@ const lobbyHandlers = [
     }
 
     const body = await request.formData();
-    const audio = body.get('audio');
-    const video = body.get('video');
+    // Duck-typed rather than `instanceof Blob`: a file that crossed the
+    // interceptor comes from another realm, where the constructor is not ours.
+    const audio = fileIn(body, 'audio');
+    const video = fileIn(body, 'video');
 
-    if (!(audio instanceof Blob) && !(video instanceof Blob)) {
+    if (!audio && !video) {
       return envelope(
         'The given data was invalid.',
         { errors: { audio: ['The audio field is required when video is not present.'] } },
@@ -445,12 +447,8 @@ const lobbyHandlers = [
     }
 
     // Re-uploading replaces what that participant already sent (ADR 0012).
-    if (audio instanceof Blob) {
-      row.aod = storedFile(audio, 'audio', started(body, 'audio_client_started_at'));
-    }
-    if (video instanceof Blob) {
-      row.vod = storedFile(video, 'video', started(body, 'video_client_started_at'));
-    }
+    if (audio) row.aod = storedFile(audio, 'audio', started(body, 'audio_client_started_at'));
+    if (video) row.vod = storedFile(video, 'video', started(body, 'video_client_started_at'));
 
     return envelope('Recording uploaded.', { aod: row.aod, vod: row.vod });
   }),
@@ -460,10 +458,16 @@ let lastRecordingId = 500;
 
 const started = (body: FormData, field: string) => (body.get(field) as string | null) || null;
 
-function storedFile(file: Blob, kind: 'audio' | 'video', client_started_at: string | null) {
+/** A FormData value is a string or a file; anything else is the file. */
+function fileIn(body: FormData, field: string): File | null {
+  const value = body.get(field);
+  return value === null || typeof value === 'string' ? null : (value as File);
+}
+
+function storedFile(file: File, kind: 'audio' | 'video', client_started_at: string | null) {
   return {
     id: (lastRecordingId += 1),
-    original_filename: file instanceof File ? file.name : `${kind}.webm`,
+    original_filename: file.name || `${kind}.webm`,
     mime_type: file.type,
     size_bytes: file.size,
     client_started_at,
