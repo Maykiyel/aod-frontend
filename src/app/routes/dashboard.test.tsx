@@ -526,7 +526,7 @@ describe('the dashboard', () => {
     await user.click(await screen.findByRole('link', { name: 'Open session' }));
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Session lobby' })).toBeInTheDocument(),
+      expect(screen.getByRole('heading', { name: 'Scrim vs Ronin Squad' })).toBeInTheDocument(),
     );
   });
 });
