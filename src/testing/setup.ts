@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { resetRegistrations, resetSessions } from '@/testing/mocks/handlers';
+import { resetRegistrations, resetSessions, resetTeamSettings } from '@/testing/mocks/handlers';
 import { server } from '@/testing/mocks/server';
 
 // Every render now waits on the router's first navigation, which is where a
@@ -21,6 +21,8 @@ afterEach(() => {
   // Sessions are written by creation and read back by the index, so one test's
   // new session would otherwise be in the next test's list.
   resetSessions();
+  // Team settings are written by #5's editor and read back by the same panel.
+  resetTeamSettings();
   cleanup();
   // The token outlives a component, so it has to be cleared between tests or
   // one test's login silently authenticates the next.

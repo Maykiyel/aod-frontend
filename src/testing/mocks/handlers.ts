@@ -7,6 +7,7 @@ import {
   shortPoolHeader,
   shortPoolPlayers,
   teamSessions,
+  teamSettings,
   thunderbolts,
   thunderboltsRoster,
   usersByToken,
@@ -16,7 +17,9 @@ import type {
   MembershipStatus,
   RegistrationRequest,
   Session,
+  SessionParticipant,
   Team,
+  TeamSettings,
   User,
 } from '@/types/api';
 
@@ -73,11 +76,33 @@ let lastSessionId = 200;
  *  recording rather than in the lobby — passes its own. */
 export function resetSessions(rows: Session[] = teamSessions): void {
   sessionsByTeam.clear();
-  sessionsByTeam.set(thunderbolts.id, rows.map((row) => ({ ...row })));
+  // Participants are copied too, not shared: #5 writes to them, so a shallow
+  // copy would let one test's join outlive it.
+  sessionsByTeam.set(
+    thunderbolts.id,
+    rows.map((row) => ({
+      ...row,
+      ...(row.participants ? { participants: row.participants.map((p) => ({ ...p })) } : {}),
+    })),
+  );
   lastSessionId = 200;
 }
 
 resetSessions();
+
+/** The team's detection settings, writable because #5 edits them. Reset between
+ *  tests beside the sessions, for the same reason. */
+let settings: TeamSettings = teamSettings;
+
+resetTeamSettings();
+
+export function resetTeamSettings(next: TeamSettings = teamSettings): void {
+  settings = {
+    ...next,
+    informative_keywords: [...next.informative_keywords],
+    declarative_keywords: [...next.declarative_keywords],
+  };
+}
 
 const COACH_ROLES: readonly MemberRole[] = ['main_coach', 'assistant_coach'];
 
@@ -143,6 +168,299 @@ function uniquenessConflicts(body: RegistrationRequest): Record<string, string[]
   return conflicts;
 }
 
+/** Active rows only, which is what `activeParticipants` loads and so the only
+ *  shape `GET /sessions/{session}` ever serves. */
+const active = (session: Session) =>
+  (session.participants ?? []).filter((row) => row.left_at === null);
+
+const served = (session: Session): Session => ({ ...session, participants: active(session) });
+
+/** The caller's session, through their active team — session routes bind the
+ *  session explicitly and authorize against ITS team, so an outsider gets 404. */
+function locate(user: User, sessionId: number): Session | null {
+  const team = activeTeamOf(user);
+  if (!team) return null;
+  return (sessionsByTeam.get(team.id) ?? []).find((row) => row.id === sessionId) ?? null;
+}
+
+/** The role the pivot holds, snapshotted onto a participant row at join time. */
+function roleOf(user: User): MemberRole {
+  const self = thunderboltsRoster.members?.find((member) => member.id === user.id);
+  return (self?.member_role as MemberRole | undefined) ?? 'player';
+}
+
+/** A Coach joins with nothing to agree to; a player joins needing consent. */
+const initialStatus = (role: string) =>
+  COACH_ROLES.includes(role as MemberRole) ? 'ready' : 'needs_consent';
+
+const JOINED_AT = '2026-09-16T18:10:00.000000Z';
+
+/** Session::cancelIfNoParticipantsRemain — a lobby that empties out ends. */
+function cancelIfEmpty(session: Session): void {
+  if (!NON_TERMINAL.includes(session.status)) return;
+  if (active(session).length === 0) session.status = 'cancelled';
+}
+
+/** Join, consent, leave, start and cancel, each answering the way the controller
+ *  does — including which refusals are policy denials and which are the model's
+ *  own guard surfaced as 422. */
+const lobbyHandlers = [
+  http.post(url('/sessions/:sessionId/join'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+    if (!NON_TERMINAL.includes(session.status)) {
+      return envelope('This session is not open for joining.', [], 403);
+    }
+
+    const role = roleOf(user);
+    const rows: SessionParticipant[] = session.participants ?? [];
+    const held = rows.find((row) => row.user_id === user.id);
+
+    if (!held) {
+      rows.push({
+        user_id: user.id,
+        username: user.username,
+        participant_role: role,
+        participant_status: initialStatus(role),
+        joined_at: JOINED_AT,
+        left_at: null,
+      });
+    } else if (held.left_at !== null) {
+      // joinOrRejoin resets a returning member, which is what makes "asked
+      // again after rejoining" the server's rule rather than the client's.
+      held.left_at = null;
+      held.joined_at = JOINED_AT;
+      held.participant_role = role;
+      held.participant_status = initialStatus(role);
+    }
+
+    session.participants = rows;
+
+    return envelope('Joined session.', { session: served(session) });
+  }),
+
+  http.post(url('/sessions/:sessionId/consent'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+
+    const row = active(session).find((held) => held.user_id === user.id);
+    if (!row) return envelope('You are not in this session.', [], 422);
+    if (COACH_ROLES.includes(row.participant_role as MemberRole)) {
+      return envelope('A coach has nothing to consent to.', [], 422);
+    }
+    if (
+      !NON_TERMINAL.includes(session.status) ||
+      !['needs_consent', 'ready'].includes(row.participant_status)
+    ) {
+      return envelope('Consent can no longer be recorded for this session.', [], 422);
+    }
+
+    row.participant_status = 'ready';
+
+    return envelope('Consent recorded.', { session: served(session) });
+  }),
+
+  http.post(url('/sessions/:sessionId/leave'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+
+    const row = (session.participants ?? []).find((held) => held.user_id === user.id);
+    if (!row) return envelope('You are not a participant in this session.', [], 422);
+
+    if (row.left_at === null) {
+      row.left_at = JOINED_AT;
+      // Departure resets the row to its role's initial status (backend ADR 0013).
+      row.participant_status = initialStatus(row.participant_role);
+      cancelIfEmpty(session);
+    }
+
+    return envelope('Left session.', { session: served(session), discarded: [] });
+  }),
+
+  http.post(url('/sessions/:sessionId/start'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+    if (session.status !== 'queuing') {
+      return envelope('Only a queuing session can be started.', [], 422);
+    }
+
+    const players = active(session).filter(
+      (row) => !COACH_ROLES.includes(row.participant_role as MemberRole),
+    );
+
+    if (players.length === 0) {
+      return envelope('A session needs at least one player before it can start.', [], 422);
+    }
+    if (players.some((row) => row.participant_status !== 'ready')) {
+      return envelope('Every player must consent before the session can start.', [], 422);
+    }
+
+    session.status = 'in_progress';
+    for (const player of players) player.participant_status = 'recording';
+
+    return envelope('Session started.', { session: served(session) });
+  }),
+
+  http.post(url('/sessions/:sessionId/transitions'), async ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+
+    const { to } = (await request.json()) as { to?: string };
+
+    if (to === 'in_progress') {
+      return envelope('Use POST /sessions/{session}/start to begin recording.', [], 422);
+    }
+    if (to !== 'cancelled') {
+      return envelope(
+        'The given data was invalid.',
+        { errors: { to: ['The selected to is invalid.'] } },
+        422,
+      );
+    }
+    if (!NON_TERMINAL.includes(session.status)) {
+      return envelope('Only a live session can be cancelled.', [], 422);
+    }
+
+    session.status = 'cancelled';
+    for (const row of active(session)) row.left_at = JOINED_AT;
+
+    return envelope('Session transition applied.', { session: served(session) });
+  }),
+];
+
+const KEYWORD_CATEGORIES = ['informative_keywords', 'declarative_keywords'] as const;
+
+const fold = (word: string) => word.trim().toLowerCase();
+
+/** Every rule `UpdateTeamKeywordsRequest` enforces, reproduced so a payload the
+ *  server would refuse cannot pass here either. */
+function keywordConflicts(body: Record<string, unknown>): Record<string, string[]> {
+  const errors: Record<string, string[]> = {};
+  const folded: Record<string, string[]> = {};
+
+  for (const field of KEYWORD_CATEGORIES) {
+    const words = body[field];
+
+    if (!Array.isArray(words)) {
+      errors[field] = [`The ${field.replace('_', ' ')} field must be present.`];
+      folded[field] = [];
+      continue;
+    }
+
+    words.forEach((word: unknown, index: number) => {
+      const trimmed = typeof word === 'string' ? word.trim() : '';
+      if (!/^\S+$/.test(trimmed)) {
+        errors[`${field}.${index}`] = [`The ${field}.${index} field format is invalid.`];
+      } else if (trimmed.length > 64) {
+        errors[`${field}.${index}`] = [
+          `The ${field}.${index} field must not be greater than 64 characters.`,
+        ];
+      }
+    });
+
+    if (words.length > 200) {
+      errors[field] = [`The ${field.replace('_', ' ')} field must not have more than 200 items.`];
+    }
+
+    const list = words.filter((word): word is string => typeof word === 'string').map(fold);
+    folded[field] = list;
+
+    if (new Set(list).size !== list.length) {
+      errors[field] = ['This category lists the same keyword more than once (case-insensitive).'];
+    }
+  }
+
+  const inBoth = [
+    ...new Set(
+      folded.informative_keywords.filter((word) => folded.declarative_keywords.includes(word)),
+    ),
+  ];
+
+  if (inBoth.length > 0) {
+    errors.declarative_keywords = [`These keywords appear in both categories: ${inBoth.join(', ')}.`];
+  }
+
+  return errors;
+}
+
+/** Team-wide, resolved through the caller's active team, and restricted to any
+ *  active Coach — main or assistant. */
+const teamSettingsHandlers = [
+  http.get(url('/teams/settings'), ({ request }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+    if (!activeTeamOf(user)) return envelope('Team not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+
+    return envelope('Team settings retrieved.', { settings });
+  }),
+
+  http.put(url('/teams/settings'), async ({ request }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+    if (!activeTeamOf(user)) return envelope('Team not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+
+    const body = (await request.json()) as { dead_air_threshold_ms?: unknown };
+    const threshold = body.dead_air_threshold_ms;
+
+    if (!Number.isInteger(threshold) || (threshold as number) < 1) {
+      return envelope(
+        'The given data was invalid.',
+        {
+          errors: {
+            dead_air_threshold_ms: ['The dead air threshold ms field must be at least 1.'],
+          },
+        },
+        422,
+      );
+    }
+
+    settings = { ...settings, dead_air_threshold_ms: threshold as number };
+
+    return envelope('Team settings updated.', { settings });
+  }),
+
+  http.put(url('/teams/settings/keywords'), async ({ request }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+    if (!activeTeamOf(user)) return envelope('Team not found.', [], 404);
+    if (!isCoach(user)) return envelope('This action is unauthorized.', [], 403);
+
+    const body = (await request.json()) as Record<string, unknown>;
+    const conflicts = keywordConflicts(body);
+
+    if (Object.keys(conflicts).length > 0) {
+      return envelope('The given data was invalid.', { errors: conflicts }, 422);
+    }
+
+    settings = {
+      ...settings,
+      informative_keywords: (body.informative_keywords as string[]).map((word) => word.trim()),
+      declarative_keywords: (body.declarative_keywords as string[]).map((word) => word.trim()),
+    };
+
+    return envelope('Team keywords updated.', { settings });
+  }),
+];
+
 /**
  * The happy path. Individual tests override a handler with `server.use(...)`
  * rather than editing these, so the default stays the behaviour most tests want.
@@ -183,7 +501,7 @@ export const handlers = [
   }),
 
   // Both dashboard endpoints resolve the caller's active team and serve any
-  // active member; only `players` shapes its body by role (ADR 0011).
+  // active member; only `players` shapes its body by role (aod-backend ADR 0011).
   http.get(url('/dashboard/header'), ({ request }) => {
     const user = caller(request);
     if (!user) return envelope('Unauthenticated.', [], 401);
@@ -307,9 +625,16 @@ export const handlers = [
     const live = rows.find((row) => NON_TERMINAL.includes(row.status)) ?? null;
     const past = rows.filter((row) => row !== live);
 
+    // The index never loads participants; only the detail endpoint does.
+    const withoutParticipants = (row: Session): Session => {
+      const copy = { ...row };
+      delete copy.participants;
+      return copy;
+    };
+
     return envelope('Sessions retrieved.', {
-      live_session: live,
-      past_sessions: past,
+      live_session: live ? withoutParticipants(live) : null,
+      past_sessions: past.map(withoutParticipants),
       pagination: {
         current_page: 1,
         total_pages: 1,
@@ -386,8 +711,11 @@ export const handlers = [
       return envelope('This session is still processing.', [], 409);
     }
 
-    return envelope('Session retrieved.', { session });
+    return envelope('Session retrieved.', { session: served(session) });
   }),
+
+  ...lobbyHandlers,
+  ...teamSettingsHandlers,
 
   http.post(url('/logout'), () => envelope('Logout successful.', [])),
 ];

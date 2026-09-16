@@ -1,0 +1,70 @@
+/* The panel, its header and its readings are the shared rail treatment; what
+   is left here is this panel's own content. */
+.lede {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.agree {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border-soft);
+  font: var(--type-body-s);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* accent-color rather than a hand-built box: the tick is the platform's, and
+   the only thing the design fixes here is the hue. */
+.checkbox {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--red);
+}
+
+.granted {
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border-soft);
+  font: var(--type-eyebrow);
+  letter-spacing: var(--track-label);
+  color: var(--aligned);
+}
+
+.withheld {
+  margin: 0;
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.micro {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+/* Cancelling is not weighted like starting: its own row under the divider, so
+   the two never sit side by side with equal weight (spec #38). */
+.secondary {
+  display: flex;
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border-soft);
+}
+
+.leave {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.error {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+}

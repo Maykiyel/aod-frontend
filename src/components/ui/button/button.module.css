@@ -5,6 +5,10 @@
 .button {
   display: inline-flex;
   align-items: center;
+  /* Addition: the vendored source never sets this, because the design sizes
+     every button to its own content. A caller that stretches one got a label
+     hard against its left edge. */
+  justify-content: center;
   gap: var(--space-2);
   font: var(--type-data);
   /* 0.1em is not --track-tag (.08em) or --track-eyebrow (.16em); no token

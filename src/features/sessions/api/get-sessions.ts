@@ -5,6 +5,8 @@ import { api } from '@/lib/api-client';
 
 /** One prefix, so #5 can invalidate everything a broadcast touches at once. */
 export const sessionKeys = {
+  /** Everything a broadcast touches, invalidated in one call. */
+  all: ['sessions'] as const,
   index: (teamId: number) => ['sessions', 'index', teamId] as const,
   detail: (sessionId: number) => ['sessions', 'detail', sessionId] as const,
 };

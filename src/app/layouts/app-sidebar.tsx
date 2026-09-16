@@ -6,7 +6,10 @@ import { DESTINATIONS } from '@/app/navigation';
 import { UserMenu } from '@/app/layouts/user-menu';
 import { capabilitiesOf, useMembership } from '@/features/team/hooks/use-membership';
 import type { MembershipState } from '@/features/team/hooks/use-membership';
+import { useLiveStatus } from '@/lib/live-updates/hooks';
+import type { ConnectionStatus } from '@/lib/live-updates/live-updates';
 import { logout, useAuth } from '@/lib/auth-store';
+import { cx } from '@/utils/cx';
 import type { MemberRole } from '@/types/api';
 import styles from './app-sidebar.module.css';
 
@@ -22,6 +25,14 @@ function roleReading(state: MembershipState): string | null {
   if (state.status === 'member') return ROLE_LABELS[state.membership.member_role];
   return state.status === 'teamless' ? 'NO TEAM' : null;
 }
+
+/** Named LIVE rather than the design's API: what it reports is the broadcast
+ *  connection, and a checkout with no credentials sits at DOWN honestly. */
+const LIVE_READINGS: Record<ConnectionStatus, string> = {
+  connected: 'LIVE:OK',
+  connecting: 'LIVE:SYNC',
+  disconnected: 'LIVE:DOWN',
+};
 
 /** The plate device: stepped silhouette, ring, milled holes and corner bolts.
    Static chrome, so it is hoisted out of the render (`rendering-hoist-jsx`). */
@@ -45,6 +56,7 @@ const PLATE = (
 export function AppSidebar() {
   const { user } = useAuth();
   const membership = useMembership();
+  const connection = useLiveStatus();
 
   const capabilities = capabilitiesOf(membership);
   const destinations = DESTINATIONS.filter((destination) =>
@@ -99,13 +111,18 @@ export function AppSidebar() {
         <div className={styles.spacer} />
 
         <div className={styles.footer}>
-          {/* Both readings are static, as on screen 01: no build identifier is
-              wired and no health check sits behind API:OK. */}
+          {/* The build identifier is still static; the connection reading is
+              not, and is the same source the lobby's own reading reads. */}
           <div className={styles.readings}>
             <span className={styles.reading}>BUILD:DEV</span>
             <span className={styles.reading}>
-              <span className={styles.readingDot} />
-              API:OK
+              <span
+                className={cx(
+                  styles.readingDot,
+                  connection === 'connected' ? null : styles.readingDotDown,
+                )}
+              />
+              {LIVE_READINGS[connection]}
             </span>
           </div>
 

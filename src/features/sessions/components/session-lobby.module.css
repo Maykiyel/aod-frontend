@@ -1,0 +1,114 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  text-align: right;
+}
+
+.counterLabel {
+  font: var(--type-micro);
+  letter-spacing: var(--track-micro);
+  color: var(--text-muted);
+}
+
+.counterValue {
+  font: var(--type-stat);
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.counterTotal {
+  color: var(--text-muted);
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.main {
+  flex: 1 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mainHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.mainTitle {
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.rail {
+  flex: 0 1 var(--size-rail);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Dashed rather than a plate: a standing statement about the Screen, not a
+   module in the elevation ladder. */
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: var(--border-width) dashed var(--border-raised);
+}
+
+.noticeHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.noticeMark {
+  display: block;
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  background: var(--aligned);
+  transform: rotate(45deg);
+}
+
+.noticeBody {
+  font: var(--type-body-s);
+  color: var(--text-secondary);
+}
+
+.error {
+  margin: 0;
+  font: var(--type-data);
+  color: var(--red);
+}

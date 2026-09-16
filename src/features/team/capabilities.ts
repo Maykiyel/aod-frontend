@@ -1,4 +1,5 @@
-import type { MemberRole, Membership } from '@/types/api';
+import { isCoachRole } from '@/types/api';
+import type { Membership } from '@/types/api';
 
 /** What the current user may do in their active team (ADR 0007, ADR 0009).
  *  A flag hides a control; it never grants one — the backend policy named
@@ -17,8 +18,6 @@ export interface Capabilities {
   canManageMembers: boolean;
 }
 
-const COACH_ROLES: readonly MemberRole[] = ['main_coach', 'assistant_coach'];
-
 /** A user with no active membership. Hoisted so callers share one object. */
 export const NO_CAPABILITIES: Capabilities = {
   canViewTeamData: false,
@@ -33,7 +32,7 @@ export const NO_CAPABILITIES: Capabilities = {
 export function capabilitiesFor(membership: Membership | null): Capabilities {
   if (!membership) return NO_CAPABILITIES;
 
-  const isCoach = COACH_ROLES.includes(membership.member_role);
+  const isCoach = isCoachRole(membership.member_role);
 
   return {
     canViewTeamData: true,

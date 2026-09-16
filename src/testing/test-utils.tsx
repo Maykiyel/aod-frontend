@@ -4,16 +4,21 @@ import userEvent from '@testing-library/user-event';
 import { AppProvider } from '@/app/provider';
 import { routes } from '@/app/route-table';
 import { routerFuture } from '@/app/router-future';
+import type { ConnectionStatus } from '@/lib/live-updates/live-updates';
 import { resetAuthStore, setSessionEndedHandler } from '@/lib/auth-store';
+import { createLiveUpdatesDouble } from '@/testing/live-updates-double';
 
-/** Mount the real app at `initialPath` — the only seam #14 sanctions. Exercises
- *  routes, providers, HTTP client and token handling together, with the network
- *  mocked at the HTTP boundary and nothing else stubbed. */
-export function renderApp(initialPath = '/') {
+/** Mount the real app at `initialPath` — the seam #14 sanctions, plus the one
+ *  #38 adds. Exercises routes, providers, HTTP client and token handling
+ *  together, with the network mocked at the HTTP boundary and the live-updates
+ *  port supplied as a double. */
+export function renderApp(initialPath = '/', options: { connection?: ConnectionStatus } = {}) {
   // The session store and its one-shot restoration both outlive a render, so
   // mounting a fresh app means starting them fresh too — and the store reads the
   // token the test has just planted.
   resetAuthStore();
+
+  const live = createLiveUpdatesDouble(options.connection);
 
   const router = createMemoryRouter(routes, {
     initialEntries: [initialPath],
@@ -25,10 +30,10 @@ export function renderApp(initialPath = '/') {
   setSessionEndedHandler(() => void router.revalidate());
 
   const utils = render(
-    <AppProvider>
+    <AppProvider liveUpdates={live}>
       <RouterProvider router={router} />
     </AppProvider>,
   );
 
-  return { ...utils, user: userEvent.setup(), router };
+  return { ...utils, user: userEvent.setup(), router, live };
 }

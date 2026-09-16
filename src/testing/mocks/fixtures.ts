@@ -2,7 +2,15 @@ import type {
   DashboardHeaderResponse,
   DashboardPlayersResponse,
 } from '@/features/dashboard/types';
-import type { MemberRole, Session, Team, TeamMember, User } from '@/types/api';
+import type {
+  MemberRole,
+  Session,
+  SessionParticipant,
+  Team,
+  TeamMember,
+  TeamSettings,
+  User,
+} from '@/types/api';
 
 /** Typed as the generated schemas so a mock cannot describe a response the API
  *  would never send. Values taken from a real seeded-team response. */
@@ -185,8 +193,43 @@ function session(
   };
 }
 
+function participant(
+  user_id: number,
+  username: string,
+  participant_role: MemberRole,
+  participant_status: string,
+): SessionParticipant {
+  return {
+    user_id,
+    username,
+    participant_role,
+    participant_status,
+    joined_at: '2026-09-16T18:04:00.000000Z',
+    left_at: null,
+  };
+}
+
+/** The lobby's starting roll, shaped so the two tautology traps #38 names go red
+ *  when they are wrong: `playertwo` is rostered and has NOT joined, and
+ *  `formermember` has joined and is NOT rostered. One player short of consent. */
+export const lobbyParticipants: SessionParticipant[] = [
+  participant(1, 'maincoach', 'main_coach', 'ready'),
+  participant(3, 'playerone', 'player', 'needs_consent'),
+  participant(7, 'formermember', 'player', 'ready'),
+];
+
 /** The team's one non-terminal session. Queuing, so it is in the lobby. */
-export const lobbySession = session(48, 'Scrim vs Ronin Squad', 'queuing', '2026-09-16T18:02:00.000000Z');
+export const lobbySession: Session = {
+  ...session(48, 'Scrim vs Ronin Squad', 'queuing', '2026-09-16T18:02:00.000000Z'),
+  participants: lobbyParticipants,
+};
+
+/** The same lobby with nobody in it but the Coach who made it — the other half
+ *  of the start gate, which a single unhappy fixture would not separate. */
+export const emptyLobbySession: Session = {
+  ...lobbySession,
+  participants: [participant(1, 'maincoach', 'main_coach', 'ready')],
+};
 
 /** The other non-terminal status. Never in the list beside `lobbySession` — a
  *  team holds one at a time — so a test swaps one for the other. */
@@ -216,3 +259,16 @@ export const pastSessions: Session[] = [
 
 /** Everything the team holds: the live session and the four terminal ones. */
 export const teamSessions: Session[] = [lobbySession, ...pastSessions];
+
+/** Team detection settings, as `GET /teams/settings` serialises them. The two
+ *  keyword lists are short subsets of the seeded defaults: a forty-word list
+ *  tells a test nothing the first four do not. */
+export const teamSettings: TeamSettings = {
+  team_id: thunderbolts.id,
+  dead_air_threshold_ms: 5000,
+  comm_event_padding_ms: 2000,
+  game_alignment_window_ms: 5000,
+  informative_keywords: ['smoked', 'flashed', 'spotted', 'clear'],
+  declarative_keywords: ['pushing', 'rotating', 'holding'],
+  updated_at: '2026-09-16T11:52:36.000000Z',
+};

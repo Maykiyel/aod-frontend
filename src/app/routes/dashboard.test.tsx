@@ -213,7 +213,7 @@ describe('the dashboard', () => {
         }),
       ),
       // A member with no completed transcript anywhere in the pool, on a team
-      // whose population is too small for a median (ADR 0011).
+      // whose population is too small for a median (aod-backend ADR 0011).
       http.get(`${env.apiUrl}/dashboard/players`, () =>
         envelope('Dashboard players retrieved.', {
           ...ownLineAndMedian,
@@ -526,7 +526,7 @@ describe('the dashboard', () => {
     await user.click(await screen.findByRole('link', { name: 'Open session' }));
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Session lobby' })).toBeInTheDocument(),
+      expect(screen.getByRole('heading', { name: 'Scrim vs Ronin Squad' })).toBeInTheDocument(),
     );
   });
 });
