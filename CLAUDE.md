@@ -23,6 +23,9 @@ suggestions this repo has already decided against, and why.
 
 Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
 
+`docs/notes/open-questions.md` holds what the code does but nobody has proved.
+Not decisions, which are ADRs, and not work, which is the issue tracker.
+
 ### Backend contract
 
 The API is a separate repo, `Joe-Zupo/aod-backend`, checked out **as a sibling of

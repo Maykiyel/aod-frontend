@@ -147,8 +147,8 @@ function Capturing({ run, onBegin }: { run: CaptureRun; onBegin: () => void }) {
 }
 
 /** A permission revoked mid-run. The Coach's table still reads CAPTURING until
- *  this player acts, because the only endpoint that would move it discards their
- *  take (backend ADR 0013), and #40 ships no control that does that. */
+ *  this player acts: the only endpoint that would move it discards their take
+ *  (backend ADR 0013). `Joe-Zupo/aod-backend#25` is the wider gap behind it. */
 function Stopped({
   reading,
   onBegin,
