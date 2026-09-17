@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import type { UserEvent } from '@testing-library/user-event';
 import { env } from '@/config/env';
@@ -300,8 +300,10 @@ describe('enrolment', () => {
 
     // The rejection names a credential, so the coach is put back on the screen
     // that owns it rather than shown a banner on team setup.
-    expect(await screen.findByLabelText('Username')).toHaveAccessibleDescription(
-      'The username has already been taken.',
+    await waitFor(() =>
+      expect(screen.getByLabelText('Username')).toHaveAccessibleDescription(
+        'The username has already been taken.',
+      ),
     );
     expect(screen.getByRole('heading', { name: /make your profile/i })).toBeInTheDocument();
   });
@@ -315,8 +317,10 @@ describe('enrolment', () => {
     await user.type(screen.getByLabelText('Team code'), 'TM-NOTREAL');
     await user.click(screen.getByRole('button', { name: 'Join team' }));
 
-    expect(await screen.findByLabelText('Team code')).toHaveAccessibleDescription(
-      'The provided team code does not exist.',
+    await waitFor(() =>
+      expect(screen.getByLabelText('Team code')).toHaveAccessibleDescription(
+        'The provided team code does not exist.',
+      ),
     );
     // Not a page-level failure, and nothing the user typed is lost.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -335,8 +339,10 @@ describe('enrolment', () => {
     await user.type(screen.getByLabelText('In-game name'), 'Fresh#EUW');
     await user.click(screen.getByRole('button', { name: 'Register' }));
 
-    expect(await screen.findByLabelText('Email')).toHaveAccessibleDescription(
-      'The email has already been taken.',
+    await waitFor(() =>
+      expect(screen.getByLabelText('Email')).toHaveAccessibleDescription(
+        'The email has already been taken.',
+      ),
     );
   });
 
