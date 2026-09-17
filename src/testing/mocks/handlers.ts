@@ -67,7 +67,11 @@ export function resetRegistrations(): void {
  *  creates one and then reads it back out of the index. */
 const sessionsByTeam = new Map<number, Session[]>();
 
-const NON_TERMINAL: readonly string[] = ['queuing', 'in_progress'];
+const NON_TERMINAL: readonly string[] = ['queuing', 'in_progress', 'delivering'];
+
+/** The two statuses a live run passes through, and so the window in which a
+ *  participant at `recording` may upload. */
+const UPLOADABLE: readonly string[] = ['in_progress', 'delivering'];
 
 let lastSessionId = 200;
 
@@ -195,6 +199,21 @@ const initialStatus = (role: string) =>
 
 const JOINED_AT = '2026-09-16T18:10:00.000000Z';
 
+/** Session::regressIfNobodyRecording — a run nobody is recording is not a run,
+ *  so it returns to the lobby and every stored take is discarded (ADR 0013). */
+function regressIfNobodyRecording(session: Session): void {
+  if (!UPLOADABLE.includes(session.status)) return;
+  if (active(session).some((row) => row.participant_status === 'recording')) return;
+
+  session.status = 'queuing';
+  session.started_at = null;
+  for (const row of active(session)) {
+    row.participant_status = initialStatus(row.participant_role);
+    row.aod = null;
+    row.vod = null;
+  }
+}
+
 /** Session::cancelIfNoParticipantsRemain — a lobby that empties out ends. */
 function cancelIfEmpty(session: Session): void {
   if (!NON_TERMINAL.includes(session.status)) return;
@@ -227,6 +246,8 @@ const lobbyHandlers = [
         participant_status: initialStatus(role),
         joined_at: JOINED_AT,
         left_at: null,
+        aod: null,
+        vod: null,
       });
     } else if (held.left_at !== null) {
       // joinOrRejoin resets a returning member, which is what makes "asked
@@ -276,14 +297,22 @@ const lobbyHandlers = [
     const row = (session.participants ?? []).find((held) => held.user_id === user.id);
     if (!row) return envelope('You are not a participant in this session.', [], 422);
 
+    const discarded = { audio: false, video: false };
+
     if (row.left_at === null) {
       row.left_at = JOINED_AT;
-      // Departure resets the row to its role's initial status (backend ADR 0013).
+      // Departure resets the row and discards what that participant had stored,
+      // so nothing outlives the status that authorised it (backend ADR 0013).
       row.participant_status = initialStatus(row.participant_role);
+      discarded.audio = row.aod !== null;
+      discarded.video = row.vod !== null;
+      row.aod = null;
+      row.vod = null;
       cancelIfEmpty(session);
+      regressIfNobodyRecording(session);
     }
 
-    return envelope('Left session.', { session: served(session), discarded: [] });
+    return envelope('Left session.', { session: served(session), discarded });
   }),
 
   http.post(url('/sessions/:sessionId/start'), ({ request, params }) => {
@@ -309,6 +338,7 @@ const lobbyHandlers = [
     }
 
     session.status = 'in_progress';
+    session.started_at = new Date().toISOString();
     for (const player of players) player.participant_status = 'recording';
 
     return envelope('Session started.', { session: served(session) });
@@ -327,6 +357,16 @@ const lobbyHandlers = [
     if (to === 'in_progress') {
       return envelope('Use POST /sessions/{session}/start to begin recording.', [], 422);
     }
+    if (to === 'delivering') {
+      if (session.status !== 'in_progress') {
+        return envelope('Only an in_progress session can be moved to delivering.', [], 422);
+      }
+      // Recorders stop, uploads stay legal, and players keep `recording`
+      // throughout (backend ADR 0015).
+      session.status = 'delivering';
+      return envelope('Session transition applied.', { session: served(session) });
+    }
+
     if (to !== 'cancelled') {
       return envelope(
         'The given data was invalid.',
@@ -338,12 +378,101 @@ const lobbyHandlers = [
       return envelope('Only a live session can be cancelled.', [], 422);
     }
 
+    // Aborting a live session discards every take stored for it (backend ADR 0012).
     session.status = 'cancelled';
-    for (const row of active(session)) row.left_at = JOINED_AT;
+    for (const row of active(session)) {
+      row.left_at = JOINED_AT;
+      row.aod = null;
+      row.vod = null;
+    }
 
     return envelope('Session transition applied.', { session: served(session) });
   }),
+
+  http.post(url('/sessions/:sessionId/start-recording'), ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+
+    const row = active(session).find((held) => held.user_id === user.id);
+    if (!row) return envelope('You are not in this session.', [], 422);
+    if (COACH_ROLES.includes(row.participant_role as MemberRole)) {
+      return envelope('A coach does not record.', [], 422);
+    }
+    if (session.status !== 'in_progress') {
+      return envelope('Only an in_progress session can be recorded.', [], 422);
+    }
+    // Never a silent 200: a client told it is recording uploads files the server
+    // then refuses (backend ADR 0013).
+    if (row.participant_status === 'needs_consent') {
+      return envelope('Consent is required before recording can start.', [], 422);
+    }
+
+    row.participant_status = 'recording';
+
+    return envelope('Recording started.', {
+      session: served(session),
+      discarded: { audio: false, video: false },
+    });
+  }),
+
+  // One participant's own audio and/or video. Eligibility is that participant's
+  // own state, not the session's: `recording`, and still in it (ADR 0012).
+  http.post(url('/sessions/:sessionId/recording'), async ({ request, params }) => {
+    const user = caller(request);
+    if (!user) return envelope('Unauthenticated.', [], 401);
+
+    const session = locate(user, Number(params.sessionId));
+    if (!session) return envelope('Not found.', [], 404);
+
+    const row = active(session).find((held) => held.user_id === user.id);
+    if (!row || row.participant_status !== 'recording' || !UPLOADABLE.includes(session.status)) {
+      return envelope('You are not recording in this session.', [], 422);
+    }
+
+    const body = await request.formData();
+    // Duck-typed rather than `instanceof Blob`: a file that crossed the
+    // interceptor comes from another realm, where the constructor is not ours.
+    const audio = fileIn(body, 'audio');
+    const video = fileIn(body, 'video');
+
+    if (!audio && !video) {
+      return envelope(
+        'The given data was invalid.',
+        { errors: { audio: ['The audio field is required when video is not present.'] } },
+        422,
+      );
+    }
+
+    // Re-uploading replaces what that participant already sent (ADR 0012).
+    if (audio) row.aod = storedFile(audio, 'audio', started(body, 'audio_client_started_at'));
+    if (video) row.vod = storedFile(video, 'video', started(body, 'video_client_started_at'));
+
+    return envelope('Recording uploaded.', { aod: row.aod, vod: row.vod });
+  }),
 ];
+
+let lastRecordingId = 500;
+
+const started = (body: FormData, field: string) => (body.get(field) as string | null) || null;
+
+/** A FormData value is a string or a file; anything else is the file. */
+function fileIn(body: FormData, field: string): File | null {
+  const value = body.get(field);
+  return value === null || typeof value === 'string' ? null : (value as File);
+}
+
+function storedFile(file: File, kind: 'audio' | 'video', client_started_at: string | null) {
+  return {
+    id: (lastRecordingId += 1),
+    original_filename: file.name || `${kind}.webm`,
+    mime_type: file.type,
+    size_bytes: file.size,
+    client_started_at,
+  };
+}
 
 const KEYWORD_CATEGORIES = ['informative_keywords', 'declarative_keywords'] as const;
 
@@ -687,6 +816,7 @@ export const handlers = [
       session_name: name,
       status: 'queuing',
       created_at: new Date().toISOString(),
+      started_at: null,
     };
 
     sessionsByTeam.set(teamId, [session, ...rows]);

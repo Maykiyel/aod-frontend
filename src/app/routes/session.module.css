@@ -1,0 +1,8 @@
+/* The recovery notice sits above whichever Screen the status dispatches to: an
+   orphan from a Session that has already ended is offered on that Session's own
+   Screen, since its owner never opens the recording Screen again (spec #40). */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}

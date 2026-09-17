@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { SectionHeader } from '@/components/ui/section-header/section-header';
-import { Tag } from '@/components/ui/tag/tag';
 import { joinSession } from '@/features/sessions/api/session-actions';
+import { ConnectionReading } from '@/features/sessions/components/connection-reading';
 import {
   CoachControls,
   ConsentPanel,
@@ -12,8 +12,6 @@ import { ParticipantGrid } from '@/features/sessions/components/participant-grid
 import { useSessionAction } from '@/features/sessions/hooks/use-session-action';
 import { useSessionLive } from '@/features/sessions/hooks/use-session-live';
 import { lobbyRows, selfParticipant, startGate } from '@/features/sessions/lobby';
-import { useLiveStatus } from '@/lib/live-updates/hooks';
-import type { ConnectionStatus } from '@/lib/live-updates/live-updates';
 import type { Session, TeamMember } from '@/types/api';
 import styles from './session-lobby.module.css';
 
@@ -47,7 +45,6 @@ export function SessionLobby({
   const rows = lobbyRows(session, members, selfId);
   const gate = startGate(rows);
   const self = selfParticipant(session, selfId);
-  const status = useLiveStatus();
 
   return (
     <div className={styles.screen}>
@@ -73,7 +70,7 @@ export function SessionLobby({
         <section className={styles.main}>
           <div className={styles.mainHead}>
             <span className={styles.mainTitle}>Participants</span>
-            <ConnectionReading status={status} />
+            <ConnectionReading />
           </div>
 
           {join.error ? (
@@ -112,24 +109,6 @@ export function SessionLobby({
         </aside>
       </div>
     </div>
-  );
-}
-
-const CONNECTION_READINGS: Record<ConnectionStatus, { label: string; tone: 'live' | 'neutral' | 'alert' }> = {
-  connected: { label: 'LIVE', tone: 'live' },
-  connecting: { label: 'CONNECTING', tone: 'neutral' },
-  disconnected: { label: 'CONNECTION LOST', tone: 'alert' },
-};
-
-/** The grid's own reading, beside the grid rather than only in the sidebar: a
- *  Coach deciding whether to start is looking here, and this is the panel whose
- *  staleness costs something. */
-function ConnectionReading({ status }: { status: ConnectionStatus }) {
-  const reading = CONNECTION_READINGS[status];
-  return (
-    <Tag tone={reading.tone} dot={status === 'connected'}>
-      {reading.label}
-    </Tag>
   );
 }
 

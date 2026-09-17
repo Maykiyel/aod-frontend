@@ -6,6 +6,8 @@ import { sessionQuery } from '@/features/sessions/api/get-session';
 import { teamSessionsQuery } from '@/features/sessions/api/get-sessions';
 import { CancelledSession } from '@/features/sessions/components/cancelled-session';
 import { ProcessingSession } from '@/features/sessions/components/processing-session';
+import { RecordingScreen } from '@/features/sessions/components/recording-screen';
+import { RecoveredTake } from '@/features/sessions/components/recovered-take';
 import {
   SessionPlaceholder,
   UnknownSession,
@@ -16,6 +18,7 @@ import { TeamSettingsPanel } from '@/features/team-settings/components/team-sett
 import { useMembership } from '@/features/team/hooks/use-membership';
 import { useAuth } from '@/lib/auth-store';
 import type { Session } from '@/types/api';
+import styles from './session.module.css';
 
 const NOT_YOUR_TEAM = 'This session belongs to a team you are not an active member of.';
 
@@ -40,19 +43,35 @@ export function SessionRoute() {
     return <InlineError message={read.error.message} onRetry={() => void read.refetch()} />;
   }
 
-  return read.data.status === 'processing' ? (
-    <ProcessingReading sessionId={sessionId} />
-  ) : (
-    <ReadableSession session={read.data.session} />
+  // A processing Session serves no body, so it is narrowed out here rather than
+  // branched around the recovery notice.
+  const readable = read.data.status === 'readable' ? read.data.session : null;
+
+  return (
+    <div className={styles.stack}>
+      {/* Above whichever Screen the status dispatches to, processing included:
+          a Coach who completes puts every player's Session there, so it is the
+          commonest place an orphan's owner will ever look again. */}
+      <RecoveredTake sessionId={sessionId} live={readable ? isLive(readable.status) : false} />
+      {readable ? (
+        <SessionScreen session={readable} />
+      ) : (
+        <ProcessingReading sessionId={sessionId} />
+      )}
+    </div>
   );
 }
 
-function ReadableSession({ session }: { session: Session }) {
+/** A Session still taking deliveries. Anything else can no longer be delivered
+ *  to, which is the difference the recovery notice has to state. */
+const isLive = (status: string) => ['queuing', 'in_progress', 'delivering'].includes(status);
+
+function SessionScreen({ session }: { session: Session }) {
   switch (sessionState(session.status).screen) {
     case 'lobby':
       return <Lobby session={session} />;
     case 'recording':
-      return <SessionPlaceholder session={session} destination="Recording" />;
+      return <Recording session={session} />;
     case 'review':
       return <SessionPlaceholder session={session} destination="Review board" />;
     case 'cancelled':
@@ -95,6 +114,35 @@ function Lobby({ session }: { session: Session }) {
           settings={
             membership.capabilities.canConfigureTeamSettings ? <TeamSettingsPanel /> : undefined
           }
+        />
+      );
+  }
+}
+
+/** The roster, the caller's capabilities and their own identity, resolved the
+ *  same way the lobby's are and for the same reason: the Screen lives in the
+ *  sessions feature, which may not import another (conventions.md). */
+function Recording({ session }: { session: Session }) {
+  const membership = useMembership();
+  const { user } = useAuth();
+
+  switch (membership.status) {
+    case 'loading':
+      return <Skeleton label="Loading the team" />;
+
+    case 'error':
+      return <InlineError message={membership.message} onRetry={membership.retry} />;
+
+    case 'teamless':
+      return <InlineError message={NOT_YOUR_TEAM} />;
+
+    case 'member':
+      return (
+        <RecordingScreen
+          session={session}
+          members={membership.team.members ?? []}
+          selfId={user?.id ?? null}
+          canRunSession={membership.capabilities.canConfigureSessions}
         />
       );
   }

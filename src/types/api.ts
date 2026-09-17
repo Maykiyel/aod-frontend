@@ -23,8 +23,31 @@ export interface TeamSettings {
   updated_at: string | null;
 }
 
-export type Session = Schemas['SessionResource'];
-export type SessionParticipant = Schemas['SessionParticipantResource'];
+/** What one participant has stored for the current run. Declared by hand for
+ *  the same reason `TeamSettings` is: the generated types predate
+ *  `Joe-Zupo/aod-backend#24` and know none of these fields. Regenerating is #36. */
+export interface RecordingMeta {
+  id: number;
+  original_filename: string;
+  mime_type: string;
+  size_bytes: number;
+  /** When that browser began recording. Nullable, and stored unused (ADR 0006). */
+  client_started_at: string | null;
+}
+
+/** Delivery State travels with the participant, on the Session body and on every
+ *  participant broadcast (aod-backend ADR 0015). Both are null for a Coach. */
+export type SessionParticipant = Schemas['SessionParticipantResource'] & {
+  aod: RecordingMeta | null;
+  vod: RecordingMeta | null;
+};
+
+/** `started_at` is when the current run began: `start()` stamps it and the
+ *  return to `queuing` clears it, so it is null in the lobby (aod-backend ADR 0015). */
+export type Session = Omit<Schemas['SessionResource'], 'participants'> & {
+  started_at: string | null;
+  participants?: SessionParticipant[];
+};
 
 /** The one atomic enrolment body (#31). Role-conditional in ways the schema
  *  cannot express — `toRegistrationRequest` is where those rules are applied. */

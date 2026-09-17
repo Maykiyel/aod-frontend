@@ -13,11 +13,38 @@ This is a fallback, not a backup — it is same-browser-same-device only. A take
 that genuinely matters should also be recorded locally with OBS.
 
 **The clock.** The backend assumes all recordings share t=0 (its ADR 0004, the
-"zero-offset assumption"), but five browsers start recording when a Pusher event
-reaches them, which is not the same moment — typically 50–300ms apart. We keep
-rendering on zero-offset maths, which sits inside tolerance given dead-air
-thresholds measured in seconds and a 5000ms default alignment window. But each
-upload carries a nullable `client_started_at` that the backend stores unused.
+"zero-offset assumption"), but five browsers do not start recording at the same
+moment. We keep rendering on zero-offset maths, which sits inside tolerance given
+dead-air thresholds measured in seconds and a 5000ms default alignment window.
+But each upload carries a nullable `client_started_at` that the backend stores
+unused.
+
+> **Amended during #7, and this paragraph rewritten with it.** Two premises here
+> were wrong, and both are settled the other way now.
+>
+> Recording does **not** start when a Pusher event reaches each client.
+> `getDisplayMedia` requires a transient user activation, so no client can begin
+> capturing off the back of a broadcast: capture is player-initiated, and the
+> client calls `start-recording` once both tracks are live. The skew between
+> players is therefore the interval each of them spent picking a window, which is
+> seconds rather than the 50–300ms this ADR estimated. That makes capturing
+> `client_started_at` more worth having, not less.
+>
+> The elapsed reading on screens 10 and 11 is **not** the Session's. It counts
+> that player's own recorder, whose zero their browser already holds, and a Coach
+> has no recorder and so no elapsed clock at all. The design's
+> `ELAPSED ON SESSION CLOCK` label is wrong about it.
+>
+> The conclusions stand: chunk to IndexedDB, keep zero-offset maths, capture the
+> offsets. What the paragraph above says about **why** does not.
+>
+> #7 also found a branch this ADR does not cover. `MediaRecorder` cannot resume
+> across a page load, and two separately-headered WebM streams do not concatenate
+> into a valid file without remuxing, so a reload leaves a player holding two
+> takes while the endpoint stores one per participant. The earlier take is
+> offered as a file to save and a fresh recorder starts; see
+> `0012-capture-as-a-declared-port.md`, which also records where the browser's
+> copy is cleared.
 
 ## Consequences
 

@@ -4,6 +4,7 @@ import type { TagTone } from '@/components/ui/tag/tag';
 export type SessionStatus =
   | 'queuing'
   | 'in_progress'
+  | 'delivering'
   | 'processing'
   | 'timeline_ready'
   | 'analysis_ready'
@@ -31,6 +32,9 @@ export interface SessionState {
 const STATES: Record<SessionStatus, SessionState> = {
   queuing: { label: 'LOBBY', tone: 'live', dot: true, screen: 'lobby' },
   in_progress: { label: 'RECORDING', tone: 'live', dot: true, screen: 'recording' },
+  // The end of the run: recorders have stopped and takes are still arriving, so
+  // it is the same Screen and still somewhere a person is sitting (ADR 0015).
+  delivering: { label: 'DELIVERING', tone: 'live', dot: true, screen: 'recording' },
   // Neutral rather than alert: the pipeline running is not an error, and cyan
   // would claim a session nobody is in is live.
   processing: { label: 'PROCESSING', tone: 'neutral', dot: false, screen: 'processing' },

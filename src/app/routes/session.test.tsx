@@ -6,10 +6,9 @@ import { renderApp } from '@/testing/test-utils';
 
 const TOKEN_KEY = 'aod.auth.token.v1';
 
-/** Opening a Session is one route that dispatches on its status (spec #33).
- *  The lobby is #5's Screen at the same route; recording and the Review Board
- *  are still placeholders. The lobby's own behaviour is covered in
- *  `session-lobby.test.tsx`. */
+/** Opening a Session is one route that dispatches on its status (spec #33). The
+ *  lobby (#5) and recording (#7) are Screens at that route and the Review Board
+ *  is still a placeholder; each Screen's own behaviour has its own file. */
 describe('opening a session', () => {
   it('sends a queuing session to the lobby', async () => {
     window.localStorage.setItem(TOKEN_KEY, authToken);
@@ -27,7 +26,8 @@ describe('opening a session', () => {
 
     renderApp('/sessions/49');
 
-    expect(await screen.findByRole('heading', { name: 'Recording' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Scrim vs Kestrel' })).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Capture status' })).toBeInTheDocument();
   });
 
   it('sends a session under review to the review board', async () => {
